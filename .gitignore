@@ -1,0 +1,89 @@
+# ==============================================================================
+# Git Ignore Configuration for Indian Standards Recommender Engine (SIH26108)
+# Strict Security Policy: Zero API Keys, Zero Sensitive Data, Zero Raw Databases
+# ==============================================================================
+
+# --- Secrets & Environment Variables ---
+.env
+*.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+credentials.json
+service_account.json
+
+# --- Sensitive Datasets, Database Files & Large Binaries ---
+data/standards.db
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/*.jsonl
+data/*.csv
+data/*.xlsx
+data/*.xls
+data/*.parquet
+data/*.tar.gz
+data/*.zip
+data/*.pdf
+!data/qco_master.json
+!data/sample_gem_tender.pdf
+
+# --- Python Cache & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Testing, Coverage & Profiling ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+scratch/
+scratch_*.py
+
+# --- IDE & OS Artifacts ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# --- Subagent & IDE Brain Logs ---
+.system_generated/
+.tempmediaStorage/
+.user_uploaded/

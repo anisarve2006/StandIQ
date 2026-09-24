@@ -1,0 +1,28 @@
+# Indian Standards Recommendation & Compliance Engine (SIH26108)
+# Backend Python Dependencies
+
+# Core Web API & Validation
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+python-multipart>=0.0.9
+
+# Numerical & Semantic Embeddings (Air-Gapped ONNX Runtime)
+numpy>=1.26.0
+fastembed>=0.3.0
+onnxruntime>=1.17.0
+
+# Document & PDF Processing
+PyMuPDF>=1.24.0
+
+# LLM Synthesis & Verification (Optional Groq Cloud Provider)
+groq>=0.5.0
+requests>=2.31.0
+
+# Data Pipeline & Scraping
+openpyxl>=3.1.2
+beautifulsoup4>=4.12.0
+lxml>=5.1.0
+
+# Database Connectors (Optional Production PostgreSQL)
+psycopg2-binary>=2.9.9

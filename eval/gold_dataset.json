@@ -1,0 +1,482 @@
+[
+  {
+    "id": "CASE-01",
+    "domain": "Civil Engineering",
+    "query": "Fe 500D thermo mechanically treated high strength deformed steel rebar for concrete reinforcement",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-02",
+    "domain": "Civil Engineering",
+    "query": "sariya 16mm for structural pillar construction",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "TRADE_COLLOQUIAL"
+  },
+  {
+    "id": "CASE-03",
+    "domain": "Civil Engineering",
+    "query": "Ordinary Portland Cement 43 grade 50kg bags for masonry construction",
+    "expected_family_id": "IS:8112",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-04",
+    "domain": "Civil Engineering",
+    "query": "Ordinary Portland Cement 53 grade high strength for pre-stressed concrete works",
+    "expected_family_id": "IS:12269",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-05",
+    "domain": "Civil Engineering",
+    "query": "Portland Pozzolana Cement fly ash based for plastering",
+    "expected_family_id": "IS:1489:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-06",
+    "domain": "Civil Engineering",
+    "query": "chuna hydrated building lime for whitewash and plaster",
+    "expected_family_id": "IS:712",
+    "expected_qco": false,
+    "type": "TRADE_COLLOQUIAL"
+  },
+  {
+    "id": "CASE-07",
+    "domain": "Civil Engineering",
+    "query": "unplasticized PVC pipes 110mm for potable drinking water supplies",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-08",
+    "domain": "Civil Engineering",
+    "query": "GI pipe medium grade galvanized steel tubes for water distribution",
+    "expected_family_id": "IS:1239:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-09",
+    "domain": "Civil Engineering",
+    "query": "Code of practice for plain and reinforced concrete design IS 456",
+    "expected_family_id": "IS:456",
+    "expected_qco": false,
+    "type": "EXACT_ID"
+  },
+  {
+    "id": "CASE-10",
+    "domain": "Civil Engineering",
+    "query": "commercial plywood for general interior furniture purposes",
+    "expected_family_id": "IS:303",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-11",
+    "domain": "Civil Engineering",
+    "query": "industrial safety helmets for construction workers head protection",
+    "expected_family_id": "IS:2925",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-12",
+    "domain": "Electrotechnical",
+    "query": "outdoor oil immersed three phase distribution transformer 11 kV 25 kVA",
+    "expected_family_id": "IS:1180:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-13",
+    "domain": "Electrotechnical",
+    "query": "electric ceiling type fan 1200 mm sweep with electronic regulator",
+    "expected_family_id": "IS:374",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-14",
+    "domain": "Electrotechnical",
+    "query": "self-ballasted LED lamps 9W B22 base for general lighting services",
+    "expected_family_id": "IS:16102:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-15",
+    "domain": "Electrotechnical",
+    "query": "outdoor roadway street lighting LED luminaires IP66",
+    "expected_family_id": "IS:10322:P5:S3",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-16",
+    "domain": "Electrotechnical",
+    "query": "PVC insulated unsheathed copper cables 2.5 sq mm 1100 V grade for domestic wiring",
+    "expected_family_id": "IS:694",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-17",
+    "domain": "Electrotechnical",
+    "query": "cross linked polyethylene XLPE insulated power cables 3.3 kV to 33 kV",
+    "expected_family_id": "IS:7098:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-18",
+    "domain": "Electrotechnical",
+    "query": "three phase energy efficient induction motors 15 kW 415 V 50 Hz",
+    "expected_family_id": "IS:12615",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-19",
+    "domain": "Electrotechnical",
+    "query": "AC static watt-hour smart energy meters class 1.0 and 2.0",
+    "expected_family_id": "IS:13779",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-20",
+    "domain": "Electrotechnical",
+    "query": "residual current operated circuit breakers RCCB for household electrical protection",
+    "expected_family_id": "IS:12640:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-21",
+    "domain": "Electrotechnical",
+    "query": "molded case circuit breakers MCCB low voltage switchgear per IS 13947 Part 2",
+    "expected_family_id": "IS:13947:P2",
+    "expected_qco": false,
+    "type": "EXACT_ID"
+  },
+  {
+    "id": "CASE-22",
+    "domain": "Mechanical Engineering",
+    "query": "submersible pumpsets for clear cold water 100mm borewell 5 HP",
+    "expected_family_id": "IS:8034",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-23",
+    "domain": "Mechanical Engineering",
+    "query": "pani ki motor submersible pumpset 415 V for agriculture irrigation",
+    "expected_family_id": "IS:8034",
+    "expected_qco": false,
+    "type": "TRADE_COLLOQUIAL"
+  },
+  {
+    "id": "CASE-24",
+    "domain": "Mechanical Engineering",
+    "query": "monobloc centrifugal pumps for fresh water 2 HP 230 V single phase",
+    "expected_family_id": "IS:9079",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-25",
+    "domain": "Mechanical Engineering",
+    "query": "portable dry chemical powder fire extinguisher 6 kg capacity",
+    "expected_family_id": "IS:15683",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-26",
+    "domain": "Mechanical Engineering",
+    "query": "seamless and welded carbon steel tubes for general engineering purposes",
+    "expected_family_id": "IS:3601",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-27",
+    "domain": "Mechanical Engineering",
+    "query": "radial deep groove ball bearings for rotating machinery",
+    "expected_family_id": "IS:6455",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-28",
+    "domain": "Mechanical Engineering",
+    "query": "cast iron sluice valves gate valves for waterworks purposes 200 mm",
+    "expected_family_id": "IS:14846",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-29",
+    "domain": "Mechanical Engineering",
+    "query": "diesel engines small four stroke for agricultural water pumping",
+    "expected_family_id": "IS:10001",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-30",
+    "domain": "Mechanical Engineering",
+    "query": "welded low carbon steel cylinders for low pressure liquefiable gases LPG 14.2 kg",
+    "expected_family_id": "IS:3196:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-31",
+    "domain": "Chemical & Safety",
+    "query": "personal protective equipment safety footwear with 200J steel toe cap",
+    "expected_family_id": "IS:15298:P2",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-32",
+    "domain": "Chemical & Safety",
+    "query": "industrial safety shoes for oil and gas refinery workers",
+    "expected_family_id": "IS:15298:P2",
+    "expected_qco": true,
+    "type": "TRADE_COLLOQUIAL"
+  },
+  {
+    "id": "CASE-33",
+    "domain": "Chemical & Safety",
+    "query": "synthetic enamel paint high gloss for architectural metal surfaces",
+    "expected_family_id": "IS:9034",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-34",
+    "domain": "Chemical & Safety",
+    "query": "ready mixed paint red oxide primer for steel protection",
+    "expected_family_id": "IS:11883",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-35",
+    "domain": "Chemical & Safety",
+    "query": "black disinfectant fluids phenolic grade 1 for hospital sanitation",
+    "expected_family_id": "IS:1061",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-36",
+    "domain": "Chemical & Safety",
+    "query": "stable bleaching powder chlorinated lime for water purification and bleaching",
+    "expected_family_id": "IS:1065",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-37",
+    "domain": "Electronics and IT",
+    "query": "laptop notebook computers information technology equipment safety",
+    "expected_family_id": "IS:13252:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-38",
+    "domain": "Electronics and IT",
+    "query": "closed circuit television CCTV camera for security surveillance CRS registration",
+    "expected_family_id": "IS:13252:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-39",
+    "domain": "Electronics and IT",
+    "query": "uninterruptible power systems UPS online 5 kVA single phase inverter",
+    "expected_family_id": "IS:16242:P1",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-40",
+    "domain": "Electronics and IT",
+    "query": "audio video and similar electronic apparatus television receiver safety IS 616",
+    "expected_family_id": "IS:616",
+    "expected_qco": true,
+    "type": "EXACT_ID"
+  },
+  {
+    "id": "CASE-41",
+    "domain": "Food and Agriculture",
+    "query": "packaged drinking water other than natural mineral water 20 litre jar",
+    "expected_family_id": "IS:14543",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-42",
+    "domain": "Food and Agriculture",
+    "query": "packaged natural mineral water bottled at source with ISI certification",
+    "expected_family_id": "IS:13428",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-43",
+    "domain": "Food and Agriculture",
+    "query": "compounded cattle feeds for dairy animals nutrition",
+    "expected_family_id": "IS:2052",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-44",
+    "domain": "Food and Agriculture",
+    "query": "urea fertilizer grade for agricultural applications",
+    "expected_family_id": "IS:5406",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-45",
+    "domain": "Medical and Healthcare",
+    "query": "sterile surgical rubber gloves disposable single use pre-powdered",
+    "expected_family_id": "IS:13422",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-46",
+    "domain": "Medical and Healthcare",
+    "query": "medical face masks surgical masks 3 ply with bacterial filtration",
+    "expected_family_id": "IS:16289",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-47",
+    "domain": "Medical and Healthcare",
+    "query": "clinical electrical digital thermometers for patient body temperature measurement",
+    "expected_family_id": "IS:15113",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-48",
+    "domain": "Medical and Healthcare",
+    "query": "sterile hypodermic syringes for single use with needle 2ml 5ml",
+    "expected_family_id": "IS:10258",
+    "expected_qco": false,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-49",
+    "domain": "Textiles",
+    "query": "sanitary napkins sanitary pad absorbent hygiene products",
+    "expected_family_id": "IS:5405",
+    "expected_qco": true,
+    "type": "TECHNICAL_SPEC"
+  },
+  {
+    "id": "CASE-50",
+    "domain": "Civil Engineering",
+    "query": "hard drawn mild steel wire fabric welded mesh for concrete reinforcement IS 1566",
+    "expected_family_id": "IS:1566",
+    "expected_qco": false,
+    "type": "EXACT_ID"
+  },
+  {
+    "id": "CASE-51",
+    "domain": "Multilingual Indic",
+    "query": "भवन निर्माण हेतु 12mm सरिया Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_HINDI"
+  },
+  {
+    "id": "CASE-52",
+    "domain": "Multilingual Indic",
+    "query": "भवन निर्माण के लिए 43 ग्रेड साधारण पोर्टलैंड सीमेंट 50kg बैग",
+    "expected_family_id": "IS:8112",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_HINDI"
+  },
+  {
+    "id": "CASE-53",
+    "domain": "Multilingual Indic",
+    "query": "கட்டிட வேலைக்கான சிமெண்ட் மற்றும் கம்பி",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_TAMIL"
+  },
+  {
+    "id": "CASE-54",
+    "domain": "Multilingual Indic",
+    "query": "விவசாய பாசனத்திற்கான மூழ்கும் பம்ப் மற்றும் தண்ணீர் மோட்டார் 5 HP",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_TAMIL"
+  },
+  {
+    "id": "CASE-55",
+    "domain": "Multilingual Indic",
+    "query": "घराच्या बांधकामासाठी लोखंडी गज आणि सिमेंट",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_MARATHI"
+  },
+  {
+    "id": "CASE-56",
+    "domain": "Multilingual Indic",
+    "query": "विंधन विहीर पाण्याचा पंप शेतीसाठी 415V",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_MARATHI"
+  },
+  {
+    "id": "CASE-57",
+    "domain": "Multilingual Indic",
+    "query": "రైతుల కోసం సబ్‌మెర్సిబుల్ పంప్ మరియు మోటారు 5 HP",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_TELUGU"
+  },
+  {
+    "id": "CASE-58",
+    "domain": "Multilingual Indic",
+    "query": "భవన నిర్మాణం కోసం స్టీల్ కడ్డీలు Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_TELUGU"
+  },
+  {
+    "id": "CASE-59",
+    "domain": "Multilingual Indic",
+    "query": "દાગીના માટે સોનું અને હોલમાર્ક પ્રમાણપત્ર",
+    "expected_family_id": "IS:1417",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_GUJARATI"
+  },
+  {
+    "id": "CASE-60",
+    "domain": "Multilingual Indic",
+    "query": "কারখানার সুরক্ষার জন্য বহনযোগ্য অগ্নিনির্বাপক",
+    "expected_family_id": "IS:15683",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_BENGALI"
+  }
+]
