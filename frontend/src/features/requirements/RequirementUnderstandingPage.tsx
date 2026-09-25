@@ -155,7 +155,7 @@ export default function RequirementUnderstandingPage() {
         title="Edit Requirement"
         footer={
           <>
-            <Button variant="ghost" onClick={() => handleRemove(editingReq!.id)} className="text-red-500 mr-auto hover:text-red-600 hover:bg-red-500/10">REMOVE</Button>
+            <Button variant="ghost" onClick={() => handleRemove(editingReq!.id)} className="text-error mr-auto hover:text-error hover:bg-error/10">REMOVE</Button>
             <Button variant="ghost" onClick={() => setEditingReq(null)}>CANCEL</Button>
             <Button onClick={handleEditSave}>SAVE CHANGES</Button>
           </>

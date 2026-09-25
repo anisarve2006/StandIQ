@@ -94,7 +94,7 @@ export const ExclusionReason = ({ id, year, reasonTitle, description, onViewEvid
       <Meta>CONSIDERED AND EXCLUDED</Meta>
       <div className="flex flex-col gap-1">
         <Mono className="text-sm font-bold text-text-primary">{id} : {year}</Mono>
-        <H3 className="text-sm text-red-500 mt-2">{reasonTitle}</H3>
+        <H3 className="text-sm text-error mt-2">{reasonTitle}</H3>
         <Body className="text-sm mt-1">{description}</Body>
       </div>
       {onViewEvidence && (

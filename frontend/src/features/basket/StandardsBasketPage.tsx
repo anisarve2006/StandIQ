@@ -74,7 +74,7 @@ export default function StandardsBasketPage() {
                     <Meta>EVIDENCE</Meta>
                     <Mono className="text-sm font-medium">{std.evidenceCount || 0} REFERENCES</Mono>
                   </div>
-                  <Button variant="ghost" size="sm" className="pointer-events-auto text-red-500 hover:text-red-600 uppercase" onClick={() => handleRemoveStandard(std.standard_id || std.id)}>
+                  <Button variant="ghost" size="sm" className="pointer-events-auto text-error hover:text-error hover:bg-error/10 uppercase" onClick={() => handleRemoveStandard(std.standard_id || std.id)}>
                     REMOVE
                   </Button>
                 </div>

@@ -19,13 +19,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       <div className="flex w-full flex-col gap-1.5">
         {label && (
           <Label htmlFor={selectId}>
-            {label} {required && <span className="text-red-500">*</span>}
+            {label} {required && <span className="text-error">*</span>}
           </Label>
         )}
         <select
           id={selectId}
           ref={ref}
-          className={`flex h-10 w-full rounded border border-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${error ? 'border-red-500 focus-visible:ring-red-500' : ''} ${className}`}
+          className={`flex h-10 w-full rounded border border-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${error ? 'border-error focus-visible:ring-error' : ''} ${className}`}
           aria-invalid={!!error}
           {...props}
         >
@@ -34,7 +34,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
         {description && !error && <Small>{description}</Small>}
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-error">{error}</p>}
       </div>
     );
   }

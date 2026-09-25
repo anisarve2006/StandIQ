@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Label } from '../ui/Label';
 import { GlobalSearch } from '../search/GlobalSearch';
+import { ThemeToggle } from '../ThemeToggle';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', num: '01' },
@@ -50,8 +51,9 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="p-6 border-t border-border mt-auto">
+      <div className="p-6 border-t border-border mt-auto flex items-center justify-between">
         <div className="mono text-xs text-text-muted">v1.0.0 — ONLINE</div>
+        <ThemeToggle />
       </div>
     </aside>
   );

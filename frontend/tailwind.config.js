@@ -7,21 +7,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0a',
+        background: 'var(--background)',
         surface: {
-          DEFAULT: '#111111',
-          elevated: '#161616',
+          DEFAULT: 'var(--surface)',
+          elevated: 'var(--surface-elevated)',
         },
-        border: '#2a2a2a',
+        border: {
+          DEFAULT: 'var(--border)',
+          strong: 'var(--border-strong)',
+        },
         text: {
-          primary: '#f5f5f5',
-          secondary: '#888888',
-          muted: '#555555',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
         },
         accent: {
-          DEFAULT: '#3b82f6', // One accent color
-          foreground: '#ffffff',
-        }
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        error: 'var(--error)',
+        info: 'var(--info)',
       },
       fontFamily: {
         sans: ['Inter', 'Geist', 'sans-serif'],

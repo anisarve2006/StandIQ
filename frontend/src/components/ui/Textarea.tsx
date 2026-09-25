@@ -18,18 +18,18 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="flex w-full flex-col gap-1.5">
         {label && (
           <Label htmlFor={inputId}>
-            {label} {required && <span className="text-red-500">*</span>}
+            {label} {required && <span className="text-error">*</span>}
           </Label>
         )}
         <textarea
           id={inputId}
           ref={ref}
-          className={`flex min-h-[80px] w-full rounded border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${error ? 'border-red-500 focus-visible:ring-red-500' : ''} ${className}`}
+          className={`flex min-h-[80px] w-full rounded border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${error ? 'border-error focus-visible:ring-error' : ''} ${className}`}
           aria-invalid={!!error}
           {...props}
         />
         {description && !error && <Small>{description}</Small>}
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-error">{error}</p>}
       </div>
     );
   }

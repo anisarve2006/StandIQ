@@ -4,9 +4,9 @@ import { Mono } from './Typography';
 export const Toast = ({ variant = 'info', message, onClose, className = '' }: any) => {
   const variants = {
     info: 'border-border bg-surface text-text-primary',
-    success: 'border-green-500/30 bg-green-500/10 text-green-500',
-    warning: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500',
-    error: 'border-red-500/30 bg-red-500/10 text-red-500',
+    success: 'border-success/30 bg-success/10 text-success',
+    warning: 'border-warning/30 bg-warning/10 text-warning',
+    error: 'border-error/30 bg-error/10 text-error',
   };
 
   return (

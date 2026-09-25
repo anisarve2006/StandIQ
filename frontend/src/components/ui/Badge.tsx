@@ -12,9 +12,9 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
     const variants = {
       default: "border-border bg-surface text-text-primary",
       accent: "border-accent/30 bg-accent/10 text-accent",
-      success: "border-green-500/30 bg-green-500/10 text-green-500",
-      warning: "border-yellow-500/30 bg-yellow-500/10 text-yellow-500",
-      danger: "border-red-500/30 bg-red-500/10 text-red-500",
+      success: "border-success/30 bg-success/10 text-success",
+      warning: "border-warning/30 bg-warning/10 text-warning",
+      danger: "border-error/30 bg-error/10 text-error",
       neutral: "border-transparent bg-surface-elevated text-text-secondary",
     };
 
