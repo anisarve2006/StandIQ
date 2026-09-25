@@ -1,0 +1,51 @@
+import os
+import psycopg2
+from config import settings
+
+def init_postgres():
+    conn_str = f"dbname={settings.postgres_db} user={settings.postgres_user} password={settings.postgres_password} host={settings.postgres_host} port={settings.postgres_port}"
+    try:
+        conn = psycopg2.connect(conn_str)
+        cur = conn.cursor()
+        
+        # Actual PostgreSQL schema creation
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS standards (
+            family_id VARCHAR PRIMARY KEY,
+            title_en TEXT,
+            status VARCHAR,
+            year INT
+        );
+        
+        CREATE TABLE IF NOT EXISTS standard_versions (
+            id SERIAL PRIMARY KEY,
+            family_id VARCHAR REFERENCES standards(family_id),
+            version VARCHAR,
+            status VARCHAR,
+            effective_date DATE,
+            supersedes VARCHAR
+        );
+        
+        CREATE TABLE IF NOT EXISTS regulatory_rules (
+            id SERIAL PRIMARY KEY,
+            family_id VARCHAR REFERENCES standards(family_id),
+            scheme VARCHAR,
+            product_name TEXT,
+            status VARCHAR
+        );
+        
+        CREATE TABLE IF NOT EXISTS edges (
+            id SERIAL PRIMARY KEY,
+            src_family_id VARCHAR REFERENCES standards(family_id),
+            dst_family_id VARCHAR,
+            edge_type VARCHAR,
+            provenance TEXT
+        );
+        """)
+        conn.commit()
+        print("PostgreSQL schema initialized successfully.")
+    except Exception as e:
+        print(f"PostgreSQL initialization failed or not available: {e}")
+
+if __name__ == "__main__":
+    init_postgres()

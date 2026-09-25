@@ -1,0 +1,13 @@
+{
+    "dataset_type": "SYNTHETIC",
+    "description": "Golden dataset for evaluating MaanakAI retrieval and extraction accuracy.",
+    "samples": [
+        {
+            "query": "Standard for 5 HP electric motor",
+            "language": "en",
+            "expected_standard_ids": ["IS:12615"],
+            "expected_certification": "MANDATORY",
+            "source": "Synthetic"
+        }
+    ]
+}

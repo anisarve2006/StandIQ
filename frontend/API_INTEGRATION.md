@@ -1,0 +1,48 @@
+# MaanakAI API Integration Status
+
+## Final Integration Report
+
+### Workflow Execution (Local E2E)
+**REAL E2E:** CONNECTED (Backend logic completes vertical slices).
+**SESSION VERIFIED:** YES - The `session_id` successfully flows across all integrated tools (Dashboard -> Procurement Workspace -> Requirements -> Standards Discovery -> Specification Builder -> Export).
+**ERROR STATES VERIFIED:** YES - Handled natively using TanStack Query hooks and custom `ErrorState` components.
+**LOCAL BACKEND VERIFIED:** YES - FastAPI endpoints are fully wired up.
+
+### Known Limitations & Backend Gaps
+- **Approval Workflow**: Purely a frontend state management page right now.
+
+### Routes Matrix
+
+| Route | API Endpoint | Status | Data | Loading | Error | Empty | E2E Tested |
+|-------|--------------|--------|------|---------|-------|-------|------------|
+| `/dashboard` | `GET /api/v1/dashboard/summary` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+| `/procurements/new` | `POST /api/v1/procurements/session` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+| `/requirements` | `GET /api/v1/procurements/session/{id}` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/standards` | `POST /api/v1/standards/recommend` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/standards/:id` | `GET /api/v1/standards/{id}` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/tender-health` | `GET /api/v1/procurements/session/{id}` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/tender-diff` | `POST /api/v1/tender/diff` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/review` | `POST /api/v1/standards/verify` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+| `/basket` | `GET /api/v1/procurements/session/{id}` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/specification-builder` | `POST /api/v1/specification/generate` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
+| `/approval` | N/A | **FRONTEND WORKFLOW** | None | N/A | N/A | N/A | Yes |
+| `/export` | `POST /api/v1/export` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+| `/evidence` | N/A | **NOT REQUIRED** | Demo | N/A | N/A | N/A | No |
+| `/graph` | `GET /api/v1/graph/standard/{id}` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+| `/changes` | `GET /api/v1/changes` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+| `/procurements` | `GET /api/v1/procurements` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
+
+### Environment Setup
+
+#### Local Development Command
+```bash
+# Frontend
+npm run dev
+
+# Backend
+$env:PYTHONPATH="."
+uvicorn main:app --reload
+```
+
+#### API Base URL
+`http://localhost:8000` (or as configured in `frontend/.env`)
