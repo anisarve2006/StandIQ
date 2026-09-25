@@ -1,6 +1,12 @@
 import os
 
 class Settings:
+    application_env: str = os.getenv("APPLICATION_ENV", "DEVELOPMENT")
+    postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
+    postgres_port: int = int(os.getenv("POSTGRES_PORT", "5432"))
+    postgres_db: str = os.getenv("POSTGRES_DB", "maanakai")
+    postgres_user: str = os.getenv("POSTGRES_USER", "postgres")
+    postgres_password: str = os.getenv("POSTGRES_PASSWORD", "password")
     db_path: str = os.getenv("DB_PATH", "data/standards.db")
     qdrant_host: str = os.getenv("QDRANT_HOST", "localhost")
     qdrant_port: int = int(os.getenv("QDRANT_PORT", "6333"))
