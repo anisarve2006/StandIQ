@@ -14,12 +14,14 @@ import { Mono, Meta, Body } from '../../components/ui/Typography';
 import { Badge } from '../../components/ui/Badge';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { initialProcurementDraft } from './procurement.data';
+import { useCreateSession } from '../../hooks/useProcurement';
 
 export default function ProcurementWorkspace() {
   const navigate = useNavigate();
   const [draft, setDraft] = useState(initialProcurementDraft);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const { mutate: createSession, isPending: isLoading, error: apiError } = useCreateSession();
 
   const handleFileSelect = () => {
     // Simulate file selection
@@ -50,12 +52,19 @@ export default function ProcurementWorkspace() {
       return;
     }
     setError(null);
-    setIsLoading(true);
-    // Simulate network delay
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate('/requirements');
-    }, 1500);
+    
+    // We create a generic title from the draft for now
+    const title = draft.mode === 'describe' ? (draft.description.slice(0, 30) || "New Procurement") : (draft.fileName || "Tender Document");
+    
+    createSession(
+      { title },
+      {
+        onSuccess: (data) => {
+          // Pass sessionId to the next route or store it globally (the prompt said use existing state/routing)
+          navigate(`/requirements?session_id=${data.session_id}`);
+        }
+      }
+    );
   };
 
   const isReady = draft.mode === 'describe' ? draft.description.length > 0 : !!draft.fileName;
@@ -164,9 +173,10 @@ export default function ProcurementWorkspace() {
               />
             </div>
             {error && <ErrorState title="VALIDATION ERROR" description={error} />}
+            {apiError && <ErrorState title="API ERROR" description="Failed to create session." />}
             <div className="flex justify-end pt-4">
-              <Button onClick={handleAnalyze} isLoading={isLoading}>
-                ANALYZE PROCUREMENT →
+              <Button onClick={handleAnalyze} disabled={isLoading}>
+                {isLoading ? 'ANALYZING...' : 'ANALYZE PROCUREMENT →'}
               </Button>
             </div>
           </div>

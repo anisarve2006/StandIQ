@@ -8,33 +8,49 @@ import { Button } from '../../components/ui/Button';
 import { Mono, Meta, Body } from '../../components/ui/Typography';
 import { RequirementRow } from '../../components/product/Tender';
 import { ConfidenceIndicator } from '../../components/product/Evidence';
-import { mockRequirements, mockGaps, mockQuestions } from './requirements.data';
+import { Select } from '../../components/ui/Select';
 import { DataList } from '../../components/ui/DataList';
 import { Input } from '../../components/ui/Input';
 import { Dialog } from '../../components/ui/Dialog';
-import { Select } from '../../components/ui/Select';
-import type { Requirement } from './requirements.types';
+import { useSearchParams } from 'react-router-dom';
+import { useGetSession } from '../../hooks/useProcurement';
+import { LoadingState } from '../../components/ui/Loading';
+import { ErrorState } from '../../components/ui/ErrorState';
+import { EmptyState } from '../../components/ui/EmptyState';
+import type { Requirement } from '../../types/api';
 
 export default function RequirementUnderstandingPage() {
   const navigate = useNavigate();
-  const [requirements, setRequirements] = useState(mockRequirements);
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  const { data: sessionData, isLoading, error } = useGetSession(sessionId);
+
+  // We map the backend Requirement array directly.
+  const [editedRequirements, setEditedRequirements] = useState<Requirement[]>([]);
+  const requirements = editedRequirements.length > 0 ? editedRequirements : (sessionData?.requirements || []);
+
   const [editingReq, setEditingReq] = useState<Requirement | null>(null);
 
   const categories = useMemo(() => {
-    const cats = new Set(requirements.map(r => r.category));
+    if (!requirements) return [];
+    const cats = new Set(requirements.map((r: Requirement) => r.category));
     return Array.from(cats);
   }, [requirements]);
 
   const handleEditSave = () => {
     if (!editingReq) return;
-    setRequirements(requirements.map(r => r.id === editingReq.id ? editingReq : r));
+    setEditedRequirements(requirements.map(r => r.id === editingReq.id ? editingReq : r));
     setEditingReq(null);
   };
 
-  const handleRemove = (id: string) => {
-    setRequirements(requirements.filter(r => r.id !== id));
+  const handleRemove = (id: string | undefined) => {
+    if (!id) return;
+    setEditedRequirements(requirements.filter(r => r.id !== id));
     if (editingReq?.id === id) setEditingReq(null);
   };
+
+  if (isLoading) return <LoadingState message="Loading procurement requirements..." />;
+  if (error || !sessionId) return <PageContainer><ErrorState title="SESSION ERROR" description="Could not load the procurement session." /></PageContainer>;
 
   return (
     <PageContainer>
@@ -51,15 +67,15 @@ export default function RequirementUnderstandingPage() {
           <div className="flex flex-col gap-2">
             <Meta>SOURCE</Meta>
             <Body className="font-medium text-text-primary">
-              Electrical distribution panel for commercial building applications.
+              {sessionData?.title || "Procurement Session"}
             </Body>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <DataList items={[
-              { label: 'INPUT LANGUAGE', value: 'ENGLISH' }
+              { label: 'INPUT LANGUAGE', value: 'AUTO-DETECT' }
             ]} />
             <DataList items={[
-              { label: 'INPUT TYPE', value: 'PRODUCT DESCRIPTION' }
+              { label: 'INPUT TYPE', value: 'ANALYZED CONTEXT' }
             ]} />
           </div>
         </div>
@@ -75,18 +91,18 @@ export default function RequirementUnderstandingPage() {
                 content: (
                   <div className="flex flex-col border border-border rounded-sm bg-surface overflow-hidden">
                     {requirements.filter(r => r.category === cat).map((req, idx) => (
-                      <div key={req.id} className="relative group flex items-center justify-between border-b border-border last:border-0 hover:bg-surface-elevated transition-colors px-4">
+                      <div key={req.id || idx} className="relative group flex items-center justify-between border-b border-border last:border-0 hover:bg-surface-elevated transition-colors px-4">
                         <div className="flex-1 min-w-0 pr-4">
                           <RequirementRow 
                             index={idx + 1}
-                            parameter={req.parameter}
-                            value={req.value}
-                            status={req.status}
+                            parameter={req.name}
+                            value={req.normalized_value ? `${req.normalized_value} ${req.unit || ''}` : req.source_text}
+                            status={req.required ? "SPECIFIED" : "OPTIONAL"}
                           />
                           <div className="flex items-center gap-4 py-2 border-t border-border opacity-60 group-hover:opacity-100 transition-opacity">
-                            <ConfidenceIndicator level={req.confidence} />
-                            {req.source && (
-                              <Mono className="text-xs text-text-secondary">SOURCE: {req.source}</Mono>
+                            <ConfidenceIndicator level={(req.confidence || 0.8) > 0.7 ? 'HIGH' : 'MEDIUM'} />
+                            {req.source_clause && (
+                              <Mono className="text-xs text-text-secondary">SOURCE: {req.source_clause}</Mono>
                             )}
                           </div>
                         </div>
@@ -106,15 +122,7 @@ export default function RequirementUnderstandingPage() {
         <section>
           <SectionHeader number="02" title="INFORMATION GAPS" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {mockGaps.map(gap => (
-              <div key={gap.id} className="p-4 border border-border rounded-sm bg-surface flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <Mono className="text-sm font-bold text-text-primary">{gap.parameter}</Mono>
-                  <Body className="text-sm text-text-secondary">{gap.description}</Body>
-                </div>
-                <Button variant="secondary" size="sm" className="w-fit mt-2 uppercase text-xs">ADD VALUE</Button>
-              </div>
-            ))}
+            <EmptyState title="NO GAPS DETECTED" description="The backend does not currently expose requirement gaps natively through the session response." />
           </div>
         </section>
 
@@ -122,14 +130,7 @@ export default function RequirementUnderstandingPage() {
         <section>
           <SectionHeader number="03" title="CLARIFICATION" />
           <div className="p-6 border border-border rounded-sm bg-surface flex flex-col gap-6">
-            <Body className="text-sm text-text-secondary">
-              The following information may improve standards applicability:
-            </Body>
-            <div className="flex flex-col gap-4">
-              {mockQuestions.map(q => (
-                <Input key={q.id} label={q.question} placeholder="Enter your answer..." />
-              ))}
-            </div>
+            <EmptyState title="NO CLARIFYING QUESTIONS" description="The backend does not currently expose clarifying questions through the session response." />
           </div>
         </section>
 
@@ -138,10 +139,10 @@ export default function RequirementUnderstandingPage() {
           <div className="flex flex-col gap-1">
             <Meta>REQUIREMENTS REVIEWED</Meta>
             <Body className="font-medium text-text-primary">
-              {requirements.length} REQUIREMENTS · {mockGaps.length} INFORMATION GAPS
+              {requirements.length} REQUIREMENTS
             </Body>
           </div>
-          <Button onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto shrink-0">
+          <Button onClick={() => navigate(`/standards?session_id=${sessionId}`)} size="lg" className="w-full sm:w-auto shrink-0">
             CONTINUE TO STANDARD DISCOVERY →
           </Button>
         </div>
@@ -164,18 +165,18 @@ export default function RequirementUnderstandingPage() {
           <div className="flex flex-col gap-6 py-4">
             <Input 
               label="PARAMETER" 
-              value={editingReq.parameter}
-              onChange={e => setEditingReq({...editingReq, parameter: e.target.value})}
+              value={editingReq.name}
+              onChange={(e: any) => setEditingReq({...editingReq, name: e.target.value})}
             />
             <Input 
               label="VALUE" 
-              value={editingReq.value}
-              onChange={e => setEditingReq({...editingReq, value: e.target.value})}
+              value={editingReq.source_text}
+              onChange={(e: any) => setEditingReq({...editingReq, source_text: e.target.value})}
             />
             <Select 
               label="CATEGORY"
               value={editingReq.category}
-              onChange={e => setEditingReq({...editingReq, category: e.target.value})}
+              onChange={e => setEditingReq({...editingReq, category: e.target.value as any})}
               options={[
                 { value: 'PRODUCT', label: 'PRODUCT' },
                 { value: 'PERFORMANCE', label: 'PERFORMANCE' },
@@ -189,14 +190,11 @@ export default function RequirementUnderstandingPage() {
             />
             <Select 
               label="STATUS"
-              value={editingReq.status}
-              onChange={e => setEditingReq({...editingReq, status: e.target.value as any})}
+              value={editingReq.required ? 'SPECIFIED' : 'OPTIONAL'}
+              onChange={e => setEditingReq({...editingReq, required: e.target.value === 'SPECIFIED'})}
               options={[
                 { value: 'SPECIFIED', label: 'SPECIFIED' },
-                { value: 'MISSING', label: 'MISSING' },
-                { value: 'CONFLICT', label: 'CONFLICT' },
-                { value: 'UNKNOWN', label: 'UNKNOWN' },
-                { value: 'VERIFIED', label: 'VERIFIED' },
+                { value: 'OPTIONAL', label: 'OPTIONAL' },
               ]}
             />
           </div>

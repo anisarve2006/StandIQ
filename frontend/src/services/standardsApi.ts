@@ -22,4 +22,7 @@ export const standardsApi = {
     
   getAllied: (familyId: string) => 
     fetchApi<AlliedStandardsResponse>(`/api/v1/standard/${familyId}/allied`),
+    
+  getStandard: (familyId: string) =>
+    fetchApi<any>(`/api/v1/standard/${familyId}`),
 };

@@ -31,3 +31,11 @@ export function useAlliedStandards(familyId: string, options?: { enabled?: boole
     enabled: !!familyId && options?.enabled !== false,
   });
 }
+
+export function useStandard(familyId: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['standard', familyId],
+    queryFn: () => standardsApi.getStandard(familyId),
+    enabled: !!familyId && options?.enabled !== false,
+  });
+}

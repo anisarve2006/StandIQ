@@ -6,16 +6,25 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Mono, Body, Meta } from '../../components/ui/Typography';
 import { DataList } from '../../components/ui/DataList';
-import { Table, TableHeader, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { VersionTimeline, RelationshipItem, CertificationIndicator } from '../../components/product/Standards';
-import { EvidenceBlock, VerificationStatus } from '../../components/product/Evidence';
-import { mockCandidates, mockRelationships } from './standards.data';
+import { useStandard, useStandardVersions } from '../../hooks/useStandards';
+import { LoadingState } from '../../components/ui/Loading';
+import { ErrorState } from '../../components/ui/ErrorState';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 export default function StandardDetailPage() {
   const navigate = useNavigate();
   const { standardId } = useParams();
 
-  const standard = mockCandidates.find(c => standardId && c.id.toLowerCase().replace(/ /g, '-') === standardId.split('-202')[0]) || mockCandidates[0];
+  const { data: stdData, isLoading, error } = useStandard(standardId || '');
+  const { data: versionsData } = useStandardVersions(standardId || '', { enabled: !!standardId });
+
+  if (isLoading) return <LoadingState message={`Loading standard ${standardId}...`} />;
+  if (error || !stdData) return <PageContainer><ErrorState title="NOT FOUND" description="Standard could not be loaded." /></PageContainer>;
+
+  const standard = stdData.standard;
+  const alliedGraph = stdData.allied_graph || [];
+  const certification = stdData.certification;
 
   return (
     <PageContainer>
@@ -26,8 +35,8 @@ export default function StandardDetailPage() {
       </div>
       
       <PageHeader
-        eyebrow={`${standard.id}:${standard.year}`}
-        title={standard.title.toUpperCase()}
+        eyebrow={`${standard.raw_id || standard.number}`}
+        title={(standard.title_en || standard.title || '').toUpperCase()}
         description={standard.status}
       />
 
@@ -36,13 +45,13 @@ export default function StandardDetailPage() {
         <Mono className="text-sm">{standard.year}</Mono>
         <span className="text-border">|</span>
         <Meta>STATUS</Meta>
-        <Badge variant={standard.status === 'CURRENT' ? 'success' : 'neutral'}>{standard.status}</Badge>
+        <Badge variant={standard.status === 'CURRENT' ? 'success' : 'neutral'}>{standard.status || 'CURRENT'}</Badge>
         <span className="text-border">|</span>
         <Meta>PUBLICATION</Meta>
-        <Mono className="text-sm">12 SEP 2026</Mono>
+        <Mono className="text-sm">{standard.publication_date || 'UNKNOWN'}</Mono>
         <span className="text-border">|</span>
         <Meta>CATEGORY</Meta>
-        <Body className="text-sm">Electrical Equipment</Body>
+        <Body className="text-sm">{standard.committee || 'N/A'}</Body>
       </div>
 
       <div className="flex flex-col gap-12 pb-24">
@@ -61,10 +70,11 @@ export default function StandardDetailPage() {
               <div className="p-6 border border-border bg-surface rounded-sm">
                 <DataList 
                   items={[
-                    { label: 'TITLE', value: standard.title },
-                    { label: 'STATUS', value: standard.status },
+                    { label: 'TITLE', value: standard.title_en || standard.title },
+                    { label: 'STATUS', value: standard.status || 'CURRENT' },
                     { label: 'EDITION', value: standard.year },
-                    { label: 'PUBLICATION DATE', value: '12 SEP 2026' }
+                    { label: 'PUBLICATION DATE', value: standard.publication_date || 'UNKNOWN' },
+                    { label: 'COMMITTEE', value: standard.committee || 'UNKNOWN' }
                   ]}
                 />
               </div>
@@ -74,67 +84,20 @@ export default function StandardDetailPage() {
               <SectionHeader number="02" title="SCOPE" />
               <div className="p-6 border border-border bg-surface rounded-sm">
                 <Body className="text-sm whitespace-pre-line leading-relaxed">
-                  This standard specifies requirements for electrical distribution equipment used in low-voltage installations.{'\n\n'}
-                  It covers construction, performance, testing and safety requirements within the defined scope.{'\n\n'}
-                  [DEMO CONTENT]
+                  {standard.scope || 'Scope not provided for this standard.'}
                 </Body>
               </div>
             </section>
 
             <section className="flex flex-col gap-6">
               <SectionHeader number="05" title="KEY REQUIREMENTS" />
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>REQUIREMENT</TableHead>
-                    <TableHead>VALUE / CONDITION</TableHead>
-                    <TableHead>SOURCE</TableHead>
-                    <TableHead>STATUS</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <tbody>
-                  <TableRow>
-                    <TableCell><Body className="text-sm">Temperature range</Body></TableCell>
-                    <TableCell><Mono className="text-sm">-10°C to 50°C</Mono></TableCell>
-                    <TableCell><Mono className="text-sm">Clause 5.2</Mono></TableCell>
-                    <TableCell><Badge variant="success">VERIFIED</Badge></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell><Body className="text-sm">Ingress protection</Body></TableCell>
-                    <TableCell><Mono className="text-sm">IP54</Mono></TableCell>
-                    <TableCell><Mono className="text-sm">Clause 6.1</Mono></TableCell>
-                    <TableCell><Badge variant="success">VERIFIED</Badge></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell><Body className="text-sm">Testing</Body></TableCell>
-                    <TableCell><Mono className="text-sm">Dielectric test</Mono></TableCell>
-                    <TableCell><Mono className="text-sm">Clause 8</Mono></TableCell>
-                    <TableCell><Badge variant="warning">REVIEW</Badge></TableCell>
-                  </TableRow>
-                </tbody>
-              </Table>
+              <EmptyState title="NO EXTRACTED REQUIREMENTS" description="Detailed clause-level requirements extraction is not available natively in this lookup." />
             </section>
 
             <section className="flex flex-col gap-6">
               <SectionHeader number="06" title="EVIDENCE" />
               <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-2 relative">
-                  <EvidenceBlock 
-                    id={standard.id}
-                    year={standard.year}
-                    clause="5.2"
-                    page="12"
-                    text="Demo standard evidence demonstrating the requirement."
-                    sourceLabel="DEMO STANDARD EVIDENCE"
-                  />
-                  <div className="absolute top-4 right-4 z-10">
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/evidence')} className="text-accent uppercase text-xs">VIEW EVIDENCE →</Button>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Meta>VERIFICATION:</Meta>
-                    <VerificationStatus status="VERIFIED" />
-                  </div>
-                </div>
+                <EmptyState title="NO SPECIFIC EVIDENCE" description="Evidence is provided during procurement recommendation workflow." />
               </div>
             </section>
 
@@ -146,38 +109,54 @@ export default function StandardDetailPage() {
               <SectionHeader number="03" title="CERTIFICATION" />
               <div className="p-6 border border-border bg-surface rounded-sm flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                  <Meta>DEMO REGULATORY INDICATOR</Meta>
-                  <CertificationIndicator type={standard.certification} />
+                  <Meta>REGULATORY INDICATOR</Meta>
+                  <CertificationIndicator type={certification?.status === 'MANDATORY' ? 'REQUIRED' : 'VOLUNTARY'} />
                 </div>
-                <div className="flex flex-col gap-1 pt-4 border-t border-border">
-                  <Meta>APPLICABILITY</Meta>
-                  <Badge variant="warning" className="w-fit">REVIEW REQUIRED</Badge>
-                </div>
+                {certification?.orders?.length > 0 && (
+                  <div className="flex flex-col gap-1 pt-4 border-t border-border">
+                    <Meta>QUALITY CONTROL ORDERS</Meta>
+                    <Body className="text-sm text-text-secondary">
+                      {certification.orders.map((o: any) => o.title).join(', ')}
+                    </Body>
+                  </div>
+                )}
               </div>
             </section>
 
             <section className="flex flex-col gap-6">
               <SectionHeader number="04" title="VERSION HISTORY" />
               <div className="p-6 border border-border bg-surface rounded-sm">
-                <VersionTimeline 
-                  versions={[
-                    { date: '2026', status: 'CURRENT', label: `${standard.id}:${standard.year}`, isCurrent: true },
-                    { date: '2022', status: 'SUPERSEDED', label: `${standard.id}:2022`, isCurrent: false },
-                    { date: '2018', status: 'SUPERSEDED', label: `${standard.id}:2018`, isCurrent: false }
-                  ]}
-                />
+                {!versionsData?.version_info ? (
+                  <VersionTimeline 
+                    versions={[
+                      { date: standard.year, status: standard.status || 'CURRENT', label: `${standard.raw_id || standard.number}`, isCurrent: true },
+                    ]}
+                  />
+                ) : (
+                  <VersionTimeline 
+                    versions={[
+                      {
+                        date: versionsData.version_info.version || standard.year,
+                        status: versionsData.version_info.status as any,
+                        label: standard.raw_id || standard.number,
+                        isCurrent: versionsData.version_info.status === 'CURRENT'
+                      }
+                    ]}
+                  />
+                )}
               </div>
             </section>
 
             <section className="flex flex-col gap-6">
               <SectionHeader number="07" title="RELATED STANDARDS" />
               <div className="flex flex-col gap-4">
-                {mockRelationships.map(rel => (
+                {alliedGraph?.length === 0 && <Body className="text-text-muted text-sm">No allied standards found.</Body>}
+                {alliedGraph?.map((rel: any, i: number) => (
                   <RelationshipItem 
-                    key={rel.id}
-                    type={rel.type}
-                    id={rel.targetId}
-                    description={rel.description}
+                    key={i}
+                    type={rel.relationship_type || 'RELATES_TO'}
+                    id={rel.target_id}
+                    description={rel.context || `Related standard`}
                   />
                 ))}
               </div>
@@ -185,27 +164,7 @@ export default function StandardDetailPage() {
 
             <section className="flex flex-col gap-6">
               <SectionHeader number="08" title="PROCUREMENT RELEVANCE" />
-              <div className="p-6 border-l-2 border-accent bg-surface-elevated rounded-r-sm flex flex-col gap-6">
-                <div className="flex flex-col gap-1">
-                  <Meta>APPLICABLE CONTEXT</Meta>
-                  <Body className="text-sm font-medium">Electrical distribution equipment</Body>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Meta>MATCH SIGNALS</Meta>
-                  <ul className="list-disc pl-4 text-sm font-mono text-text-primary">
-                    <li>Electrical equipment</li>
-                    <li>Low-voltage application</li>
-                    <li>Distribution use</li>
-                  </ul>
-                </div>
-                <div className="flex flex-col gap-1 pt-4 border-t border-accent/20">
-                  <Meta>OPEN QUESTIONS</Meta>
-                  <ul className="list-disc pl-4 text-sm text-text-muted">
-                    <li>Installation environment not specified</li>
-                    <li>Required rating not specified</li>
-                  </ul>
-                </div>
-              </div>
+              <EmptyState title="NO ACTIVE PROCUREMENT SESSION" description="Access this standard through a procurement recommendation to see contextual relevance." />
             </section>
 
           </div>

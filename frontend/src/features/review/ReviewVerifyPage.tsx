@@ -10,9 +10,11 @@ import { Dialog } from '../../components/ui/Dialog';
 import { Textarea } from '../../components/ui/Textarea';
 import { Mono, Body, Meta } from '../../components/ui/Typography';
 import { StandardCard } from '../../components/product/Standards';
-import { ConfidenceIndicator, EvidenceBlock } from '../../components/product/Evidence';
+import { ConfidenceIndicator, EvidenceBlock, VerificationStatus as EvidenceVerificationStatus } from '../../components/product/Evidence';
 import { mockReviewQueue, mockChecklist } from './review.data';
 import type { ReviewItem, VerificationState } from './review.types';
+import { useVerifyClause } from '../../hooks/useVerification';
+import { ErrorState } from '../../components/ui/ErrorState';
 
 export default function ReviewVerifyPage() {
   const navigate = useNavigate();
@@ -21,11 +23,29 @@ export default function ReviewVerifyPage() {
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [checklist, setChecklist] = useState<Set<string>>(new Set(['c1', 'c2', 'c3']));
 
+  const { mutate: verifyClause, isPending: isVerifying, data: verificationResult, error: verifyError } = useVerifyClause();
+
   const handleStatusChange = (id: string, newStatus: VerificationState) => {
     setQueue(queue.map(q => q.id === id ? { ...q, status: newStatus } : q));
     if (selectedItem?.id === id) {
       setSelectedItem({ ...selectedItem, status: newStatus });
     }
+  };
+
+  const handleVerifyBackend = () => {
+    if (!selectedItem) return;
+    const clause = notes[selectedItem.id] || "No custom clause provided.";
+    verifyClause(
+      {
+        tender_clause: clause,
+        evidence_pack: { evidence: selectedItem.evidence } // Pass evidence
+      },
+      {
+        onSuccess: (data) => {
+          handleStatusChange(selectedItem.id, data.verification_status === 'VERIFIED' ? 'VERIFIED' : 'REJECTED');
+        }
+      }
+    );
   };
 
   const handleNoteChange = (id: string, note: string) => {
@@ -231,12 +251,27 @@ export default function ReviewVerifyPage() {
 
             <div className="flex flex-col gap-4 border-t border-border pt-6">
               <Textarea 
-                label="REVIEW NOTE" 
-                placeholder="Add a note about this standard..."
+                label="TENDER CLAUSE TO VERIFY" 
+                placeholder="Enter tender clause to verify against evidence..."
                 value={notes[selectedItem.id] || ''}
                 onChange={(e) => handleNoteChange(selectedItem.id, e.target.value)}
                 rows={3}
               />
+              <Button variant="secondary" onClick={handleVerifyBackend} disabled={isVerifying}>
+                {isVerifying ? 'VERIFYING WITH ENGINE...' : 'RUN BACKEND VERIFICATION'}
+              </Button>
+              {verifyError && <ErrorState title="VERIFICATION ERROR" description="Failed to run backend verification." />}
+              {verificationResult && (
+                <div className="p-4 border border-border bg-surface-elevated flex flex-col gap-2 mt-4">
+                  <Meta>BACKEND VERIFICATION RESULT</Meta>
+                  <EvidenceVerificationStatus status={verificationResult.verification_status as any} />
+                  <Body className="text-sm font-medium mt-2">REASON:</Body>
+                  <Body className="text-sm text-text-secondary">{verificationResult.reason}</Body>
+                  <div className="flex gap-4 mt-2">
+                     <Meta>CONFIDENCE: {(verificationResult.confidence * 100).toFixed(0)}%</Meta>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-4 border-t border-border pt-6 bg-surface-elevated p-4 -mx-6 -mb-6 mt-4 rounded-b-sm items-center justify-between">
