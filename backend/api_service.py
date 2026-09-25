@@ -30,7 +30,9 @@ from schemas.api import (
     AlliedStandardsResponse, VersionResponse, CertificationResponse, 
     TenderAnalyzeRequest, TenderAnalyzeResponse, TenderHealthRequest, TenderHealthResponse,
     TenderDiffRequest, TenderDiffResponse, SpecificationGenerateRequest, SpecificationGenerateResponse,
-    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse
+    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse,
+    DashboardSummary, KnowledgeGraphResponse, ChangesResponse, ProcurementListResponse,
+    GraphNode, GraphEdge
 )
 
 
@@ -304,6 +306,58 @@ def export_session(req: ExportRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@app.get("/api/v1/dashboard/summary", response_model=DashboardSummary)
+def get_dashboard_summary():
+    # In a real app we'd aggregate from DB/sessions. Returning a valid empty/mocked representation per instructions.
+    return DashboardSummary(
+        active_procurements=len(session_repo.sessions),
+        standards_requiring_review=0,
+        tender_findings=0,
+        certification_gaps=0
+    )
+
+@app.get("/api/v1/graph/standard/{family_id}", response_model=KnowledgeGraphResponse)
+def get_knowledge_graph(family_id: str):
+    graph = engine.graph_expander.expand_standard(family_id)
+    nodes = []
+    edges = []
+    nodes.append(GraphNode(id=family_id, label=family_id, type="STANDARD"))
+    for rel in graph.get("allied_standards", []):
+        target = rel.get("target_id")
+        nodes.append(GraphNode(id=target, label=target, type="STANDARD"))
+        edges.append(GraphEdge(source=family_id, target=target, relationship=rel.get("relationship_type", "RELATED_TO")))
+    
+    return KnowledgeGraphResponse(nodes=nodes, edges=edges)
+
+@app.get("/api/v1/changes", response_model=ChangesResponse)
+def get_changes():
+    # Mocking changes response for now as local implementation might lack version history engine
+    return ChangesResponse(changes=[])
+
+@app.get("/api/v1/procurements", response_model=ProcurementListResponse)
+def list_procurements():
+    sessions = [procurement_session_service.get_session(sid) for sid in session_repo.sessions.keys()]
+    return ProcurementListResponse(sessions=[s for s in sessions if s])
+
+@app.post("/api/v1/procurements/session/{session_id}/standards")
+def add_standard_to_basket(session_id: str, standard: dict):
+    # Retrieve session, append standard, and save
+    session = procurement_session_service.get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    # For in-memory implementation we modify the object and return
+    session.selected_standards.append(standard)
+    return session
+
+@app.delete("/api/v1/procurements/session/{session_id}/standards/{family_id}")
+def remove_standard_from_basket(session_id: str, family_id: str):
+    session = procurement_session_service.get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session.selected_standards = [s for s in session.selected_standards if s.get("family_id") != family_id and s.get("raw_id") != family_id]
+    return session
 
 # Python direct callables for internal scripts / teammates
 def recommend_standards(query_text: str, top_candidates: int = 5) -> Dict[str, Any]:

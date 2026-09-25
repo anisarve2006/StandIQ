@@ -15,3 +15,10 @@ export function useGetSession(sessionId: string | null) {
     enabled: !!sessionId,
   });
 }
+
+export function useProcurements() {
+  return useQuery({
+    queryKey: ['procurements'],
+    queryFn: () => procurementApi.listSessions(),
+  });
+}

@@ -7,36 +7,52 @@ import { Mono, Body, Meta } from '../../components/ui/Typography';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
-import { mockNodes, mockEdges } from './graph.data';
-
+import { useSearchParams } from 'react-router-dom';
+import { useKnowledgeGraph } from '../../hooks/useGraph';
 
 export default function KnowledgeGraphPage() {
+  const [searchParams] = useSearchParams();
+  const familyId = searchParams.get('standard_id') || 'IS 13947'; // Default fallback
+  const { data: graphData } = useKnowledgeGraph(familyId);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('ALL');
 
+  // Simple random layout for nodes since the backend doesn't provide x, y coordinates
+  const nodes = useMemo(() => {
+    if (!graphData) return [];
+    return graphData.nodes.map((n, idx) => ({
+      ...n,
+      x: 300 + 200 * Math.cos((idx / graphData.nodes.length) * 2 * Math.PI),
+      y: 300 + 200 * Math.sin((idx / graphData.nodes.length) * 2 * Math.PI),
+      status: 'CURRENT'
+    }));
+  }, [graphData]);
+
+  const edges = graphData?.edges || [];
+
   const filteredNodes = useMemo(() => {
-    if (filterType === 'ALL') return mockNodes;
-    if (filterType === 'STANDARDS') return mockNodes.filter(n => n.type === 'STANDARD');
-    if (filterType === 'REQUIREMENTS') return mockNodes.filter(n => n.type === 'REQUIREMENT');
-    return mockNodes.filter(n => n.type === filterType);
-  }, [filterType]);
+    if (filterType === 'ALL') return nodes;
+    if (filterType === 'STANDARDS') return nodes.filter(n => n.type === 'STANDARD');
+    if (filterType === 'REQUIREMENTS') return nodes.filter(n => n.type === 'REQUIREMENT');
+    return nodes.filter(n => n.type === filterType);
+  }, [filterType, nodes]);
 
   const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
 
-  const visibleEdges = mockEdges.filter(e => filteredNodeIds.has(e.source) && filteredNodeIds.has(e.target));
+  const visibleEdges = edges.filter(e => filteredNodeIds.has(e.source) && filteredNodeIds.has(e.target));
 
-  const selectedNode = mockNodes.find(n => n.id === selectedNodeId);
+  const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   const connectedNodes = useMemo(() => {
     if (!selectedNodeId) return new Set<string>();
     const connected = new Set<string>();
     connected.add(selectedNodeId);
-    mockEdges.forEach(e => {
+    edges.forEach(e => {
       if (e.source === selectedNodeId) connected.add(e.target);
       if (e.target === selectedNodeId) connected.add(e.source);
     });
     return connected;
-  }, [selectedNodeId]);
+  }, [selectedNodeId, edges]);
 
   return (
     <PageContainer>
@@ -55,16 +71,16 @@ export default function KnowledgeGraphPage() {
                   <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-border" />
                 </marker>
               </defs>
-              {visibleEdges.map(edge => {
-                const sourceNode = mockNodes.find(n => n.id === edge.source);
-                const targetNode = mockNodes.find(n => n.id === edge.target);
+              {visibleEdges.map((edge, i) => {
+                const sourceNode = nodes.find(n => n.id === edge.source);
+                const targetNode = nodes.find(n => n.id === edge.target);
                 if (!sourceNode || !targetNode || sourceNode.x === undefined || sourceNode.y === undefined || targetNode.x === undefined || targetNode.y === undefined) return null;
                 
                 const isHighlighted = selectedNodeId ? (edge.source === selectedNodeId || edge.target === selectedNodeId) : true;
                 const isDimmed = selectedNodeId && !isHighlighted;
                 
                 return (
-                  <g key={edge.id} className={`transition-opacity duration-300 ${isDimmed ? 'opacity-10' : 'opacity-100'}`}>
+                  <g key={`${edge.source}-${edge.target}-${i}`} className={`transition-opacity duration-300 ${isDimmed ? 'opacity-10' : 'opacity-100'}`}>
                     <line 
                       x1={sourceNode.x} 
                       y1={sourceNode.y} 
@@ -174,16 +190,9 @@ export default function KnowledgeGraphPage() {
                     </div>
                   )}
 
-                  {selectedNode.metadata && Object.entries(selectedNode.metadata).map(([key, val]) => (
-                    <div key={key} className="flex flex-col gap-1">
-                      <Meta>{key.toUpperCase()}</Meta>
-                      <Mono className="text-sm">{val}</Mono>
-                    </div>
-                  ))}
-
                   <div className="flex flex-col gap-1">
                     <Meta>RELATIONSHIPS</Meta>
-                    <Mono className="text-sm">{mockEdges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).length.toString().padStart(2, '0')}</Mono>
+                    <Mono className="text-sm">{edges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).length.toString().padStart(2, '0')}</Mono>
                   </div>
 
                   {selectedNode.type === 'STANDARD' && (

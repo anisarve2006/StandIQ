@@ -11,17 +11,16 @@ import { mockDashboardData } from './dashboard.data';
 import { VersionTimeline } from '../../components/product/Standards';
 import { useNavigate } from 'react-router-dom';
 import { useHealth } from '../../hooks/useHealth';
+import { useDashboardSummary } from '../../hooks/useDashboard';
+import { useProcurements } from '../../hooks/useProcurement';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const data = mockDashboardData;
   const { data: healthData, isLoading: healthLoading, error: healthError } = useHealth();
+  const { data: summaryData, isLoading: summaryLoading } = useDashboardSummary();
+  const { data: procurementsData, isLoading: procurementsLoading } = useProcurements();
 
-  const healthToVariant = (health: string) => {
-    if (health === 'READY') return 'success';
-    if (health === 'REVIEW') return 'warning';
-    return 'danger';
-  };
 
   const changesForTimeline = data.recentChanges.map(c => ({
     date: c.date,
@@ -43,10 +42,10 @@ export default function DashboardPage() {
         
         {/* METRICS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <Metric value={data.metrics.standardsRequiringReview.toString().padStart(2, '0')} label="STANDARDS REQUIRING REVIEW" />
-          <Metric value={data.metrics.tenderFindings.toString().padStart(2, '0')} label="TENDER FINDINGS" />
-          <Metric value={data.metrics.certificationGaps.toString().padStart(2, '0')} label="CERTIFICATION GAPS" />
-          <Metric value={data.metrics.recentChanges.toString().padStart(2, '0')} label="RECENT STANDARD CHANGES" />
+          <Metric value={summaryLoading ? '--' : (summaryData?.active_procurements?.toString() || '00').padStart(2, '0')} label="ACTIVE PROCUREMENTS" />
+          <Metric value={summaryLoading ? '--' : (summaryData?.standards_requiring_review?.toString() || '00').padStart(2, '0')} label="STANDARDS REQUIRING REVIEW" />
+          <Metric value={summaryLoading ? '--' : (summaryData?.tender_findings?.toString() || '00').padStart(2, '0')} label="TENDER FINDINGS" />
+          <Metric value={summaryLoading ? '--' : (summaryData?.certification_gaps?.toString() || '00').padStart(2, '0')} label="CERTIFICATION GAPS" />
         </div>
 
         {/* ACTIVE PROCUREMENTS */}
@@ -64,16 +63,26 @@ export default function DashboardPage() {
               </TableRow>
             </TableHeader>
             <tbody>
-              {data.activeProcurements.map((p) => (
-                <TableRow key={p.id} className="cursor-pointer">
-                  <TableCell className="font-medium text-text-primary">{p.name}</TableCell>
-                  <TableCell><Body className="text-sm">{p.category}</Body></TableCell>
-                  <TableCell><Mono>{p.standardsCount}</Mono></TableCell>
-                  <TableCell><Mono>{p.findingsCount}</Mono></TableCell>
-                  <TableCell><Badge variant={healthToVariant(p.health) as any}>{p.health}</Badge></TableCell>
-                  <TableCell><Mono className="text-text-muted">{p.updatedAt}</Mono></TableCell>
+              {procurementsLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">Loading procurements...</TableCell>
                 </TableRow>
-              ))}
+              ) : procurementsData?.sessions && procurementsData.sessions.length > 0 ? (
+                procurementsData.sessions.map((p: any) => (
+                  <TableRow key={p.session_id} className="cursor-pointer" onClick={() => navigate(`/requirements?session_id=${p.session_id}`)}>
+                    <TableCell className="font-medium text-text-primary">{p.title || p.session_id}</TableCell>
+                    <TableCell><Body className="text-sm">General</Body></TableCell>
+                    <TableCell><Mono>{p.selected_standards?.length || 0}</Mono></TableCell>
+                    <TableCell><Mono>{p.tender_findings?.length || 0}</Mono></TableCell>
+                    <TableCell><Badge variant="success">READY</Badge></TableCell>
+                    <TableCell><Mono className="text-text-muted">Just now</Mono></TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-text-muted italic">No active procurements.</TableCell>
+                </TableRow>
+              )}
             </tbody>
           </Table>
         </section>

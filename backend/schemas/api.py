@@ -98,3 +98,39 @@ class ExportRequest(BaseModel):
 class ExportResponse(BaseModel):
     content: str
     content_type: str
+
+class DashboardSummary(BaseModel):
+    active_procurements: int
+    standards_requiring_review: int
+    tender_findings: int
+    certification_gaps: int
+
+class GraphNode(BaseModel):
+    id: str
+    label: str
+    type: str
+
+class GraphEdge(BaseModel):
+    source: str
+    target: str
+    relationship: str
+
+class KnowledgeGraphResponse(BaseModel):
+    nodes: List[GraphNode]
+    edges: List[GraphEdge]
+
+class StandardChange(BaseModel):
+    id: str
+    standard_id: str
+    change_type: str
+    previous_version: str
+    current_version: str
+    date: str
+    impact: str
+    affected_procurements: List[Dict[str, str]]
+
+class ChangesResponse(BaseModel):
+    changes: List[StandardChange]
+
+class ProcurementListResponse(BaseModel):
+    sessions: List[ProcurementSessionResponse]

@@ -10,4 +10,7 @@ export const procurementApi = {
     
   getSession: (sessionId: string) =>
     fetchApi<ProcurementSessionResponse>(`/api/v1/procurements/session/${sessionId}`),
+
+  listSessions: () =>
+    fetchApi<{ sessions: ProcurementSessionResponse[] }>('/api/v1/procurements'),
 };

@@ -162,6 +162,45 @@ export interface ExportResponse {
   content_type: string;
 }
 
+export interface DashboardSummary {
+  active_procurements: number;
+  standards_requiring_review: number;
+  tender_findings: number;
+  certification_gaps: number;
+}
+
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: string;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  relationship: string;
+}
+
+export interface KnowledgeGraphResponse {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
+export interface StandardChange {
+  id: string;
+  standard_id: string;
+  change_type: string;
+  previous_version: string;
+  current_version: string;
+  date: string;
+  impact: string;
+  affected_procurements: Record<string, string>[];
+}
+
+export interface ChangesResponse {
+  changes: StandardChange[];
+}
+
 export interface StandardRecommendationRequest {
   query: string;
   context?: Record<string, any>;
