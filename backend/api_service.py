@@ -12,6 +12,23 @@ from pydantic import BaseModel, Field
 
 from retrieval.engine import StandardsRecommenderEngine
 
+from services.version_service import VersionService
+from services.regulatory_service import RegulatoryService
+from services.allied_standards_service import AlliedStandardsService
+from services.tender_service import TenderService
+from services.tender_health_service import TenderHealthService
+from services.tender_diff_service import TenderDiffService
+from services.specification_service import SpecificationService
+from services.procurement_session_service import ProcurementSessionService
+from services.export_service import ExportService
+from schemas.api import (
+    AlliedStandardsResponse, VersionResponse, CertificationResponse, 
+    TenderAnalyzeRequest, TenderAnalyzeResponse, TenderHealthRequest, TenderHealthResponse,
+    TenderDiffRequest, TenderDiffResponse, SpecificationGenerateRequest, SpecificationGenerateResponse,
+    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse
+)
+
+
 app = FastAPI(
     title="Indian Standards Recommender & Compliance Engine (GeM / CPPP)",
     version="3.0.0",
@@ -29,6 +46,18 @@ app.add_middleware(
 
 # Global engine singleton
 engine = StandardsRecommenderEngine()
+
+# Services Initialization
+version_service = VersionService(engine.db_path)
+regulatory_service = RegulatoryService(engine.db_path)
+allied_service = AlliedStandardsService(engine.db_path)
+tender_service = TenderService()
+tender_health_service = TenderHealthService()
+tender_diff_service = TenderDiffService()
+specification_service = SpecificationService()
+procurement_session_service = ProcurementSessionService()
+export_service = ExportService(procurement_session_service)
+
 
 # Request & Response Models
 class RecommendRequest(BaseModel):
@@ -133,6 +162,96 @@ async def recommend_pdf_endpoint(
         return matrix
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process tender PDF: {str(e)}")
+
+class VerifyRequest(BaseModel):
+    tender_clause: str = Field(..., description="The drafted or existing tender specification text.")
+    evidence_pack: Dict[str, Any] = Field(..., description="The verified evidence pack returned by /api/v1/recommend")
+
+@app.get("/api/v1/search")
+def global_search(q: str, limit: int = 10):
+    """
+    Fast, generic global search for standards bypassing the full recommendation loop.
+    Uses multi-tier lexical + semantic search if needed.
+    """
+    if not q.strip():
+        return []
+    
+    from retrieval.compiler import compile_query
+    query_obj = compile_query(q)
+    results = engine.retriever.retrieve(query_obj, top_n=limit)
+    
+    # Strip heavy fields for generic search
+    clean_results = []
+    for r in results:
+        clean_results.append({
+            "family_id": r.get("family_id"),
+            "raw_id": r.get("raw_id"),
+            "title_en": r.get("title_en"),
+            "status": r.get("status"),
+            "year": r.get("year"),
+            "score": r.get("rrf_score")
+        })
+    return {"results": clean_results}
+
+@app.post("/api/v1/verify")
+def verify_clause(req: VerifyRequest):
+    """
+    Standalone Verification Endpoint.
+    Verifies an existing or generated tender clause against an evidence pack.
+    """
+    report = engine.verification_kernel.verify_evidence_grounding(req.tender_clause, req.evidence_pack)
+    return report
+
+@app.get("/api/v1/standard/{family_id}/allied", response_model=AlliedStandardsResponse)
+def get_allied_standards(family_id: str):
+    allied = allied_service.get_allied_standards(family_id)
+    return AlliedStandardsResponse(family_id=family_id, allied_standards=allied)
+
+@app.get("/api/v1/standard/{family_id}/versions", response_model=VersionResponse)
+def get_standard_versions(family_id: str):
+    v_info = version_service.get_version_info(family_id)
+    return VersionResponse(family_id=family_id, version_info=v_info)
+
+@app.get("/api/v1/standard/{family_id}/certification", response_model=CertificationResponse)
+def get_standard_certification(family_id: str):
+    certs = regulatory_service.get_certification_info(family_id)
+    return CertificationResponse(family_id=family_id, certifications=certs)
+
+@app.post("/api/v1/tender/analyze", response_model=TenderAnalyzeResponse)
+def analyze_tender(req: TenderAnalyzeRequest):
+    return tender_service.analyze_text(req.text or "")
+
+@app.post("/api/v1/tender/health", response_model=TenderHealthResponse)
+def get_tender_health(req: TenderHealthRequest):
+    findings = tender_health_service.analyze_health(req.clauses)
+    return TenderHealthResponse(findings=findings)
+
+@app.post("/api/v1/tender/diff", response_model=TenderDiffResponse)
+def get_tender_diff(req: TenderDiffRequest):
+    return tender_diff_service.compare_tenders(req.version_a_text, req.version_b_text)
+
+@app.post("/api/v1/specification/generate", response_model=SpecificationGenerateResponse)
+def generate_specification(req: SpecificationGenerateRequest):
+    return specification_service.generate_specification(req.requirements, req.standards, req.evidence)
+
+@app.post("/api/v1/procurements/session", response_model=ProcurementSessionResponse)
+def create_session(req: ProcurementSessionCreateRequest):
+    return procurement_session_service.create_session(req)
+
+@app.get("/api/v1/procurements/session/{session_id}", response_model=ProcurementSessionResponse)
+def get_session(session_id: str):
+    session = procurement_session_service.get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return session
+
+@app.post("/api/v1/export", response_model=ExportResponse)
+def export_session(req: ExportRequest):
+    try:
+        return export_service.export(req)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 # Python direct callables for internal scripts / teammates
 def recommend_standards(query_text: str, top_candidates: int = 5) -> Dict[str, Any]:
