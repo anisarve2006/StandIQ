@@ -31,11 +31,11 @@
 | `/review` | `POST /api/v1/standards/verify` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
 | `/basket` | `GET /api/v1/procurements/session/{id}` | **PARTIAL** | Real | Yes | Yes | Yes | Yes |
 | `/specification-builder` | `POST /api/v1/specification/generate` | **CONNECTED** | Real | Yes | Yes | Yes | Yes |
-| `/approval` | N/A | **NOT CONNECTED** | None | N/A | N/A | N/A | Yes |
+| `/approval` | N/A | **FRONTEND WORKFLOW** | None | N/A | N/A | N/A | Yes |
 | `/export` | `POST /api/v1/export` | **CONNECTED** | Real | Yes | Yes | N/A | Yes |
-| `/evidence` | N/A | **NOT CONNECTED** | Demo | N/A | N/A | N/A | No |
+| `/evidence` | N/A | **NOT REQUIRED** | Demo | N/A | N/A | N/A | No |
 | `/graph` | N/A | **BACKEND GAP** | Demo | N/A | N/A | N/A | No |
-| `/changes` | N/A | **BACKEND GAP** | Demo | N/A | N/A | N/A | No |
+| `/changes` | N/A | **BACKEND GAP** | None | N/A | N/A | N/A | No |
 | `/procurements` | N/A | **BACKEND GAP** | Demo | N/A | N/A | N/A | No |
 
 ### Environment Setup
