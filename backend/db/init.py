@@ -1,30 +1,51 @@
-import sys
-import argparse
-import psycopg
+import os
+import psycopg2
 from config import settings
 
-def init_db():
+def init_postgres():
+    conn_str = f"dbname={settings.postgres_db} user={settings.postgres_user} password={settings.postgres_password} host={settings.postgres_host} port={settings.postgres_port}"
     try:
-        # Validate PostgreSQL configuration
-        conn_str = f"dbname={settings.postgres_db} user={settings.postgres_user} password={settings.postgres_password} host={settings.postgres_host} port={settings.postgres_port}"
+        conn = psycopg2.connect(conn_str)
+        cur = conn.cursor()
         
-        print("Connecting to PostgreSQL...")
-        with psycopg.connect(conn_str) as conn:
-            with conn.cursor() as cur:
-                # Apply schema (dummy for architecture demonstration)
-                cur.execute("CREATE TABLE IF NOT EXISTS standards (family_id VARCHAR PRIMARY KEY, title TEXT);")
-                conn.commit()
-                print("PostgreSQL schema initialized successfully.")
+        # Actual PostgreSQL schema creation
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS standards (
+            family_id VARCHAR PRIMARY KEY,
+            title_en TEXT,
+            status VARCHAR,
+            year INT
+        );
+        
+        CREATE TABLE IF NOT EXISTS standard_versions (
+            id SERIAL PRIMARY KEY,
+            family_id VARCHAR REFERENCES standards(family_id),
+            version VARCHAR,
+            status VARCHAR,
+            effective_date DATE,
+            supersedes VARCHAR
+        );
+        
+        CREATE TABLE IF NOT EXISTS regulatory_rules (
+            id SERIAL PRIMARY KEY,
+            family_id VARCHAR REFERENCES standards(family_id),
+            scheme VARCHAR,
+            product_name TEXT,
+            status VARCHAR
+        );
+        
+        CREATE TABLE IF NOT EXISTS edges (
+            id SERIAL PRIMARY KEY,
+            src_family_id VARCHAR REFERENCES standards(family_id),
+            dst_family_id VARCHAR,
+            edge_type VARCHAR,
+            provenance TEXT
+        );
+        """)
+        conn.commit()
+        print("PostgreSQL schema initialized successfully.")
     except Exception as e:
-        print(f"Failed to initialize PostgreSQL: {e}")
-        sys.exit(1)
+        print(f"PostgreSQL initialization failed or not available: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--apply", action="store_true", help="Apply migrations")
-    args = parser.parse_args()
-    
-    if args.apply:
-        init_db()
-    else:
-        print("Dry run. Use --apply to execute.")
+    init_postgres()
