@@ -7,8 +7,9 @@ Backend:
 Python + FastAPI MaanakAI retrieval and verification engine.
 
 Current status:
+Backend is **APPLICATION-LAYER COMPLETE**, featuring hardened intelligent APIs ready for UI usage. Production Data (PostgreSQL, Qdrant, Neo4j) is currently stubbed by SQLite.
 Frontend and backend consolidated into one repository.
-API integration is the next engineering stage.
+**API integration is the next engineering stage.**
 
 ## Development Setup
 
