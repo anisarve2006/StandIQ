@@ -17,11 +17,13 @@ class CompletenessService:
         questions = []
         
         # Clarifying questions based on missing requirements/constraints
-        # This matches the user request for deterministic questions based on missing requirements
+        # Generate specific, deterministic questions based on core parameters
         if "environment" not in constraints:
-            questions.append("Is the equipment intended for indoor or outdoor installation?")
+            questions.append("What operating temperature range and environment (indoor/outdoor) should the equipment support?")
         if "voltage" not in constraints:
-            questions.append("What operating voltage should be supported?")
+            questions.append("What operating voltage is required for the installation?")
+        if "power" not in constraints:
+            questions.append("What is the required power rating (e.g., kW, HP)?")
         if "grade" not in constraints:
             questions.append("What material grade is required?")
             

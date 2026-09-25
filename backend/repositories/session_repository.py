@@ -1,8 +1,9 @@
-from typing import Dict
+from typing import Dict, Optional
 import uuid
 from schemas.api import ProcurementSessionResponse
+from .base import SessionRepository
 
-class SessionRepository:
+class InMemorySessionRepository(SessionRepository):
     def __init__(self):
         self.sessions: Dict[str, ProcurementSessionResponse] = {}
 
@@ -10,7 +11,7 @@ class SessionRepository:
         self.sessions[session.session_id] = session
         return session
 
-    def get(self, session_id: str) -> ProcurementSessionResponse:
+    def get(self, session_id: str) -> Optional[ProcurementSessionResponse]:
         return self.sessions.get(session_id)
 
     def update(self, session: ProcurementSessionResponse) -> ProcurementSessionResponse:

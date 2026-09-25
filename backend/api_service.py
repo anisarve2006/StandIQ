@@ -6,7 +6,7 @@ Run with: uvicorn api_service:app --host 0.0.0.0 --port 8000 --reload
 
 import os
 from typing import Optional, Dict, Any, List
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -21,6 +21,11 @@ from services.tender_diff_service import TenderDiffService
 from services.specification_service import SpecificationService
 from services.procurement_session_service import ProcurementSessionService
 from services.export_service import ExportService
+from repositories.standard_repository import SQLiteStandardRepository
+from repositories.regulatory_repository import SQLiteRegulatoryRepository
+from repositories.graph_repository import SQLiteGraphRepository
+from repositories.session_repository import InMemorySessionRepository
+from config import settings
 from schemas.api import (
     AlliedStandardsResponse, VersionResponse, CertificationResponse, 
     TenderAnalyzeRequest, TenderAnalyzeResponse, TenderHealthRequest, TenderHealthResponse,
@@ -47,15 +52,21 @@ app.add_middleware(
 # Global engine singleton
 engine = StandardsRecommenderEngine()
 
+# Repositories Initialization
+std_repo = SQLiteStandardRepository(engine.db_path)
+reg_repo = SQLiteRegulatoryRepository(engine.db_path)
+graph_repo = SQLiteGraphRepository(engine.db_path)
+session_repo = InMemorySessionRepository()
+
 # Services Initialization
-version_service = VersionService(engine.db_path)
-regulatory_service = RegulatoryService(engine.db_path)
-allied_service = AlliedStandardsService(engine.db_path)
+version_service = VersionService(std_repo)
+regulatory_service = RegulatoryService(reg_repo)
+allied_service = AlliedStandardsService(graph_repo)
 tender_service = TenderService()
 tender_health_service = TenderHealthService()
 tender_diff_service = TenderDiffService()
 specification_service = SpecificationService()
-procurement_session_service = ProcurementSessionService()
+procurement_session_service = ProcurementSessionService(session_repo)
 export_service = ExportService(procurement_session_service)
 
 
@@ -75,6 +86,47 @@ class RecommendResponse(BaseModel):
     verification_audit: Dict[str, Any]
     alternative_candidates: List[Dict[str, Any]]
     latency_breakdown_ms: Dict[str, float]
+
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "An unexpected error occurred processing your request.",
+                "details": str(exc) if settings.use_groq else None # Don't expose unless debug/configured
+            }
+        }
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": {
+                "code": "UNPROCESSABLE_ENTITY",
+                "message": "The request payload is invalid.",
+                "details": exc.errors()
+            }
+        }
+    )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": {
+                "code": f"HTTP_{exc.status_code}",
+                "message": exc.detail
+            }
+        }
+    )
 
 @app.get("/api/v1/health")
 def healthcheck():

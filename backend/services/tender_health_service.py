@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List
 from schemas.api import TenderHealthFinding, TenderClauseDetail
 
 class TenderHealthService:
@@ -7,10 +7,13 @@ class TenderHealthService:
         requirements_map = {}
         
         for clause in clauses:
+            if not clause.requirement:
+                continue
+                
             # Check missing units
-            if clause.requirement and clause.value and not clause.unit and clause.requirement not in ["grade", "ip_rating"]:
+            if clause.value and not clause.unit and clause.requirement not in ["grade", "ip_rating"]:
                 findings.append(TenderHealthFinding(
-                    severity="HIGH",
+                    severity="WARNING",
                     category="MISSING_UNIT",
                     clause=clause.text,
                     message=f"Requirement '{clause.requirement}' has a value but is missing a unit.",
@@ -18,12 +21,12 @@ class TenderHealthService:
                 ))
                 
             # Contradiction detection
-            if clause.requirement and clause.value:
+            if clause.value:
                 if clause.requirement in requirements_map:
                     prev = requirements_map[clause.requirement]
                     if prev.value != clause.value:
                         findings.append(TenderHealthFinding(
-                            severity="HIGH",
+                            severity="ERROR",
                             category="CONTRADICTION",
                             clause=f"'{prev.text}' VS '{clause.text}'",
                             message=f"Conflicting values for {clause.requirement}: {prev.value} vs {clause.value}",

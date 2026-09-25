@@ -36,5 +36,5 @@ def test_completeness_service():
     result = service.get_completeness_report(coverage, constraints)
     assert "TESTING" in result.missing
     assert "PRODUCT" in result.covered
-    # Grade and environment missing, should yield 2 questions
-    assert len(result.clarifying_questions) == 2
+    # Grade, environment, and power missing, should yield 3 questions
+    assert len(result.clarifying_questions) == 3

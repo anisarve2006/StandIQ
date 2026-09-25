@@ -1,10 +1,11 @@
 import uuid
+from typing import Optional
 from schemas.api import ProcurementSessionCreateRequest, ProcurementSessionResponse
-from repositories.session_repository import SessionRepository
+from repositories.base import SessionRepository
 
 class ProcurementSessionService:
-    def __init__(self):
-        self.repository = SessionRepository()
+    def __init__(self, repository: SessionRepository):
+        self.repository = repository
 
     def create_session(self, request: ProcurementSessionCreateRequest) -> ProcurementSessionResponse:
         session_id = str(uuid.uuid4())
@@ -19,5 +20,5 @@ class ProcurementSessionService:
         )
         return self.repository.create(session)
 
-    def get_session(self, session_id: str) -> ProcurementSessionResponse:
+    def get_session(self, session_id: str) -> Optional[ProcurementSessionResponse]:
         return self.repository.get(session_id)

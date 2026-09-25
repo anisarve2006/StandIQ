@@ -1,30 +1,17 @@
-import sqlite3
 from typing import List
 from schemas.domain import CertificationInfo, CertificationType, CertificationStatus
+from repositories.base import RegulatoryRepository
 
 class RegulatoryService:
-    def __init__(self, db_path: str):
-        self.db_path = db_path
+    def __init__(self, repository: RegulatoryRepository):
+        self.repository = repository
 
     def get_certification_info(self, standard_id: str) -> List[CertificationInfo]:
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        
-        # Check cert_rules table for QCO or BIS product cert
-        cur.execute("""
-        SELECT scheme, category, sr_no, raw_is_no, product_name, gazette_notification, status, source_url
-        FROM cert_rules
-        WHERE family_id = ? OR raw_is_no LIKE ?;
-        """, (standard_id, f"%{standard_id.replace('IS:', '')}%"))
-        
-        rules = cur.fetchall()
-        conn.close()
+        rules = self.repository.get_certification_rules(standard_id)
         
         results = []
         if rules:
-            for r in rules:
-                rule = dict(r)
+            for rule in rules:
                 scheme = rule.get("scheme", "").upper()
                 c_type = CertificationType.BIS_PRODUCT_CERTIFICATION
                 if "QCO" in scheme or "QUALITY CONTROL" in scheme:
@@ -34,11 +21,19 @@ class RegulatoryService:
                 elif "HALLMARK" in scheme:
                     c_type = CertificationType.HALLMARKING
                     
+                status_raw = rule.get("status", "").upper()
+                if status_raw == "MANDATORY" or c_type == CertificationType.QCO:
+                    status = CertificationStatus.REQUIRED
+                elif status_raw == "CONDITIONAL":
+                    status = CertificationStatus.UNKNOWN
+                else:
+                    status = CertificationStatus.REQUIRED
+                    
                 results.append(CertificationInfo(
                     standard=standard_id,
                     certification_type=c_type,
-                    status=CertificationStatus.REQUIRED,
-                    mandatory=True,
+                    status=status,
+                    mandatory=(status == CertificationStatus.REQUIRED),
                     applicability=rule.get("product_name"),
                     source=rule.get("gazette_notification")
                 ))
