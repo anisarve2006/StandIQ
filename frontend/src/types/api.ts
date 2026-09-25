@@ -82,6 +82,10 @@ export interface TenderClauseDetail {
   source_location?: string;
 }
 
+export interface TenderAnalyzeRequest {
+  tender_text: string;
+}
+
 export interface TenderAnalyzeResponse {
   clauses: TenderClauseDetail[];
   recommendations: Record<string, any>;
@@ -95,8 +99,17 @@ export interface TenderHealthFinding {
   suggested_action: string;
 }
 
+export interface TenderHealthRequest {
+  session_id: string;
+}
+
 export interface TenderHealthResponse {
   findings: TenderHealthFinding[];
+}
+
+export interface TenderDiffRequest {
+  version_a_text: string;
+  version_b_text: string;
 }
 
 export interface TenderDiffResponse {

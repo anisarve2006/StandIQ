@@ -5,19 +5,30 @@ import { PageHeader } from '../../components/layout/PageHeader';
 import { SectionHeader } from '../../components/layout/SectionHeader';
 import { Metric } from '../../components/ui/Metric';
 import { Select } from '../../components/ui/Select';
-import { FindingRow, RequirementRow } from '../../components/product/Tender';
-import { Table, TableHeader, TableRow, TableHead, TableCell } from '../../components/ui/Table';
-import { StatusIndicator } from '../../components/ui/StatusIndicator';
+import { FindingRow } from '../../components/product/Tender';
 import { Mono, Body, Meta } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
-import { EvidenceCitation } from '../../components/product/Evidence';
-import { mockFindings, mockCoverage, mockMissing, mockConflicts } from './tender-health.data';
-import type { TenderFinding } from './tender-health.types';
+import { useSearchParams } from 'react-router-dom';
+import { useGetSession } from '../../hooks/useProcurement';
+import { LoadingState } from '../../components/ui/Loading';
+import { ErrorState } from '../../components/ui/ErrorState';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 export default function TenderHealthPage() {
   const navigate = useNavigate();
-  const [selectedFinding, setSelectedFinding] = useState<TenderFinding | null>(null);
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  const { data: sessionData, isLoading, error } = useGetSession(sessionId);
+  const [selectedFinding, setSelectedFinding] = useState<any | null>(null);
+
+  if (isLoading) return <LoadingState message="Analyzing tender health..." />;
+  if (error || !sessionId) return <PageContainer><ErrorState title="SESSION ERROR" description="Could not load the procurement session." /></PageContainer>;
+
+  const findings = sessionData?.tender_findings || [];
+  const highPriority = findings.filter(f => f.severity === 'HIGH').length;
+  const mediumPriority = findings.filter(f => f.severity === 'MEDIUM').length;
+  const infoPriority = findings.filter(f => f.severity === 'LOW').length;
 
   return (
     <PageContainer>
@@ -28,20 +39,20 @@ export default function TenderHealthPage() {
       />
       <div className="flex gap-4 items-center mb-12 flex-wrap">
         <Meta>PROCUREMENT</Meta>
-        <Body className="text-sm font-medium">Electrical Distribution Panel</Body>
+        <Body className="text-sm font-medium">{sessionData?.title || 'Procurement Session'}</Body>
         <span className="text-border">|</span>
         <Meta>LAST ANALYZED</Meta>
-        <Mono className="text-sm">DEMO · 24 SEP 2026</Mono>
+        <Mono className="text-sm">LIVE SESSION</Mono>
       </div>
 
       <div className="flex flex-col gap-12 pb-24">
         
         {/* HEALTH SUMMARY */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 border border-border p-6 bg-surface rounded-sm">
-          <Metric value="07" label="FINDINGS" />
-          <Metric value="03" label="HIGH PRIORITY" />
-          <Metric value="02" label="MEDIUM" />
-          <Metric value="02" label="INFORMATIONAL" />
+          <Metric value={findings.length.toString().padStart(2, '0')} label="FINDINGS" />
+          <Metric value={highPriority.toString().padStart(2, '0')} label="HIGH PRIORITY" />
+          <Metric value={mediumPriority.toString().padStart(2, '0')} label="MEDIUM" />
+          <Metric value={infoPriority.toString().padStart(2, '0')} label="INFORMATIONAL" />
         </section>
 
         {/* FINDINGS FILTERS */}
@@ -54,12 +65,13 @@ export default function TenderHealthPage() {
         <section className="flex flex-col gap-6">
           <SectionHeader number="01" title="FINDINGS" />
           <div className="flex flex-col gap-4">
-            {mockFindings.map((finding) => (
+            {findings.length === 0 && <EmptyState title="NO FINDINGS" description="No significant health issues found in this tender specification." />}
+            {findings.map((finding, index) => (
               <FindingRow 
-                key={finding.id}
-                status={finding.type}
-                title={finding.standardId}
-                description={finding.description}
+                key={index}
+                status={finding.severity === 'HIGH' ? 'danger' : finding.severity === 'MEDIUM' ? 'warning' : 'neutral'}
+                title={finding.category}
+                description={finding.message}
                 actionLabel="REVIEW"
                 onAction={() => setSelectedFinding(finding)}
               />
@@ -70,59 +82,25 @@ export default function TenderHealthPage() {
         {/* REQUIREMENT COVERAGE */}
         <section className="flex flex-col gap-6">
           <SectionHeader number="02" title="REQUIREMENT COVERAGE" />
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>REQUIREMENT</TableHead>
-                <TableHead>COVERAGE</TableHead>
-                <TableHead>STATUS</TableHead>
-              </TableRow>
-            </TableHeader>
-            <tbody>
-              {mockCoverage.map((c, i) => (
-                <TableRow key={i}>
-                  <TableCell><Body className="text-sm">{c.requirement}</Body></TableCell>
-                  <TableCell><Mono className="text-sm">{c.coverage}</Mono></TableCell>
-                  <TableCell><StatusIndicator status={c.status} /></TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
+          <EmptyState title="NOT AVAILABLE" description="Requirement coverage metrics are currently not natively surfaced by the session endpoint." />
         </section>
 
         {/* MISSING REQUIREMENTS */}
         <section className="flex flex-col gap-6">
           <SectionHeader number="03" title="MISSING REQUIREMENTS" />
-          <div className="flex flex-col border border-border rounded-sm bg-surface">
-            {mockMissing.map((m, i) => (
-              <RequirementRow 
-                key={i}
-                index={i + 1}
-                parameter={m.parameter}
-                value={m.description}
-                status={m.status}
-              />
-            ))}
-          </div>
+          <EmptyState title="NOT AVAILABLE" description="Missing requirements are calculated dynamically in the specification builder." />
         </section>
 
         {/* CROSS-ITEM CONFLICTS */}
         <section className="flex flex-col gap-6">
           <SectionHeader number="04" title="CROSS-ITEM CONFLICTS" />
-          <div className="flex flex-col gap-4">
-            {mockConflicts.map((c) => (
-              <div key={c.id} className="p-4 border-l-2 border-warning bg-surface flex flex-col gap-2 rounded-r-sm">
-                <Meta className="text-warning">CONFLICT</Meta>
-                <Body className="text-sm whitespace-pre-line">{c.description}</Body>
-              </div>
-            ))}
-          </div>
+          <EmptyState title="NO CONFLICTS" description="No major conflicts were reported in this session." />
         </section>
 
         {/* ACTIONS */}
         <div className="flex flex-wrap gap-4 mt-8 pt-8 border-t border-border">
-          <Button variant="secondary" onClick={() => navigate('/tender-diff')}>OPEN DIFF / FIX →</Button>
-          <Button onClick={() => navigate('/review')}>CONTINUE TO REVIEW →</Button>
+          <Button variant="secondary" onClick={() => navigate(`/tender-diff?session_id=${sessionId}`)}>OPEN DIFF / FIX →</Button>
+          <Button onClick={() => navigate(`/review?session_id=${sessionId}`)}>CONTINUE TO REVIEW →</Button>
         </div>
 
       </div>
@@ -137,42 +115,24 @@ export default function TenderHealthPage() {
         {selectedFinding && (
           <div className="flex flex-col gap-6 py-4">
             <div className="flex flex-col gap-1">
-              <Meta>{selectedFinding.type}</Meta>
-              <Mono className="text-lg font-bold text-text-primary mt-1">{selectedFinding.standardId}</Mono>
+              <Meta>{selectedFinding.category}</Meta>
+              <Mono className="text-lg font-bold text-text-primary mt-1">{selectedFinding.severity} PRIORITY</Mono>
             </div>
             
-            {selectedFinding.currentVersion && (
-              <div className="flex flex-col gap-1 p-3 border border-border bg-surface-elevated rounded-sm">
-                <Meta>CURRENT VERSION</Meta>
-                <Mono className="text-sm">{selectedFinding.currentVersion}</Mono>
-              </div>
-            )}
+            <div className="flex flex-col gap-1">
+              <Meta>CLAUSE</Meta>
+              <Body className="text-sm">{selectedFinding.clause}</Body>
+            </div>
 
-            {selectedFinding.issue && (
-              <div className="flex flex-col gap-1">
-                <Meta>ISSUE</Meta>
-                <Body className="text-sm">{selectedFinding.issue}</Body>
-              </div>
-            )}
+            <div className="flex flex-col gap-1">
+              <Meta>ISSUE</Meta>
+              <Body className="text-sm">{selectedFinding.message}</Body>
+            </div>
 
-            {selectedFinding.evidence && (
-              <div className="flex flex-col gap-2">
-                <Meta>EVIDENCE</Meta>
-                <EvidenceCitation 
-                  id={selectedFinding.evidence.id}
-                  year={selectedFinding.evidence.year}
-                  clause={selectedFinding.evidence.clause}
-                  page={selectedFinding.evidence.page}
-                />
-              </div>
-            )}
-
-            {selectedFinding.recommendedAction && (
-              <div className="flex flex-col gap-2 p-4 border-l-2 border-accent bg-surface rounded-r-sm mt-4">
-                <Meta>RECOMMENDED ACTION</Meta>
-                <Body className="text-sm">{selectedFinding.recommendedAction}</Body>
-              </div>
-            )}
+            <div className="flex flex-col gap-2 p-4 border-l-2 border-accent bg-surface rounded-r-sm mt-4">
+              <Meta>RECOMMENDED ACTION</Meta>
+              <Body className="text-sm">{selectedFinding.suggested_action}</Body>
+            </div>
           </div>
         )}
       </Dialog>

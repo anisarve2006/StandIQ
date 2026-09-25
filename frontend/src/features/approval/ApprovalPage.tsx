@@ -8,8 +8,13 @@ import { Button } from '../../components/ui/Button';
 import { FindingRow } from '../../components/product/Tender';
 import { mockApprovalChecks, mockApprovalIssues } from './approval.data';
 
+import { useSearchParams } from 'react-router-dom';
+
 export default function ApprovalPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id') || '';
+
   const [checks, setChecks] = useState<Set<string>>(new Set(['ac1', 'ac2', 'ac3', 'ac4']));
   const [isApproved, setIsApproved] = useState(false);
 
@@ -60,7 +65,7 @@ export default function ApprovalPage() {
                 </div>
               </div>
               <div className="mt-4 flex justify-end">
-                <Button onClick={() => navigate('/export')} size="lg">PROCEED TO EXPORT →</Button>
+                <Button onClick={() => navigate(`/export?session_id=${sessionId}`)} size="lg">PROCEED TO EXPORT →</Button>
               </div>
             </div>
           </section>
@@ -117,7 +122,7 @@ export default function ApprovalPage() {
                     </Mono>
                   </div>
                   <div className="flex gap-4 mt-2 border-t border-border pt-6">
-                    <Button variant="secondary" onClick={() => navigate('/specification-builder')}>RETURN TO REVIEW</Button>
+                    <Button variant="secondary" onClick={() => navigate(`/specification-builder?session_id=${sessionId}`)}>RETURN TO REVIEW</Button>
                     <Button disabled={!isReady} onClick={() => setIsApproved(true)}>APPROVE PACKAGE</Button>
                   </div>
                 </div>
