@@ -144,16 +144,19 @@ def healthcheck():
     edge_cnt = cur.fetchone()[0]
     conn.close()
 
+    from services.bharatgpt_service import bharatgpt_engine
+
     return {
         "status": "HEALTHY",
-        "engine_version": "3.0.0",
+        "engine_version": "3.1.0",
         "corpus_statistics": {
             "total_standards": std_cnt,
             "compulsory_qco_rules": cert_cnt,
             "allied_graph_edges": edge_cnt
         },
         "zero_hallucination_kernel": "ACTIVE",
-        "embedding_runtime": "ONNX FastEmbed CPU"
+        "embedding_runtime": "ONNX FastEmbed CPU",
+        "sovereign_llm": bharatgpt_engine.get_status()
     }
 
 @app.post("/api/v1/recommend", response_model=Dict[str, Any])

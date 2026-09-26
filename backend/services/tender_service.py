@@ -20,12 +20,13 @@ class TenderService:
                 constraints = extract_units_and_numbers(raw_text)
                 compiled = compile_query(raw_text)
                 
+                item_num_str = str(item.get("item_number") or (i+1))
                 clause = TenderClauseDetail(
-                    clause_id=str(i+1),
+                    clause_id=item_num_str,
                     text=raw_text,
                     category="PRODUCT" if not constraints else "TECHNICAL",
                     referenced_standard=compiled.get("exact_is")[0]["raw_id"] if compiled.get("exact_is") else None,
-                    source_location=item.get("source", f"Item {i+1}")
+                    source_location=item.get("source", f"Item {item_num_str}")
                 )
                 
                 if constraints:

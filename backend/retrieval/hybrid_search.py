@@ -27,7 +27,8 @@ STOP_WORDS = {
     "up", "about", "into", "over", "after", "is", "are", "was", "were", "be", "been",
     "being", "have", "has", "had", "do", "does", "did", "shall", "will", "would",
     "should", "can", "could", "may", "might", "must", "per", "as", "to", "work", "need",
-    "supply", "procurement", "item", "required", "specification", "specifications", "nos", "sets"
+    "supply", "procurement", "item", "required", "specification", "specifications", "nos", "sets",
+    "tender", "nit", "boq", "emd", "fdr", "bidding", "corrigendum", "enquiry", "providing", "fixing", "laying"
 }
 
 class HybridRetriever:

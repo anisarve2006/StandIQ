@@ -14,22 +14,22 @@
 | **Mean Reciprocal Rank (MRR)** | ≥ 0.85 | **0.9792** | PASS |
 | **Compulsory QCO Match** | ≥ 85.0% | **73.3%** | FAIL |
 | **Zero-Hallucination Rate** | 100.0% | **100.0%** | PASS |
-| **Latency p50 (Median)** | < 1500 ms | **1069.4 ms** | PASS |
-| **Latency p95** | < 4000 ms | **1307.4 ms** | PASS |
+| **Latency p50 (Median)** | < 1500 ms | **1192.0 ms** | PASS |
+| **Latency p95** | < 4000 ms | **9670.7 ms** | REVIEW |
 
 ## 2. Domain-Wise Accuracy Breakdown
 
 | Engineering Division | Cases | Top-1 | Top-3 | Top-5 | Median Latency |
 |---|---|---|---|---|---|
-| Chemical & Safety | 6 | 100.0% | 100.0% | 100.0% | 1112.5 ms |
-| Civil Engineering | 12 | 100.0% | 100.0% | 100.0% | 1065.8 ms |
-| Electronics and IT | 4 | 100.0% | 100.0% | 100.0% | 1035.3 ms |
-| Electrotechnical | 10 | 100.0% | 100.0% | 100.0% | 1087.8 ms |
-| Food and Agriculture | 4 | 75.0% | 75.0% | 100.0% | 1097.1 ms |
-| Mechanical Engineering | 9 | 100.0% | 100.0% | 100.0% | 1167.7 ms |
-| Medical and Healthcare | 4 | 100.0% | 100.0% | 100.0% | 1212.0 ms |
-| Multilingual Indic | 10 | 90.0% | 100.0% | 100.0% | 316.4 ms |
-| Textiles | 1 | 100.0% | 100.0% | 100.0% | 1112.5 ms |
+| Chemical & Safety | 6 | 100.0% | 100.0% | 100.0% | 1112.1 ms |
+| Civil Engineering | 12 | 100.0% | 100.0% | 100.0% | 1241.7 ms |
+| Electronics and IT | 4 | 100.0% | 100.0% | 100.0% | 1142.9 ms |
+| Electrotechnical | 10 | 100.0% | 100.0% | 100.0% | 1179.3 ms |
+| Food and Agriculture | 4 | 75.0% | 75.0% | 100.0% | 1142.7 ms |
+| Mechanical Engineering | 9 | 100.0% | 100.0% | 100.0% | 1105.9 ms |
+| Medical and Healthcare | 4 | 100.0% | 100.0% | 100.0% | 1188.4 ms |
+| Multilingual Indic | 10 | 90.0% | 100.0% | 100.0% | 4117.3 ms |
+| Textiles | 1 | 100.0% | 100.0% | 100.0% | 1084.2 ms |
 
 ## 3. Architecture Validation Notes
 - **Zero-Hallucination Guarantee:** The Verification Kernel verified 100% of all generated IS numbers against `standards.db`. Zero synthetic or hallucinated standards were admitted into any output clause.

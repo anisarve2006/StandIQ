@@ -16,5 +16,7 @@ class Settings:
     neo4j_password: str = os.getenv("NEO4J_PASSWORD", "password")
     use_groq: bool = os.getenv("USE_GROQ", "false").lower() == "true"
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
+    use_bharatgpt: bool = os.getenv("USE_BHARATGPT", "true").lower() == "true"
+    bharatgpt_model_path: str = os.getenv("BHARATGPT_MODEL_PATH", "BharatGPT-3B-Indic.Q8_0.gguf")
 
 settings = Settings()

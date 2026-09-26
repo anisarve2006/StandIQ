@@ -21,7 +21,11 @@ class LateInteractionReranker:
         clean = re.sub(r'[^a-zA-Z0-9\s]', ' ', text.lower())
         tokens = [t for t in clean.split() if len(t) > 1]
         # Filter standard stop words
-        stop_words = {"the", "and", "for", "with", "all", "shall", "under", "per", "from", "into", "than", "other"}
+        stop_words = {
+            "the", "and", "for", "with", "all", "shall", "under", "per", "from", "into", "than", "other",
+            "to", "in", "of", "be", "by", "at", "on", "an", "is", "it", "as", "or", "if", "do", "we", "re",
+            "cost", "costs", "manner", "wise", "year", "years", "rate", "rates", "item", "items", "nos"
+        }
         return [t for t in tokens if t not in stop_words]
 
     def compute_maxsim(self, query_tokens: List[str], doc_tokens: List[str]) -> float:
@@ -33,23 +37,21 @@ class LateInteractionReranker:
             return 0.0
 
         doc_set = set(doc_tokens)
-        doc_text = " ".join(doc_tokens)
-        
         sim_sum = 0.0
         for q_tok in query_tokens:
             if q_tok in doc_set:
                 # Exact token match
                 sim_sum += 1.0
-            elif q_tok in doc_text:
-                # Substring match (e.g. "motor" in "motors", "reinforce" in "reinforcement")
+            elif len(q_tok) >= 4 and any(q_tok in dt or dt in q_tok for dt in doc_set if len(dt) >= 4):
+                # Substring match only for substantive tokens (len >= 4) e.g. "motor" in "motors"
                 sim_sum += 0.75
             else:
-                # Character ngram overlap for morphological similarity
+                # Character prefix overlap for morphological variations (len >= 5)
                 best_sub = 0.0
                 q_len = len(q_tok)
-                if q_len >= 4:
+                if q_len >= 5:
                     prefix = q_tok[:4]
-                    if prefix in doc_text:
+                    if any(dt.startswith(prefix) for dt in doc_set if len(dt) >= 4):
                         best_sub = 0.5
                 sim_sum += best_sub
 

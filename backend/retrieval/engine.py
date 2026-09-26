@@ -31,6 +31,7 @@ from retrieval.completeness_loop import CompletenessEngine
 from retrieval.evidence_pack import EvidencePackBuilder
 from retrieval.verification_kernel import VerificationKernel
 from retrieval.pdf_processor import TenderPDFProcessor
+from retrieval.excel_processor import tender_excel_processor
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 SQLITE_DB = os.path.join(DATA_DIR, "standards.db")
@@ -46,16 +47,15 @@ class StandardsRecommenderEngine:
         self.evidence_builder = EvidencePackBuilder()
         self.verification_kernel = VerificationKernel(db_path=db_path)
         self.pdf_processor = TenderPDFProcessor()
+        self.excel_processor = tender_excel_processor
         
-        # Initialize Groq client if key is configured
-        self.groq_api_key = os.getenv("GROQ_API_KEY")
-        self.groq_client = None
-        if self.groq_api_key and self.groq_api_key != "your_groq_api_key_here":
-            try:
-                from groq import Groq
-                self.groq_client = Groq(api_key=self.groq_api_key)
-            except Exception as e:
-                logger.warning(f"Could not initialize Groq client: {e}")
+        # Initialize local sovereign LLM (BharatGPT-3B Indic)
+        self.bharatgpt = None
+        try:
+            from services.bharatgpt_service import bharatgpt_engine
+            self.bharatgpt = bharatgpt_engine
+        except Exception as e:
+            logger.warning(f"Could not initialize BharatGPT service: {e}")
 
     def generate_tender_clause_deterministic(self, evidence_pack: Dict[str, Any]) -> str:
         """
@@ -122,38 +122,48 @@ class StandardsRecommenderEngine:
 
     def generate_tender_clause_llm(self, evidence_pack: Dict[str, Any]) -> str:
         """
-        Synthesizes the explanation and GeM tender clause using Groq Llama 3.3 70B.
+        Synthesizes the explanation and GeM tender clause using local sovereign BharatGPT-3B Indic.
         Prompt strictly confines LLM to facts inside evidence_pack.
+        Gracefully falls back to deterministic template generator if model is unavailable.
         """
-        if not self.groq_client:
+        if not self.bharatgpt or not self.bharatgpt.is_available():
             return self.generate_tender_clause_deterministic(evidence_pack)
 
-        system_prompt = (
-            "You are the Chief Standards Officer for the Government of India e-Marketplace (GeM). "
-            "You draft rigorous, legally sound tender clauses grounded ONLY in the provided Evidence Pack. "
-            "OPERATING INVARIANTS:\n"
-            "1. You must ONLY cite Indian Standard numbers (IS) that are explicitly listed in the Evidence Pack.\n"
-            "2. Never hallucinate, guess, or inject any standard numbers.\n"
-            "3. If a QCO is marked MANDATORY in the pack, state the exact Gazette notification.\n"
-            "4. Output a clean, professional markdown document with (A) Executive Technical Recommendation, "
-            "(B) 5-Point Compliant Tender Specification Clause, and (C) Technical Gap Advisory."
-        )
-
-        user_prompt = f"Evidence Pack:\n```json\n{json.dumps(evidence_pack, indent=2)}\n```\n\nGenerate the complete technical procurement recommendation."
+        primary = evidence_pack.get("primary_standard", {})
+        product_name = primary.get("title_en", "Procurement Item")
+        standard_id = primary.get("raw_id", primary.get("family_id", "IS Standard"))
+        standard_title = primary.get("title_en", "")
+        params = evidence_pack.get("technical_parameters", {})
+        cert = evidence_pack.get("certification", {})
+        cert_info = f"{cert.get('status', 'VOLUNTARY')} (Scheme: {cert.get('scheme', 'Scheme I')})"
 
         try:
-            response = self.groq_client.chat.completions.create(
-                model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.1,
-                max_tokens=1500
+            clause = self.bharatgpt.draft_specification_clause(
+                product_name=product_name,
+                standard_id=standard_id,
+                standard_title=standard_title,
+                parameters=params,
+                certification_info=cert_info
             )
-            return response.choices[0].message.content.strip()
+            if clause:
+                lines = [
+                    "### Executive Technical Recommendation (Sovereign BharatGPT Synthesis)",
+                    f"Recommended Standard: **{standard_id}** — *{standard_title}*",
+                    f"Regulatory Status: **{cert.get('status', 'VOLUNTARY')}**",
+                    "",
+                    "### 5-Point Compliant Tender Specification Clause (GeM / CPPP):",
+                    clause
+                ]
+                gaps = evidence_pack.get("specification_gaps", [])
+                if gaps:
+                    lines.append("")
+                    lines.append("> **Procurement Advisory / Specification Warnings:**")
+                    for g in gaps:
+                        lines.append(f"> - [WARNING] {g}")
+                return "\n".join(lines)
+            return self.generate_tender_clause_deterministic(evidence_pack)
         except Exception as e:
-            logger.warning(f"Groq generation failed, falling back to deterministic: {e}")
+            logger.warning(f"BharatGPT clause drafting failed, falling back to deterministic: {e}")
             return self.generate_tender_clause_deterministic(evidence_pack)
 
     def recommend(self, query_text: str, top_candidates: int = 5) -> Dict[str, Any]:
@@ -168,6 +178,160 @@ class StandardsRecommenderEngine:
         t_compile = time.time()
         query_obj = compile_query(query_text)
         timings["query_compilation_ms"] = round((time.time() - t_compile) * 1000, 2)
+
+        # Archetype Guard (Information-Theoretic Density & Non-Product Sieve)
+        archetype = query_obj.get("archetype", "PHYSICAL_PRODUCT")
+        arch_details = query_obj.get("archetype_details", {})
+
+        if archetype == "SERVICE_RATE_SLAB":
+            return {
+                "status": "NON_PRODUCT_LINE",
+                "archetype": "SERVICE_RATE_SLAB",
+                "category": arch_details.get("category", "Logistics & Freight Rate Slab"),
+                "query": query_text,
+                "primary_recommendation": {
+                    "family_id": "NONE",
+                    "raw_id": "N/A (Rate Parameter)",
+                    "title_en": "Commercial Tariff / Distance Freight Rate Slab (Non-Product)",
+                    "status": "NOT_APPLICABLE",
+                    "division": "Logistics & Commercial Operations",
+                    "confidence": {
+                        "overall_label": "HIGH",
+                        "composite_score": 1.0
+                    }
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {
+                    "is_mandatory": False,
+                    "status": "NON_PRODUCT_PARAMETER",
+                    "scheme": "None",
+                    "applicable_qco": "None"
+                },
+                "specification_clause": "### COMMERCIAL TARIFF / DISTANCE SLAB ADVISORY\nThis line item specifies a distance or tariff pricing slab (e.g. freight tier). It represents a commercial rate parameter rather than a manufactured physical product. No Indian Standards (BIS/QCO) apply.",
+                "specification_gaps": [],
+                "verification_audit": {
+                    "is_verified": True,
+                    "hallucination_strip_rate": 0.0,
+                    "violations": []
+                },
+                "alternative_candidates": [],
+                "latency_breakdown_ms": timings,
+                "total_time_ms": round((time.time() - t0) * 1000, 2)
+            }
+
+        if archetype == "FINANCIAL_ADJUSTMENT":
+            return {
+                "status": "NON_PRODUCT_LINE",
+                "archetype": "FINANCIAL_ADJUSTMENT",
+                "category": arch_details.get("category", "Financial / Scrap Credit / Disposal Adjustment"),
+                "query": query_text,
+                "primary_recommendation": {
+                    "family_id": "NONE",
+                    "raw_id": "N/A (Financial Line)",
+                    "title_en": "Accounting Credit / Scrap Salvage / Waste Disposal Adjustment",
+                    "status": "NOT_APPLICABLE",
+                    "division": "Commercial / Contract Accounting",
+                    "confidence": {
+                        "overall_label": "HIGH",
+                        "composite_score": 1.0
+                    }
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {
+                    "is_mandatory": False,
+                    "status": "NON_PRODUCT_PARAMETER",
+                    "scheme": "None",
+                    "applicable_qco": "None"
+                },
+                "specification_clause": "### ACCOUNTING ADJUSTMENT ADVISORY\nThis line item represents an accounting credit, scrap salvage adjustment, or demolition waste disposal entry. No BIS manufacturing product standard is applicable.",
+                "specification_gaps": [],
+                "verification_audit": {
+                    "is_verified": True,
+                    "hallucination_strip_rate": 0.0,
+                    "violations": []
+                },
+                "alternative_candidates": [],
+                "latency_breakdown_ms": timings,
+                "total_time_ms": round((time.time() - t0) * 1000, 2)
+            }
+
+        if archetype == "CONTRACTUAL_CONDITION":
+            return {
+                "status": "NON_PRODUCT_LINE",
+                "archetype": "CONTRACTUAL_CONDITION",
+                "category": arch_details.get("category", "Contractual / Legal Condition"),
+                "query": query_text,
+                "primary_recommendation": {
+                    "family_id": "NONE",
+                    "raw_id": "N/A (Legal Clause)",
+                    "title_en": "Contractual / Legal / Qualification Clause (Non-Product)",
+                    "status": "NOT_APPLICABLE",
+                    "division": "General Legal and Contract Administration",
+                    "confidence": {
+                        "overall_label": "HIGH",
+                        "composite_score": 1.0
+                    }
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {
+                    "is_mandatory": False,
+                    "status": "NON_PRODUCT_PARAMETER",
+                    "scheme": "None",
+                    "applicable_qco": "None"
+                },
+                "specification_clause": "### LEGAL / CONTRACTUAL CONDITION ADVISORY\nThis line item represents a commercial, legal, or bidder qualification clause (e.g. GCC/SCC conditions, payment terms, defect liability). No BIS manufacturing product standard is applicable.",
+                "specification_gaps": [],
+                "verification_audit": {
+                    "is_verified": True,
+                    "hallucination_strip_rate": 0.0,
+                    "violations": []
+                },
+                "alternative_candidates": [],
+                "latency_breakdown_ms": timings,
+                "total_time_ms": round((time.time() - t0) * 1000, 2)
+            }
+
+        if archetype == "SERVICE_OR_LABOUR" and not query_obj.get("exact_is"):
+            svc_std = arch_details.get("service_standard", {
+                "family_id": "IS/ISO:9001",
+                "raw_id": "IS/ISO 9001 : 2015",
+                "title_en": "Quality Management Systems - Requirements (Service Governance)",
+                "status": "CURRENT"
+            })
+            return {
+                "status": "SUCCESS",
+                "archetype": "SERVICE_OR_LABOUR",
+                "category": arch_details.get("category", "Operational Service Contract"),
+                "query": query_text,
+                "primary_recommendation": {
+                    "family_id": svc_std["family_id"],
+                    "raw_id": svc_std["raw_id"],
+                    "title_en": svc_std["title_en"],
+                    "status": svc_std["status"],
+                    "division": "Management and Systems",
+                    "confidence": {
+                        "overall_label": "HIGH",
+                        "composite_score": 0.95
+                    }
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {
+                    "is_mandatory": False,
+                    "status": "VOLUNTARY / SERVICE CODE",
+                    "scheme": "Scheme I (Quality Management)",
+                    "applicable_qco": "None (Service Contract)"
+                },
+                "specification_clause": f"### OPERATIONAL SERVICE SPECIFICATION CLAUSE\nThe execution of this operational/logistics service shall conform to **{svc_std['raw_id']}** (*{svc_std['title_en']}*) and statutory workplace safety guidelines. Bidders possessing ISO 9001 certification shall be evaluated for quality compliance.",
+                "specification_gaps": [],
+                "verification_audit": {
+                    "is_verified": True,
+                    "hallucination_strip_rate": 0.0,
+                    "violations": []
+                },
+                "alternative_candidates": [],
+                "latency_breakdown_ms": timings,
+                "total_time_ms": round((time.time() - t0) * 1000, 2)
+            }
 
         # 2. Adaptive Retrieval (Parallel Multi-Path + RRF)
         t_ret = time.time()
@@ -287,26 +451,41 @@ class StandardsRecommenderEngine:
             "latency_breakdown_ms": timings
         }
 
-    def recommend_pdf(self, pdf_input: Any, max_items: int = 10, top_candidates: int = 3) -> Dict[str, Any]:
+    def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3) -> Dict[str, Any]:
         """
-        Processes an entire Tender / BoQ PDF document:
-        1. Extracts layout-aware text and structured tables.
-        2. Identifies discrete line items / procurement clauses.
-        3. Runs full 12-layer recommendation pipeline for each item.
+        Processes an entire Tender / BoQ document (PDF or Excel .xls/.xlsx):
+        1. Extracts layout-aware text and structured tables with ghost-column immunity.
+        2. Identifies discrete line items / procurement clauses and classifies their archetype.
+        3. Runs full recommendation pipeline for products or returns deterministic non-product advisories.
         4. Synthesizes a consolidated Tender Compliance Matrix.
         """
         t0 = time.time()
-        doc_parsed = self.pdf_processor.extract_document(pdf_input)
+        
+        # Detect if input is Excel (.xls / .xlsx) or PDF
+        is_excel = False
+        if isinstance(pdf_input, str) and (pdf_input.lower().endswith(".xls") or pdf_input.lower().endswith(".xlsx")):
+            is_excel = True
+        elif isinstance(pdf_input, bytes) and pdf_input[:8] == b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1':
+            is_excel = True
+
+        if is_excel:
+            doc_parsed = self.excel_processor.extract_document(pdf_input)
+        else:
+            doc_parsed = self.pdf_processor.extract_document(pdf_input)
+
         items = doc_parsed["extracted_items"][:max_items]
 
         item_recommendations = []
         mandatory_count = 0
         voluntary_count = 0
+        non_product_count = 0
 
         for idx, item in enumerate(items, start=1):
             text = item["raw_text"]
             rec = self.recommend(text, top_candidates=top_candidates)
-            if rec.get("status") == "SUCCESS":
+            status = rec.get("status")
+
+            if status == "SUCCESS":
                 primary = rec["primary_recommendation"]
                 cert = rec["certification"]
                 if cert.get("is_mandatory"):
@@ -317,8 +496,10 @@ class StandardsRecommenderEngine:
                 item_recommendations.append({
                     "item_index": idx,
                     "item_source": item["source"],
-                    "page": item["page"],
+                    "page": item.get("page", 1),
                     "query_text": text,
+                    "archetype": rec.get("archetype", "PHYSICAL_PRODUCT"),
+                    "category": rec.get("category", "Manufactured Product"),
                     "primary_standard": {
                         "family_id": primary["family_id"],
                         "raw_id": primary["raw_id"],
@@ -329,19 +510,44 @@ class StandardsRecommenderEngine:
                     "certification": cert,
                     "allied_standards_count": sum(len(v) for v in rec["allied_standards"].values()),
                     "specification_clause": rec["specification_clause"],
-                    "specification_gaps": rec["specification_gaps"]
+                    "specification_gaps": rec.get("specification_gaps", [])
+                })
+            elif status == "NON_PRODUCT_LINE":
+                non_product_count += 1
+                primary = rec["primary_recommendation"]
+                item_recommendations.append({
+                    "item_index": idx,
+                    "item_source": item["source"],
+                    "page": item.get("page", 1),
+                    "query_text": text,
+                    "archetype": rec.get("archetype"),
+                    "category": rec.get("category"),
+                    "primary_standard": {
+                        "family_id": primary["family_id"],
+                        "raw_id": primary["raw_id"],
+                        "title_en": primary["title_en"],
+                        "status": primary["status"],
+                        "confidence_label": primary["confidence"]["overall_label"]
+                    },
+                    "certification": rec["certification"],
+                    "allied_standards_count": 0,
+                    "specification_clause": rec["specification_clause"],
+                    "specification_gaps": []
                 })
 
         total_time_ms = round((time.time() - t0) * 1000, 2)
+        mfg_total = mandatory_count + voluntary_count
 
         return {
             "status": "SUCCESS",
             "document_metadata": doc_parsed["metadata"],
             "total_items_analyzed": len(item_recommendations),
             "compliance_summary": {
+                "manufactured_goods_count": mfg_total,
                 "mandatory_qco_items": mandatory_count,
                 "voluntary_items": voluntary_count,
-                "compliance_score": round((mandatory_count / len(item_recommendations) * 100), 1) if item_recommendations else 0.0
+                "non_product_lines_count": non_product_count,
+                "compliance_score": round((mandatory_count / mfg_total * 100), 1) if mfg_total else 0.0
             },
             "item_recommendations": item_recommendations,
             "total_processing_time_ms": total_time_ms

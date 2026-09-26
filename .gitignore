@@ -15,7 +15,8 @@ credentials.json
 service_account.json
 
 # --- Sensitive Datasets, Database Files & Large Binaries ---
-backend/data/standards.db
+*.gguf
+data/
 backend/data/*.db
 backend/data/*.sqlite
 backend/data/*.sqlite3
@@ -27,8 +28,7 @@ backend/data/*.parquet
 backend/data/*.tar.gz
 backend/data/*.zip
 backend/data/*.pdf
-!data/qco_master.json
-!data/sample_gem_tender.pdf
+!backend/data/qco_master.json
 
 # --- Python Cache & Bytecode ---
 __pycache__/

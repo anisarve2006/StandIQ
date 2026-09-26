@@ -11,10 +11,13 @@ Computes:
 """
 
 import os
+import sys
 import json
 import time
 import numpy as np
 from typing import Dict, Any, List
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from retrieval.engine import StandardsRecommenderEngine
 
 GOLD_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gold_dataset.json")

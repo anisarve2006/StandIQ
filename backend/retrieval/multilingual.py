@@ -208,12 +208,22 @@ INDIC_PROCUREMENT_VOCAB = {
     "రోడ్డు": "road"
 }
 
+def get_bharatgpt_engine():
+    try:
+        from services.bharatgpt_service import bharatgpt_engine
+        return bharatgpt_engine
+    except Exception:
+        return None
+
 def translate_indic_procurement_query(query: str) -> Dict[str, Any]:
     """
     Translates and normalizes an Indic procurement query into canonical English
     while strictly preserving all technical entities and mapping trade terms.
+    Uses BharatGPT-3B Indic local GGUF model with automatic fallback to
+    the deterministic 8-language trade lexicon.
     """
     script = detect_script(query)
+    is_multilingual = (script != "latin")
     
     # 1. Mask technical parameters (Entity Guard)
     masked_query, masks = mask_technical_entities(query)
@@ -227,7 +237,28 @@ def translate_indic_procurement_query(query: str) -> Dict[str, Any]:
             trade_hits.append({"term": term, **meta})
             canonical_terms.append(meta["product"])
 
-    # 3. Rule-based Indic intent translation (for auxiliary procurement tokens)
+    # 3. Primary Path: Local BharatGPT-3B Indic Neural Translation
+    if is_multilingual:
+        bgpt = get_bharatgpt_engine()
+        if bgpt and bgpt.is_available():
+            neural_trans = bgpt.translate_indic(masked_query, script_name=script)
+            if neural_trans:
+                # Merge canonical product names from trade hits if not already present
+                extra_terms = " ".join([m["product"] for m in trade_hits if m["product"].lower() not in neural_trans.lower()])
+                combined = f"{neural_trans} {extra_terms}".strip()
+                final_canonical = unmask_technical_entities(combined, masks)
+                final_canonical = re.sub(r'\s+', ' ', final_canonical).strip()
+                return {
+                    "original_query": query,
+                    "detected_script": script,
+                    "is_multilingual": True,
+                    "trade_hits": trade_hits,
+                    "canonical_english": final_canonical,
+                    "expanded_terms": list(set(canonical_terms)),
+                    "translation_engine": "BharatGPT-3B-Indic (Local GGUF)"
+                }
+
+    # 4. Fallback Path: Rule-based Indic intent translation + Trade Lexicon
     translated_text = masked_query
     for indic_w, eng_w in INDIC_PROCUREMENT_VOCAB.items():
         translated_text = translated_text.replace(indic_w, f" {eng_w} ")
@@ -236,15 +267,17 @@ def translate_indic_procurement_query(query: str) -> Dict[str, Any]:
     for term, meta in CROSS_LINGUAL_LEXICON.items():
         translated_text = translated_text.replace(term, f" {meta['product']} ")
 
-    # 4. Unmask technical parameters
+    # Unmask technical parameters
     final_canonical = unmask_technical_entities(translated_text, masks)
     final_canonical = re.sub(r'\s+', ' ', final_canonical).strip()
 
     return {
         "original_query": query,
         "detected_script": script,
-        "is_multilingual": script != "latin",
+        "is_multilingual": is_multilingual,
         "trade_hits": trade_hits,
         "canonical_english": final_canonical,
-        "expanded_terms": list(set(canonical_terms))
+        "expanded_terms": list(set(canonical_terms)),
+        "translation_engine": "Deterministic Indic Lexicon (Fallback)"
     }
+

@@ -14,6 +14,7 @@ from retrieval.multilingual import (
     mask_technical_entities,
     unmask_technical_entities
 )
+from retrieval.archetype_classifier import archetype_classifier
 
 # Indian Trade & Procurement Colloquial Lexicon (Hinglish to Technical Entities)
 TRADE_LEXICON = {
@@ -98,7 +99,80 @@ TRADE_LEXICON = {
     "सुरक्षा हेलमेट": {"product": "industrial safety helmets", "family_id": "IS:2925", "division": "Civil Engineering"},
     "अग्निशामक": {"product": "portable fire extinguishers", "family_id": "IS:15683", "division": "Civil Engineering"},
     "सोना": {"product": "gold and gold alloys jewellery artefacts fineness marking", "family_id": "IS:1417", "division": "Metallurgical Engineering"},
-    "हॉलमार्क": {"product": "gold and gold alloys jewellery artefacts fineness marking", "family_id": "IS:1417", "division": "Metallurgical Engineering"}
+    "हॉलमार्क": {"product": "gold and gold alloys jewellery artefacts fineness marking", "family_id": "IS:1417", "division": "Metallurgical Engineering"},
+    # Sanitary Ware & Plumbing Fixtures
+    "wash basin": {"product": "vitreous sanitary appliances specific requirements of wash basins", "family_id": "IS:2556:P4", "division": "Civil Engineering"},
+    "wash-basin": {"product": "vitreous sanitary appliances specific requirements of wash basins", "family_id": "IS:2556:P4", "division": "Civil Engineering"},
+    "flat back wash basin": {"product": "vitreous sanitary appliances specific requirements of wash basins", "family_id": "IS:2556:P4", "division": "Civil Engineering"},
+    "squatting pan": {"product": "vitreous sanitary appliances specific requirements of squatting pans", "family_id": "IS:2556:P3", "division": "Civil Engineering"},
+    "orissa pattern": {"product": "vitreous sanitary appliances specific requirements of squatting pans", "family_id": "IS:2556:P3", "division": "Civil Engineering"},
+    "orissa pattern w.c pan": {"product": "vitreous sanitary appliances specific requirements of squatting pans", "family_id": "IS:2556:P3", "division": "Civil Engineering"},
+    "flushing cistern": {"product": "plastic flushing cisterns for water closets", "family_id": "IS:7231", "division": "Civil Engineering"},
+    "pvc flushing cistern": {"product": "plastic flushing cisterns for water closets", "family_id": "IS:7231", "division": "Civil Engineering"},
+    "kitchen sink": {"product": "stainless steel sinks for domestic purposes", "family_id": "IS:13983", "division": "Civil Engineering"},
+    "stainless steel sink": {"product": "stainless steel sinks for domestic purposes", "family_id": "IS:13983", "division": "Civil Engineering"},
+    "cpvc pipe": {"product": "chlorinated polyvinyl chloride cpvc pipes for potable hot and cold water", "family_id": "IS:17546", "division": "Civil Engineering"},
+    "cpvc pipes": {"product": "chlorinated polyvinyl chloride cpvc pipes for potable hot and cold water", "family_id": "IS:17546", "division": "Civil Engineering"},
+    "chlorinated polyvinyl chloride": {"product": "chlorinated polyvinyl chloride cpvc pipes for potable hot and cold water", "family_id": "IS:17546", "division": "Civil Engineering"},
+    "rigid pvc pipe": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    "rigid pvc pipes": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    # Door, Window & Hardware Fittings
+    "flush door": {"product": "wooden flush door shutters solid core", "family_id": "IS:2202:P1", "division": "Civil Engineering"},
+    "flush door shutter": {"product": "wooden flush door shutters solid core", "family_id": "IS:2202:P1", "division": "Civil Engineering"},
+    "flush door shutters": {"product": "wooden flush door shutters solid core", "family_id": "IS:2202:P1", "division": "Civil Engineering"},
+    "door handle": {"product": "door handles for mortice lock vertical type", "family_id": "IS:4992", "division": "Civil Engineering"},
+    "door handles": {"product": "door handles for mortice lock vertical type", "family_id": "IS:4992", "division": "Civil Engineering"},
+    "m.s. handle": {"product": "door handles for mortice lock vertical type", "family_id": "IS:4992", "division": "Civil Engineering"},
+    "m.s. handles": {"product": "door handles for mortice lock vertical type", "family_id": "IS:4992", "division": "Civil Engineering"},
+    "casement stay": {"product": "mild steel stays and fasteners", "family_id": "IS:10019", "division": "Civil Engineering"},
+    "casement stays": {"product": "mild steel stays and fasteners", "family_id": "IS:10019", "division": "Civil Engineering"},
+    "sliding door bolt": {"product": "non-ferrous metal sliding door bolts aldrops for padlocks", "family_id": "IS:2681", "division": "Civil Engineering"},
+    "sliding door bolts": {"product": "non-ferrous metal sliding door bolts aldrops for padlocks", "family_id": "IS:2681", "division": "Civil Engineering"},
+    "tower bolt": {"product": "tower bolts non-ferrous metals", "family_id": "IS:204:P2", "division": "Civil Engineering"},
+    "tower bolts": {"product": "tower bolts non-ferrous metals", "family_id": "IS:204:P2", "division": "Civil Engineering"},
+    "pull bolt lock": {"product": "tower bolts non-ferrous metals", "family_id": "IS:204:P2", "division": "Civil Engineering"},
+    "door stopper": {"product": "floor door stoppers", "family_id": "IS:1823", "division": "Civil Engineering"},
+    "hanging floor door stopper": {"product": "floor door stoppers", "family_id": "IS:1823", "division": "Civil Engineering"},
+    "pressed steel door frame": {"product": "steel door frames", "family_id": "IS:4351", "division": "Civil Engineering"},
+    "pressed steel door frames": {"product": "steel door frames", "family_id": "IS:4351", "division": "Civil Engineering"},
+    # Civil, Tiles, Masonry & Finishing
+    "acrylic sheet": {"product": "polymethyl methacrylate pmma acrylic sheets", "family_id": "IS:14753", "division": "Chemical"},
+    "acrylic sheets": {"product": "polymethyl methacrylate pmma acrylic sheets", "family_id": "IS:14753", "division": "Chemical"},
+    "vitrified tile": {"product": "pressed ceramic tiles", "family_id": "IS:15622", "division": "Civil Engineering"},
+    "vitrified tiles": {"product": "pressed ceramic tiles", "family_id": "IS:15622", "division": "Civil Engineering"},
+    "ceramic glazed floor tiles": {"product": "pressed ceramic tiles", "family_id": "IS:15622", "division": "Civil Engineering"},
+    "ceramic glazed wall tiles": {"product": "pressed ceramic tiles", "family_id": "IS:15622", "division": "Civil Engineering"},
+    "tile adhesive": {"product": "adhesives for use with ceramic tiles and mosaics", "family_id": "IS:15477", "division": "Civil Engineering"},
+    "burnt clay brick": {"product": "common burnt clay building bricks", "family_id": "IS:1077", "division": "Civil Engineering"},
+    "burnt clay bricks": {"product": "common burnt clay building bricks", "family_id": "IS:1077", "division": "Civil Engineering"},
+    "distemper": {"product": "distemper dry colour", "family_id": "IS:428", "division": "Chemical"},
+    "acrylic distemper": {"product": "distemper dry colour", "family_id": "IS:428", "division": "Chemical"},
+    "aluminium primer": {"product": "ready mixed paint aluminium primer for resinous wood", "family_id": "IS:3585", "division": "Chemical"},
+    "water proofing cement compound": {"product": "integral waterproofing compounds for cement mortar and concrete", "family_id": "IS:2645", "division": "Civil Engineering"},
+    "plaster of paris": {"product": "gypsum plaster", "family_id": "IS:2547", "division": "Civil Engineering"},
+    "kota stone": {"product": "limestone slab and tiles", "family_id": "IS:1128", "division": "Civil Engineering"},
+    "kota stone slab": {"product": "limestone slab and tiles", "family_id": "IS:1128", "division": "Civil Engineering"},
+    "kota stone slabs": {"product": "limestone slab and tiles", "family_id": "IS:1128", "division": "Civil Engineering"},
+    "marble slab": {"product": "marble blocks slabs and tiles", "family_id": "IS:1130", "division": "Civil Engineering"},
+    "marble slabs": {"product": "marble blocks slabs and tiles", "family_id": "IS:1130", "division": "Civil Engineering"},
+    "white marble": {"product": "marble blocks slabs and tiles", "family_id": "IS:1130", "division": "Civil Engineering"},
+    "green marble": {"product": "marble blocks slabs and tiles", "family_id": "IS:1130", "division": "Civil Engineering"},
+    "granite stone": {"product": "polished building stones granite and similar stones", "family_id": "IS:14223:P1", "division": "Civil Engineering"},
+    "watch and ward": {"product": "quality management systems for security services", "family_id": "IS/ISO:9001", "division": "Management and Systems"},
+    "liquid nitrogen": {"product": "nitrogen compressed gas and liquid specification", "family_id": "IS:1747", "division": "Chemical"},
+    "compressed nitrogen": {"product": "nitrogen compressed gas and liquid specification", "family_id": "IS:1747", "division": "Chemical"},
+    "cryogenic liquid": {"product": "code of safety for handling cryogenic liquids", "family_id": "IS:5931", "division": "Chemical"},
+    "cryogenic liquids": {"product": "code of safety for handling cryogenic liquids", "family_id": "IS:5931", "division": "Chemical"},
+    "cryogenic tank": {"product": "code for unfired pressure vessels", "family_id": "IS:2825", "division": "Mechanical Engineering"},
+    "cryogenic vessel": {"product": "liquid nitrogen vessels", "family_id": "IS:11552", "division": "Chemical"},
+    "plain g.s. sheet": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "plain g.s.": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "g.s. sheet": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "gs sheet": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "plain gs sheet": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "g.i. profile sheet": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "gi profile sheet": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"},
+    "ridges or hips": {"product": "galvanized steel strips and sheets plain and corrugated", "family_id": "IS:277", "division": "Metallurgical Engineering"}
 }
 
 def extract_units_and_numbers(text: str) -> Dict[str, Any]:
@@ -155,14 +229,26 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
     """
     clean_text = raw_query.strip()
     
-    # 1. Extract any explicitly mentioned IS numbers (e.g., IS:1786, IS 1239 Part 1)
-    is_pattern = r'\b(IS(?:\s*[:\-\s]?\s*\d+(?:\s*(?:Part|Pt)?\s*\d+)?(?:\s*[:/]\s*\d{4})?))\b'
-    is_raw_matches = re.findall(is_pattern, clean_text, re.IGNORECASE)
+    # 1. Extract any explicitly mentioned IS numbers (e.g., IS:1786, IS 1239 Part 1, handles 1S:4992 OCR typo)
+    is_pattern = r'\b([1I]S(?:\s*[:\-\s]?\s*\d+(?:\s*(?:Part|Pt)?\s*\d+)?(?:\s*[:/]\s*\d{4})?))\b'
+    is_raw_matches = list(re.finditer(is_pattern, clean_text, re.IGNORECASE))
     exact_is_list = []
-    for match in is_raw_matches:
-        parsed = parse_is_identifier(match)
+    auxiliary_is_list = []
+    for m in is_raw_matches:
+        match_str = m.group(0)
+        norm_match = re.sub(r'^[1I]S', 'IS', match_str, flags=re.IGNORECASE)
+        parsed = parse_is_identifier(norm_match)
         if parsed.get("valid"):
-            exact_is_list.append(parsed)
+            # Check if this IS code is purely an auxiliary finish/coating specification
+            start_pos = m.start()
+            prefix_window = clean_text[max(0, start_pos - 40):start_pos].lower()
+            if any(w in prefix_window for w in ["coating", "anodised", "anodic", "oxidised", "plating", "primer as per", "grade ac"]):
+                auxiliary_is_list.append(parsed)
+            else:
+                exact_is_list.append(parsed)
+
+    # Append auxiliary finishes after primary product standards
+    exact_is_list.extend(auxiliary_is_list)
 
     # 2. Multilingual Processing & Cross-Lingual Projection
     indic_info = translate_indic_procurement_query(clean_text)
@@ -180,7 +266,12 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
                 if not any(tm["term"] == term for tm in trade_matches):
                     trade_matches.append({"term": term, **meta})
         else:
-            if re.search(rf'\b{re.escape(term)}(?:s|es|sets?)?\b', lower_query):
+            if term == "ups":
+                # Ensure 'ups' is not preceded by 'touch' (e.g. 'touch ups' in stone/finishing)
+                if re.search(r'(?<!touch\s)\bups\b', lower_query):
+                    if not any(tm["term"] == term for tm in trade_matches):
+                        trade_matches.append({"term": term, **meta})
+            elif re.search(rf'\b{re.escape(term)}(?:s|es|sets?)?\b', lower_query):
                 if not any(tm["term"] == term for tm in trade_matches):
                     trade_matches.append({"term": term, **meta})
 
@@ -231,6 +322,9 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
         if re.search(pattern, lower_query) or (indic_info.get("is_multilingual") and re.search(pattern, indic_info.get("canonical_english", "").lower())):
             expanded_terms.append(syn)
 
+    # 5. Universal Procurement Archetype Classification
+    archetype_info = archetype_classifier.classify(raw_query)
+
     return {
         "raw_query": raw_query,
         "clean_query": clean_text,
@@ -241,5 +335,7 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
         "query_type": query_type,
         "detected_script": indic_info.get("detected_script", "latin"),
         "is_multilingual": indic_info.get("is_multilingual", False),
-        "canonical_english": indic_info.get("canonical_english", clean_text)
+        "canonical_english": indic_info.get("canonical_english", clean_text),
+        "archetype": archetype_info["archetype"],
+        "archetype_details": archetype_info
     }
