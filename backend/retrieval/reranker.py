@@ -476,6 +476,96 @@ class LateInteractionReranker:
                 if "2309" in cand.get("family_id", "") or "62305" in cand.get("family_id", ""):
                     role_adjustment += 0.70
 
+            # Lighting & Luminaires (IS 10322 / IS 16107 / IS 16102 / IS 9583)
+            if any(w in query_lower for w in ["led panel", "high-bay", "high bay"]):
+                if "16107" in cand.get("family_id", "") or "10322:P5:S1" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+            if "downlight" in query_lower:
+                if "10322:P5:S2" in cand.get("family_id", "") or "recessed" in title.lower():
+                    role_adjustment += 0.70
+            if "tube light" in query_lower or "led tube" in query_lower:
+                if "16102" in cand.get("family_id", "") or "self - ballasted" in title.lower():
+                    role_adjustment += 0.70
+            if any(w in query_lower for w in ["floodlight", "flood light", "high mast"]):
+                if "10322:P5:S5" in cand.get("family_id", "") or "flood light" in title.lower():
+                    role_adjustment += 0.70
+            if any(w in query_lower for w in ["emergency light", "exit sign"]):
+                if "9583" in cand.get("family_id", ""):
+                    role_adjustment += 0.75
+            if any(w in query_lower for w in ["explosion-proof", "flameproof"]):
+                if "60079:P1" in cand.get("family_id", "") or "flameproof" in title.lower():
+                    role_adjustment += 0.85
+                elif "10322:P5:S3" in cand.get("family_id", ""):
+                    role_adjustment -= 0.70
+            if any(w in query_lower for w in ["street light", "garden light", "outdoor lighting"]):
+                if "10322:P5:S3" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+            if "street lighting pole" in query_lower or "lighting pole" in query_lower:
+                if "2713" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+
+            # Transformers (IS 1180 / IS 11171 / IS 2026)
+            if "transformer" in query_lower:
+                if "dry" in query_lower:
+                    if "11171" in cand.get("family_id", ""):
+                        role_adjustment += 0.75
+                    elif "1180" in cand.get("family_id", ""):
+                        role_adjustment -= 0.60
+                elif any(w in query_lower for w in ["distribution", "oil-immersed", "oil immersed"]):
+                    if "1180" in cand.get("family_id", ""):
+                        role_adjustment += 0.75
+                    elif "11171" in cand.get("family_id", ""):
+                        role_adjustment -= 0.60
+
+            # Voltage Stabilizer & UPS (IS 9815 / IS 16242)
+            if "stabilizer" in query_lower or "voltage corrector" in query_lower:
+                if "9815" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+            if "ups" in query_lower or "uninterruptible" in query_lower or "inverter system" in query_lower:
+                if "16242" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+
+            # Solar PV Systems (IS 14286 / IS/IEC 61683)
+            if any(w in query_lower for w in ["solar photovoltaic module", "solar pv module", "solar panel"]):
+                if "14286" in cand.get("family_id", "") or "terrestrial photovoltaic" in title.lower():
+                    role_adjustment += 0.75
+            if any(w in query_lower for w in ["solar inverter", "solar photovoltaic inverter", "charge controller"]):
+                if "61683" in cand.get("family_id", ""):
+                    role_adjustment += 0.75
+
+            # Batteries & Storage
+            if "battery" in query_lower or "energy storage" in query_lower:
+                if "lithium" in query_lower or "bess" in query_lower:
+                    if "16046" in cand.get("family_id", ""):
+                        role_adjustment += 0.70
+                elif any(w in query_lower for w in ["lead-acid", "lead acid", "emergency lighting battery"]):
+                    if "13369" in cand.get("family_id", "") or "15549" in cand.get("family_id", ""):
+                        role_adjustment += 0.70
+
+            # Diesel Generator (IS 13364 / IS 10001 / IS 8623)
+            if any(w in query_lower for w in ["diesel generator", "standby generator", "dg set"]):
+                if "13364" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+            if any(w in query_lower for w in ["amf panel", "automatic mains failure", "generator control panel"]):
+                if "8623" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+
+            # Meters (IS 13779 / IS 16444)
+            if "smart" in query_lower and "meter" in query_lower:
+                if "16444" in cand.get("family_id", ""):
+                    role_adjustment += 0.75
+            elif "meter" in query_lower and any(w in query_lower for w in ["energy", "electricity", "watthour", "building"]):
+                if "13779" in cand.get("family_id", ""):
+                    role_adjustment += 0.75
+
+            # Security, Surveillance & ELV (IS 13252 / IS 1881)
+            if any(w in query_lower for w in ["cctv", "camera system", "nvr", "video recorder", "access control", "biometric", "video intercom", "intrusion alarm"]):
+                if "13252" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+            if "public address" in query_lower or "pa system" in query_lower:
+                if "1881" in cand.get("family_id", "") or "10426" in cand.get("family_id", ""):
+                    role_adjustment += 0.75
+
             # 7. Negative Constraint Handling ("other than X")
             if "other than" in query_lower:
                 neg_match = re.search(r'other than\s+([^,;\n]+)', query_lower)

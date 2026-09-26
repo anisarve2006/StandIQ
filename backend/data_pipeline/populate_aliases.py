@@ -476,7 +476,69 @@ SEED_ALIASES = [
     ("gi earthing strip", "IS:3043", "code of practice for earthing - galvanized iron earthing strip", "Electrotechnical", "Standard Spec"),
     ("chemical earthing electrode", "IS:3043", "code of practice for earthing - chemical pipe earthing electrode", "Electrotechnical", "Standard Spec"),
     ("earthing electrode", "IS:3043", "code of practice for earthing", "Electrotechnical", "Standard Spec"),
-    ("chemical earthing", "IS:3043", "code of practice for earthing", "Electrotechnical", "Standard Spec")
+    ("chemical earthing", "IS:3043", "code of practice for earthing", "Electrotechnical", "Standard Spec"),
+
+    # Lighting & Luminaires
+    ("led panel light", "IS:16107:P2:S1", "luminaires performance led luminaire", "Electrotechnical", "Standard Spec"),
+    ("led downlight", "IS:10322:P5:S2", "luminaires particular requirements recessed luminaires", "Electrotechnical", "Standard Spec"),
+    ("led tube light", "IS:16102:P2", "self-ballasted led lamps for general lighting services", "Electrotechnical", "Standard Spec"),
+    ("led floodlight", "IS:10322:P5:S5", "luminaires particular requirements flood light", "Electrotechnical", "Standard Spec"),
+    ("led high-bay luminaire", "IS:16107:P2:S1", "luminaires performance led luminaire", "Electrotechnical", "Standard Spec"),
+    ("led emergency light", "IS:9583", "emergency lighting units", "Electrotechnical", "Standard Spec"),
+    ("exit sign luminaire", "IS:9583", "emergency lighting units and illuminated exit signs", "Electrotechnical", "Standard Spec"),
+    ("explosion-proof led luminaire", "IS/IEC:60079:P1", "explosive atmospheres equipment protection by flameproof enclosures", "Electrotechnical", "Standard Spec"),
+    ("flameproof luminaire", "IS/IEC:60079:P1", "explosive atmospheres equipment protection by flameproof enclosures", "Electrotechnical", "Standard Spec"),
+    ("solar street light", "IS:10322:P5:S3", "luminaires for road and street lighting", "Electrotechnical", "Standard Spec"),
+    ("solar led garden light", "IS:10322:P5:S3", "luminaires for road and street lighting", "Electrotechnical", "Standard Spec"),
+    ("high mast lighting system", "IS:10322:P5:S5", "luminaires particular requirements flood light", "Electrotechnical", "Standard Spec"),
+    ("street lighting pole", "IS:2713:P1", "tubular steel poles for overhead power lines and street lighting", "Civil Engineering", "Standard Spec"),
+    ("decorative indoor lighting fixture", "IS:10322:P5:S1", "luminaires general purpose luminaires", "Electrotechnical", "Standard Spec"),
+    ("outdoor lighting fixture", "IS:10322:P5:S3", "luminaires for road and street lighting", "Electrotechnical", "Standard Spec"),
+
+    # Power Generation, Transformers & Conditioning
+    ("standby diesel generator", "IS:13364:P2", "ac generators driven by reciprocating internal combustion engine", "Electrotechnical", "Standard Spec"),
+    ("diesel generator set", "IS:13364:P2", "ac generators driven by reciprocating internal combustion engine", "Electrotechnical", "Standard Spec"),
+    ("dg set", "IS:13364:P2", "ac generators driven by reciprocating internal combustion engine", "Electrotechnical", "Standard Spec"),
+    ("automatic mains failure panel", "IS:8623:P1", "low-voltage switchgear and controlgear assemblies amf panel", "Electrotechnical", "Standard Spec"),
+    ("amf panel", "IS:8623:P1", "low-voltage switchgear and controlgear assemblies amf panel", "Electrotechnical", "Standard Spec"),
+    ("generator control panel", "IS:8623:P1", "low-voltage switchgear and controlgear assemblies generator control", "Electrotechnical", "Standard Spec"),
+    ("electrical distribution transformer", "IS:1180", "outdoor type oil immersed distribution transformers", "Electrotechnical", "Standard Spec"),
+    ("distribution transformer", "IS:1180", "outdoor type oil immersed distribution transformers", "Electrotechnical", "Standard Spec"),
+    ("dry-type transformer", "IS:11171", "dry-type power transformers", "Electrotechnical", "Standard Spec"),
+    ("oil-immersed transformer", "IS:1180", "outdoor type oil immersed distribution transformers", "Electrotechnical", "Standard Spec"),
+    ("voltage stabilizer", "IS:9815:P1", "servo-motor operated automatic line voltage correctors", "Electrotechnical", "Standard Spec"),
+    ("servo voltage stabilizer", "IS:9815:P1", "servo-motor operated automatic line voltage correctors", "Electrotechnical", "Standard Spec"),
+    ("static ups", "IS:16242:P1", "uninterruptible power systems ups general and safety requirements", "Electronics and IT", "Standard Spec"),
+    ("online double-conversion ups", "IS:16242:P1", "uninterruptible power systems ups general and safety requirements", "Electronics and IT", "Standard Spec"),
+    ("online ups", "IS:16242:P1", "uninterruptible power systems ups general and safety requirements", "Electronics and IT", "Standard Spec"),
+    ("inverter system", "IS:16242:P1", "power inverters and uninterruptible power systems", "Electronics and IT", "Standard Spec"),
+
+    # Batteries & Energy Storage
+    ("emergency lighting battery system", "IS:15549", "stationary valve regulated lead acid batteries", "Electrotechnical", "Standard Spec"),
+    ("lead-acid battery bank", "IS:13369", "stationary lead acid batteries with tubular positive plates", "Electrotechnical", "Standard Spec"),
+    ("lithium-ion battery energy storage system", "IS:16046:P2", "secondary cells and batteries containing alkaline or other non-acid electrolytes lithium cells", "Electronics and IT", "Standard Spec"),
+    ("bess", "IS:16046:P2", "battery energy storage systems lithium ion", "Electronics and IT", "Standard Spec"),
+
+    # Solar PV Systems
+    ("solar photovoltaic inverter", "IS/IEC:61683", "photovoltaic systems power conditioners procedure for measuring efficiency", "Electrotechnical", "Standard Spec"),
+    ("solar inverter", "IS/IEC:61683", "photovoltaic systems power conditioners procedure for measuring efficiency", "Electrotechnical", "Standard Spec"),
+    ("solar photovoltaic module", "IS:14286", "crystalline silicon terrestrial photovoltaic pv modules design qualification and type approval", "Electrotechnical", "Standard Spec"),
+    ("solar pv module", "IS:14286", "crystalline silicon terrestrial photovoltaic pv modules design qualification and type approval", "Electrotechnical", "Standard Spec"),
+    ("solar panel", "IS:14286", "crystalline silicon terrestrial photovoltaic pv modules design qualification and type approval", "Electrotechnical", "Standard Spec"),
+    ("solar charge controller", "IS/IEC:61683", "photovoltaic systems power conditioners procedure for measuring efficiency", "Electrotechnical", "Standard Spec"),
+
+    # Meters & Security / ELV Systems
+    ("building energy meter", "IS:13779", "ac static watthour meters class 1 and 2", "Electrotechnical", "Standard Spec"),
+    ("smart electricity meter", "IS:16444", "ac static direct connected watthour smart meter class 1 and 2", "Electrotechnical", "Standard Spec"),
+    ("cctv camera system", "IS:13252:P1", "information technology equipment safety general requirements cctv", "Electronics and IT", "Standard Spec"),
+    ("network video recorder", "IS:13252:P1", "information technology equipment safety general requirements nvr", "Electronics and IT", "Standard Spec"),
+    ("nvr", "IS:13252:P1", "information technology equipment safety general requirements nvr", "Electronics and IT", "Standard Spec"),
+    ("public address system", "IS:1881", "code of practice for indoor installation of public address systems", "Electronics and IT", "Standard Spec"),
+    ("pa system", "IS:1881", "code of practice for indoor installation of public address systems", "Electronics and IT", "Standard Spec"),
+    ("access control system", "IS:13252:P1", "information technology equipment safety access control systems", "Electronics and IT", "Standard Spec"),
+    ("biometric attendance system", "IS:13252:P1", "information technology equipment safety biometric attendance devices", "Electronics and IT", "Standard Spec"),
+    ("video intercom system", "IS:13252:P1", "information technology equipment safety video intercom systems", "Electronics and IT", "Standard Spec"),
+    ("intrusion alarm system", "IS:13252:P1", "information technology equipment safety electronic intrusion alarm systems", "Electronics and IT", "Standard Spec")
 ]
 
 
