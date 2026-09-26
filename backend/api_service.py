@@ -21,6 +21,9 @@ from services.tender_diff_service import TenderDiffService
 from services.specification_service import SpecificationService
 from services.procurement_session_service import ProcurementSessionService
 from services.export_service import ExportService
+from services.feedback_service import feedback_service, FeedbackSubmission
+from services.metrics_service import metrics_collector
+from services.cache_service import query_cache
 from repositories.standard_repository import SQLiteStandardRepository
 from repositories.regulatory_repository import SQLiteRegulatoryRepository
 from repositories.graph_repository import SQLiteGraphRepository
@@ -519,6 +522,52 @@ def remove_standard_from_basket(session_id: str, family_id: str):
     
     session.selected_standards = [s for s in session.selected_standards if s.get("family_id") != family_id and s.get("raw_id") != family_id]
     return session
+
+# ==========================================
+# SYSTEM DESIGN & OBSERVABILITY ENDPOINTS
+# ==========================================
+
+@app.post("/api/v1/feedback")
+def submit_procurement_feedback(submission: FeedbackSubmission):
+    """
+    Active Learning Feedback Endpoint.
+    Records procurement officer acceptance/corrections and dynamically adapts SQLite alias catalog.
+    """
+    res = feedback_service.record_feedback(submission)
+    if res.get("status") == "ERROR":
+        raise HTTPException(status_code=500, detail=res.get("message"))
+    return res
+
+@app.get("/api/v1/system/metrics")
+def get_system_telemetry_metrics():
+    """
+    SRE Telemetry & System Design Observability Endpoint.
+    Returns P50/P90/P99 latencies, cache hit ratio, circuit breaker status, and DB health.
+    """
+    return metrics_collector.get_summary()
+
+@app.post("/api/v1/system/cache/clear")
+def clear_query_cache():
+    """
+    Invalidates the entire LRU query cache.
+    """
+    query_cache.invalidate()
+    return {"status": "SUCCESS", "message": "Query LRU cache successfully invalidated."}
+
+@app.get("/api/v1/system/health")
+def get_system_health():
+    """
+    Comprehensive System Health Check with Circuit Breaker and Resource Status.
+    """
+    metrics = metrics_collector.get_summary()
+    return {
+        "status": "HEALTHY",
+        "engine": "StandardsRecommenderEngine v3.0",
+        "sovereign_llm_state": metrics["circuit_breaker"]["state"],
+        "cache_size": metrics["cache"]["size"],
+        "uptime_seconds": metrics["uptime_seconds"],
+        "database": metrics["database_health"]
+    }
 
 # Python direct callables for internal scripts / teammates
 def recommend_standards(query_text: str, top_candidates: int = 5) -> Dict[str, Any]:

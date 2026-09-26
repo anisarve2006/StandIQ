@@ -33,6 +33,9 @@ from retrieval.evidence_pack import EvidencePackBuilder
 from retrieval.verification_kernel import VerificationKernel
 from retrieval.pdf_processor import TenderPDFProcessor
 from retrieval.excel_processor import tender_excel_processor
+from services.cache_service import query_cache
+from services.circuit_breaker import bharatgpt_circuit_breaker
+from services.metrics_service import metrics_collector
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 SQLITE_DB = os.path.join(DATA_DIR, "standards.db")
@@ -167,13 +170,25 @@ class StandardsRecommenderEngine:
             logger.warning(f"BharatGPT clause drafting failed, falling back to deterministic: {e}")
             return self.generate_tender_clause_deterministic(evidence_pack)
 
-    def recommend(self, query_text: str, top_candidates: int = 5) -> Dict[str, Any]:
+    def recommend(self, query_text: str, top_candidates: int = 5, use_cache: bool = True) -> Dict[str, Any]:
         """
         End-to-End Orchestration Pipeline.
         Returns complete verified recommendation object with sub-millisecond audit metrics.
+        Integrated with multi-tier LRU caching and observability metrics.
         """
         t0 = time.time()
         timings = {}
+
+        # 0. Check Multi-Tier LRU Query Cache (Sub-millisecond retrieval)
+        if use_cache:
+            cached_result = query_cache.get(query_text, {"top_candidates": top_candidates})
+            if cached_result is not None:
+                cached_copy = dict(cached_result)
+                cached_copy["is_cached"] = True
+                total_ms = round((time.time() - t0) * 1000, 2)
+                cached_copy["total_time_ms"] = total_ms
+                metrics_collector.record_request(total_ms, is_cached=True)
+                return cached_copy
 
         # Multi-Clause Specification / Schedule of Requirements Handling
         clause_pattern = r'(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+(?:\n(?!\s*\d+[\.\)]\s+)[^\n]+)*)'
@@ -493,8 +508,12 @@ class StandardsRecommenderEngine:
                 "confidence_label": alt["constraint_result"]["confidence_vector"]["confidence_label"]
             })
 
-        return {
+        total_time_ms = round((time.time() - t0) * 1000, 2)
+        timings["total_pipeline_ms"] = total_time_ms
+
+        response_payload = {
             "status": "SUCCESS",
+            "is_cached": False,
             "query": query_text,
             "evidence_pack": evidence_pack,
             "primary_recommendation": {
@@ -517,8 +536,15 @@ class StandardsRecommenderEngine:
                 "violations": verification_report["violations"]
             },
             "alternative_candidates": alternatives,
+            "total_time_ms": total_time_ms,
             "latency_breakdown_ms": timings
         }
+
+        if use_cache:
+            query_cache.put(query_text, response_payload, {"top_candidates": top_candidates})
+        metrics_collector.record_request(total_time_ms, is_cached=False)
+
+        return response_payload
 
     def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3, filename: Optional[str] = None) -> Dict[str, Any]:
         """
