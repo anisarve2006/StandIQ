@@ -44,8 +44,11 @@ SEED_ALIASES = [
     ("ready mix concrete", "IS:4926", "ready-mixed concrete code of practice", "Civil Engineering", "Trade Name"),
     ("ready-mix concrete", "IS:4926", "ready-mixed concrete code of practice", "Civil Engineering", "Trade Name"),
     ("ready mixed concrete", "IS:4926", "ready-mixed concrete code of practice", "Civil Engineering", "Trade Name"),
+    ("ready-mixed concrete", "IS:4926", "ready-mixed concrete code of practice", "Civil Engineering", "Trade Name"),
     ("rmc", "IS:4926", "ready-mixed concrete code of practice", "Civil Engineering", "Trade Acronym"),
     ("cement concrete", "IS:456", "plain and reinforced concrete code of practice", "Civil Engineering", "Engineering Term"),
+    ("plain cement concrete", "IS:456", "plain and reinforced concrete code of practice", "Civil Engineering", "Engineering Term"),
+    ("rcc concrete", "IS:456", "plain and reinforced concrete code of practice", "Civil Engineering", "Engineering Term"),
     ("m-10", "IS:456", "plain and reinforced concrete code of practice", "Civil Engineering", "Mix Grade"),
     ("m-15", "IS:456", "plain and reinforced concrete code of practice", "Civil Engineering", "Mix Grade"),
     ("m-20", "IS:456", "plain and reinforced concrete code of practice", "Civil Engineering", "Mix Grade"),
@@ -67,6 +70,18 @@ SEED_ALIASES = [
     ("चूना", "IS:712", "building lime", "Civil Engineering", "Hindi Colloquial"),
     ("cement mortar", "IS:2250", "preparation and use of masonry mortars", "Civil Engineering", "Engineering Term"),
     ("masonry mortar", "IS:2250", "preparation and use of masonry mortars", "Civil Engineering", "Engineering Term"),
+
+    # Fertilizer & Agricultural Chemicals
+    ("fertilizer-grade urea", "IS:5406", "urea fertilizer grade specification", "Chemical", "Trade Name"),
+    ("urea", "IS:5406", "urea fertilizer grade specification", "Chemical", "Trade Name"),
+
+    # Testing Specifications
+    ("testing of hardened concrete", "IS:516", "hardened concrete methods of test", "Civil Engineering", "Testing Spec"),
+    ("testing of hardened m-20 concrete", "IS:516", "hardened concrete methods of test", "Civil Engineering", "Testing Spec"),
+    ("testing bricks", "IS:3495", "methods of tests of burnt clay building bricks", "Civil Engineering", "Testing Spec"),
+    ("testing of bricks", "IS:3495", "methods of tests of burnt clay building bricks", "Civil Engineering", "Testing Spec"),
+    ("testing cement", "IS:4031", "methods of physical tests for hydraulic cement", "Civil Engineering", "Testing Spec"),
+    ("testing of cement", "IS:4031", "methods of physical tests for hydraulic cement", "Civil Engineering", "Testing Spec"),
 
     # Masonry, Stone, Soling & Bricks
     ("fly ash brick", "IS:12894", "pulverized fuel ash-lime bricks", "Civil Engineering", "Trade Name"),
