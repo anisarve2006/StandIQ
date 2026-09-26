@@ -323,7 +323,25 @@ SEED_ALIASES = [
     ("pcc 1:4:8", "IS:456", "plain and reinforced concrete code of practice - nominal mixes", "Civil Engineering", "Standard Spec"),
     ("pcc 1:3:6", "IS:456", "plain and reinforced concrete code of practice - nominal mixes", "Civil Engineering", "Standard Spec"),
     ("lean concrete", "IS:456", "plain and reinforced concrete code of practice - foundation bedding", "Civil Engineering", "Standard Spec"),
-    ("concrete curing compound", "IS:18256", "liquid membrane forming compounds for curing concrete", "Civil Engineering", "Standard Spec")
+    ("concrete curing compound", "IS:18256", "liquid membrane forming compounds for curing concrete", "Civil Engineering", "Standard Spec"),
+
+    # Masonry Blocks, Stonework & Flooring
+    ("aac block masonry", "IS:6041", "code of practice for construction of autoclaved cellular concrete block masonry", "Civil Engineering", "Standard Spec"),
+    ("autoclaved aerated concrete blocks", "IS:2185:P3", "concrete masonry units - autoclaved cellular aerated concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("aac blocks", "IS:2185:P3", "concrete masonry units - autoclaved cellular aerated concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("aac block", "IS:2185:P3", "concrete masonry units - autoclaved cellular aerated concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("concrete hollow blocks", "IS:2185:P1", "concrete masonry units - hollow and solid concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("solid concrete masonry blocks", "IS:2185:P1", "concrete masonry units - hollow and solid concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("hollow concrete blocks", "IS:2185:P1", "concrete masonry units - hollow and solid concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("solid concrete blocks", "IS:2185:P1", "concrete masonry units - hollow and solid concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("fly ash cement blocks", "IS:12894", "pulverized fuel ash lime bricks and blocks", "Civil Engineering", "Standard Spec"),
+    ("ips flooring", "IS:2571", "code of practice for laying in-situ cement concrete flooring indian patent stone", "Civil Engineering", "Standard Spec"),
+    ("cement screed flooring", "IS:2571", "code of practice for laying in-situ cement concrete flooring", "Civil Engineering", "Standard Spec"),
+    ("cement screed", "IS:2571", "code of practice for laying in-situ cement concrete flooring", "Civil Engineering", "Standard Spec"),
+    ("terrazzo flooring", "IS:2114", "laying in-situ terrazzo floor finish code of practice", "Civil Engineering", "Standard Spec"),
+    ("marble flooring", "IS:1130", "marble blocks slabs and tiles for flooring", "Civil Engineering", "Standard Spec"),
+    ("cement render to external walls", "IS:2402", "code of practice for external rendered finishes", "Civil Engineering", "Standard Spec"),
+    ("brick lintels", "IS:2212", "code of practice for brickwork - brick lintels", "Civil Engineering", "Standard Spec")
 ]
 
 
