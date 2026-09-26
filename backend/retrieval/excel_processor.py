@@ -23,24 +23,78 @@ class TenderExcelProcessor:
     def __init__(self):
         self.max_contiguous_cols = 15
 
-    def extract_document(self, file_path_or_bytes: Union[str, bytes]) -> Dict[str, Any]:
+    def extract_document(self, file_path_or_bytes: Union[str, bytes], filename: Optional[str] = None) -> Dict[str, Any]:
         """
-        Parses CPPP / GeM BoQ spreadsheets (.xls / .xlsx) into structured procurement items.
+        Parses CPPP / GeM BoQ spreadsheets (.xlsx / .xls / .csv) into structured procurement items.
         Features Ghost-Column Immunity: discards columns beyond active table boundary.
         """
-        if isinstance(file_path_or_bytes, bytes):
-            book = xlrd.open_workbook(file_contents=file_path_or_bytes)
-        else:
-            book = xlrd.open_workbook(file_path_or_bytes)
+        rows: List[List[str]] = []
+        sheet_name = "BoQ"
 
-        # Select primary BoQ sheet (e.g. 'BoQ1' or first sheet)
-        sheet = None
-        for sname in book.sheet_names():
-            if 'boq' in sname.lower() or 'schedule' in sname.lower() or 'price' in sname.lower():
-                sheet = book.sheet_by_name(sname)
-                break
-        if sheet is None:
-            sheet = book.sheet_by_index(0)
+        is_xlsx = False
+        is_xls = False
+
+        if filename:
+            fn_lower = filename.lower()
+            if fn_lower.endswith('.xlsx'):
+                is_xlsx = True
+            elif fn_lower.endswith('.xls'):
+                is_xls = True
+
+        if isinstance(file_path_or_bytes, bytes):
+            if file_path_or_bytes.startswith(b'PK\x03\x04'):
+                is_xlsx = True
+            elif file_path_or_bytes.startswith(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'):
+                is_xls = True
+        elif isinstance(file_path_or_bytes, str):
+            fn_lower = file_path_or_bytes.lower()
+            if fn_lower.endswith('.xlsx'):
+                is_xlsx = True
+            elif fn_lower.endswith('.xls'):
+                is_xls = True
+
+        if is_xlsx:
+            import io
+            import openpyxl
+            source = io.BytesIO(file_path_or_bytes) if isinstance(file_path_or_bytes, bytes) else file_path_or_bytes
+            wb = openpyxl.load_workbook(source, data_only=True)
+            sheet = None
+            for sname in wb.sheetnames:
+                if any(k in sname.lower() for k in ['boq', 'schedule', 'price']):
+                    sheet = wb[sname]
+                    break
+            if sheet is None:
+                sheet = wb.active
+            sheet_name = getattr(sheet, 'title', 'BoQ')
+            for r in sheet.iter_rows(values_only=True):
+                rows.append([str(c).strip() if c is not None else "" for c in r])
+        elif is_xls:
+            if isinstance(file_path_or_bytes, bytes):
+                book = xlrd.open_workbook(file_contents=file_path_or_bytes)
+            else:
+                book = xlrd.open_workbook(file_path_or_bytes)
+            sheet = None
+            for sname in book.sheet_names():
+                if any(k in sname.lower() for k in ['boq', 'schedule', 'price']):
+                    sheet = book.sheet_by_name(sname)
+                    break
+            if sheet is None:
+                sheet = book.sheet_by_index(0)
+            sheet_name = sheet.name
+            for r in range(sheet.nrows):
+                rows.append([str(sheet.cell_value(r, c)).strip() for c in range(sheet.ncols)])
+        else:
+            # Fallback CSV or tabular text
+            import csv
+            import io
+            if isinstance(file_path_or_bytes, bytes):
+                text_content = file_path_or_bytes.decode('utf-8', errors='ignore')
+            else:
+                with open(file_path_or_bytes, 'r', encoding='utf-8', errors='ignore') as f:
+                    text_content = f.read()
+            reader = csv.reader(io.StringIO(text_content))
+            for r in reader:
+                rows.append([str(c).strip() for c in r])
 
         # 1. Identify Header Row (Sl. No., Item Description, Quantity, Units, Rate)
         header_row_idx = None
@@ -49,8 +103,9 @@ class TenderExcelProcessor:
         qty_col_idx = None
         unit_col_idx = None
 
-        for r in range(min(25, sheet.nrows)):
-            row_raw = [str(sheet.cell_value(r, c)).strip() for c in range(min(sheet.ncols, self.max_contiguous_cols))]
+        total_rows = len(rows)
+        for r in range(min(25, total_rows)):
+            row_raw = [rows[r][c].strip() for c in range(min(len(rows[r]), self.max_contiguous_cols))]
             row_normalized = [" ".join(val.split()).lower() for val in row_raw]
             
             # Check if this row is the primary column header row
@@ -79,9 +134,9 @@ class TenderExcelProcessor:
         last_parent_desc = ""
 
         # 2. Extract Data Rows within the bounded active table columns
-        for r in range(header_row_idx + 1, sheet.nrows):
+        for r in range(header_row_idx + 1, total_rows):
             # Enforce ghost column immunity: only inspect columns 0 to 12
-            row_cells = [str(sheet.cell_value(r, c)).strip() for c in range(min(sheet.ncols, self.max_contiguous_cols))]
+            row_cells = [rows[r][c].strip() for c in range(min(len(rows[r]), self.max_contiguous_cols))]
             
             sl_val = row_cells[sl_col_idx] if sl_col_idx < len(row_cells) else ""
             desc_val = row_cells[desc_col_idx] if desc_col_idx < len(row_cells) else ""
@@ -137,8 +192,8 @@ class TenderExcelProcessor:
         return {
             "metadata": {
                 "file_type": "EXCEL_BOQ",
-                "sheet_name": sheet.name,
-                "total_rows": sheet.nrows,
+                "sheet_name": sheet_name,
+                "total_rows": total_rows,
                 "extracted_items_count": len(extracted_items)
             },
             "extracted_items": extracted_items

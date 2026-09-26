@@ -70,7 +70,7 @@ class BharatGPTService:
 
         try:
             from llama_cpp import Llama
-            logger.info(f"[BharatGPT] Loading sovereign model into RAM from {self.model_path}...")
+            logger.info(f"[BharatGPT] Loading sovereign model into RAM from {self.model_path} (CPU AVX2)...")
             # n_threads defaults to 4 or max available cores; n_ctx=2048 handles full clauses & specs
             self.llm = Llama(
                 model_path=self.model_path,
@@ -78,10 +78,24 @@ class BharatGPTService:
                 n_threads=min(4, os.cpu_count() or 4),
                 verbose=False
             )
+            self._backend_type = "Local GGUF (CPU AVX2)"
             logger.info("[BharatGPT] Successfully loaded BharatGPT-3B-Indic into RAM (Air-Gapped Sovereign Mode ACTIVE)")
         except ImportError:
-            self._load_error = "llama-cpp-python is not installed"
-            logger.warning("[BharatGPT] llama-cpp-python is not installed. Running in FALLBACK mode.")
+            try:
+                from transformers import AutoModelForCausalLM
+                logger.info(f"[BharatGPT] Loading model via transformers from {self.model_path}...")
+                dirname = os.path.dirname(self.model_path) or "."
+                basename = os.path.basename(self.model_path)
+                self.llm = AutoModelForCausalLM.from_pretrained(
+                    dirname,
+                    gguf_file=basename,
+                    device_map="auto"
+                )
+                self._backend_type = "Local GGUF (Transformers)"
+                logger.info("[BharatGPT] Successfully loaded BharatGPT-3B-Indic into RAM via Transformers")
+            except Exception as te:
+                self._load_error = f"Failed to load model: {te}"
+                logger.warning(f"[BharatGPT] {self._load_error}. Running in FALLBACK mode.")
         except Exception as e:
             self._load_error = str(e)
             logger.error(f"[BharatGPT] Failed to load GGUF model: {e}. Running in FALLBACK mode.")
@@ -93,7 +107,7 @@ class BharatGPTService:
         return {
             "available": self.is_available(),
             "model_path": self.model_path,
-            "backend": "Local GGUF (CPU AVX2)" if self.is_available() else "UNAVAILABLE",
+            "backend": getattr(self, "_backend_type", "Local GGUF (CPU AVX2)") if self.is_available() else "UNAVAILABLE",
             "error": self._load_error
         }
 

@@ -6,7 +6,7 @@ Run with: uvicorn api_service:app --host 0.0.0.0 --port 8000 --reload
 
 import os
 from typing import Optional, Dict, Any, List
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -31,7 +31,7 @@ from schemas.api import (
     AlliedStandardsResponse, VersionResponse, CertificationResponse, 
     TenderAnalyzeRequest, TenderAnalyzeResponse, TenderHealthRequest, TenderHealthResponse,
     TenderDiffRequest, TenderDiffResponse, SpecificationGenerateRequest, SpecificationGenerateResponse,
-    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse,
+    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse, ExportPackageRequest,
     DashboardSummary, KnowledgeGraphResponse, ChangesResponse, ProcurementListResponse,
     GraphNode, GraphEdge, StandardChange, TenderHealthFinding
 )
@@ -293,29 +293,41 @@ def get_standard_details(family_id: str):
     }
 
 @app.post("/api/v1/recommend/pdf")
+@app.post("/api/v1/recommend/document")
 async def recommend_pdf_endpoint(
-    file: UploadFile = File(..., description="Government Tender / BoQ PDF document"),
-    max_items: Optional[int] = 10,
+    file: UploadFile = File(..., description="Government Tender / BoQ document (PDF, Excel, CSV, TXT)"),
+    max_items: Optional[int] = 15,
     top_candidates: Optional[int] = 3
 ):
     """
-    Tender PDF Upload & Analysis Endpoint:
-    Upload an entire tender PDF (BoQ, Schedule of Requirements, Technical Specs).
+    Tender Document Upload & Analysis Endpoint:
+    Upload an entire tender document (BoQ, Schedule of Requirements, Technical Specs).
+    Supports PDF (.pdf), Excel (.xls, .xlsx), CSV (.csv), and Plain Text (.txt).
     Extracts tables and itemized specifications, maps applicable Indian Standards,
     audits compulsory QCO compliance, and generates a consolidated compliance matrix.
     """
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Invalid file type. Only PDF documents are supported.")
+    allowed_exts = (".pdf", ".xls", ".xlsx", ".csv", ".txt", ".docx")
+    fname_lower = (file.filename or "").lower()
+    if not any(fname_lower.endswith(ext) for ext in allowed_exts):
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
+        )
 
-    pdf_bytes = await file.read()
-    if len(pdf_bytes) == 0:
-        raise HTTPException(status_code=400, detail="Uploaded PDF file is empty.")
+    file_bytes = await file.read()
+    if len(file_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
     try:
-        matrix = engine.recommend_pdf(pdf_bytes, max_items=max_items, top_candidates=top_candidates)
+        matrix = engine.recommend_pdf(
+            file_bytes, 
+            max_items=max_items, 
+            top_candidates=top_candidates, 
+            filename=file.filename
+        )
         return matrix
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to process tender PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process tender document: {str(e)}")
 
 class VerifyRequest(BaseModel):
     tender_clause: str = Field(..., description="The drafted or existing tender specification text.")
@@ -403,6 +415,21 @@ def get_session(session_id: str):
 def export_session(req: ExportRequest):
     try:
         return export_service.export(req)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/v1/export/package")
+def export_specification_package(req: ExportPackageRequest):
+    try:
+        file_bytes, media_type, filename = export_service.export_package(req)
+        return Response(
+            content=file_bytes,
+            media_type=media_type,
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
+        )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

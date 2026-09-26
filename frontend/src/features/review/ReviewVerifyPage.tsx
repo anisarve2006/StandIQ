@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Upload, 
   ChevronLeft, 
@@ -32,6 +32,9 @@ export interface ExtractedRequirement {
   status: 'pending' | 'accepted';
   clauseNumber?: string;
   category?: string;
+  specificationGaps?: string[];
+  specificationClause?: string;
+  isMandatoryQco?: boolean;
 }
 
 export interface RecommendedStandardItem {
@@ -41,6 +44,15 @@ export interface RecommendedStandardItem {
   type: BasketStandard['type'];
   status: BasketStandard['status'];
   rationale: string;
+}
+
+export interface AuditSummary {
+  pages: number | string;
+  totalItems: number;
+  mandatoryQcoItems: number;
+  voluntaryItems: number;
+  complianceScore: number;
+  processingTimeSeconds: number;
 }
 
 interface DocumentClause {
@@ -886,6 +898,7 @@ const SAMPLE_GENERIC: TenderDocumentData = {
 
 export default function ReviewVerifyPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToBasket, removeFromBasket, isInBasket } = useStandIQ();
 
   // Active document data & state
@@ -899,6 +912,7 @@ export default function ReviewVerifyPage() {
   const [rawTextContent, setRawTextContent] = useState<string | null>(null);
   const [viewerMode, setViewerMode] = useState<'preview' | 'document'>('document');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [auditSummary, setAuditSummary] = useState<AuditSummary | null>(null);
 
   // Tab & viewer controls
   const [activeTab, setActiveTab] = useState<'extracted' | 'standards'>('extracted');
@@ -1014,43 +1028,78 @@ export default function ReviewVerifyPage() {
     const stepTimer1 = setTimeout(() => setAnalysisStep(2), 400);
     const stepTimer2 = setTimeout(() => setAnalysisStep(3), 850);
 
-    // Try calling backend /api/v1/recommend/pdf if it's a PDF
+    // Try calling backend /api/v1/recommend/document (or /pdf) for all supported document types
     let backendSuccess = false;
-    if (fileCategory === 'pdf') {
+    const canSendToBackend = 
+      fileCategory === 'pdf' || 
+      fileCategory === 'office' || 
+      fileCategory === 'text' || 
+      ['pdf', 'xlsx', 'xls', 'csv', 'txt'].includes(ext);
+
+    if (canSendToBackend) {
       try {
         const formData = new FormData();
         formData.append('file', file);
-        const res = await fetch(`${API_BASE_URL}/api/v1/recommend/pdf?max_items=8&top_candidates=3`, {
+        
+        let res = await fetch(`${API_BASE_URL}/api/v1/recommend/document?max_items=15&top_candidates=3`, {
           method: 'POST',
           body: formData,
-        });
+        }).catch(() => null);
 
-        if (res.ok) {
+        // Fallback to /recommend/pdf if /recommend/document fails or 404
+        if (!res || !res.ok) {
+          const fallbackData = new FormData();
+          fallbackData.append('file', file);
+          res = await fetch(`${API_BASE_URL}/api/v1/recommend/pdf?max_items=15&top_candidates=3`, {
+            method: 'POST',
+            body: fallbackData,
+          }).catch(() => null);
+        }
+
+        if (res && res.ok) {
           const data = await res.json();
           if (data && data.item_recommendations && data.item_recommendations.length > 0) {
             backendSuccess = true;
+
+            // Set real executive audit metrics
+            if (data.compliance_summary) {
+              setAuditSummary({
+                pages: data.document_metadata?.pages || data.document_metadata?.total_rows || 1,
+                totalItems: data.document_metadata?.total_items_extracted || data.item_recommendations.length,
+                mandatoryQcoItems: data.compliance_summary.mandatory_qco_items || 0,
+                voluntaryItems: data.compliance_summary.voluntary_items || 0,
+                complianceScore: data.compliance_summary.compliance_score || 0,
+                processingTimeSeconds: data.document_metadata?.processing_time_seconds || 0
+              });
+            }
+
             // Map backend items to requirements and standards
             const dynamicReqs: ExtractedRequirement[] = data.item_recommendations.map((item: any, idx: number) => ({
               id: idx + 1,
-              title: item.primary_standard?.title_en ? item.primary_standard.title_en.slice(0, 36) + '...' : `Requirement #${idx + 1}`,
+              title: item.primary_standard?.title_en 
+                ? (item.primary_standard.title_en.length > 40 ? item.primary_standard.title_en.slice(0, 40) + '...' : item.primary_standard.title_en) 
+                : (item.query_text ? item.query_text.slice(0, 36) + '...' : `Requirement #${idx + 1}`),
               severity: item.certification?.is_mandatory ? 'High' : 'Medium',
               requirementText: item.query_text || item.specification_clause || 'Extracted technical specification parameter.',
-              recommendedStandard: item.primary_standard?.raw_id || item.primary_standard?.family_id || 'IS 12615:2018',
+              recommendedStandard: item.primary_standard?.raw_id || item.primary_standard?.family_id || 'IS Standard',
               status: 'pending',
-              clauseNumber: `Cl-${item.page || 1}.${idx + 1}`,
-              category: item.primary_standard?.type || 'Product'
+              clauseNumber: item.item_source || (item.page ? `Page ${item.page} (Item ${idx + 1})` : `Item ${idx + 1}`),
+              category: item.category || item.archetype || 'Product',
+              specificationGaps: item.specification_gaps || [],
+              specificationClause: item.specification_clause || '',
+              isMandatoryQco: !!item.certification?.is_mandatory
             }));
 
             const dynamicStds: RecommendedStandardItem[] = data.item_recommendations
-              .filter((item: any) => item.primary_standard)
+              .filter((item: any) => item.primary_standard && item.primary_standard.family_id !== 'N/A')
               .map((item: any) => ({
                 code: item.primary_standard.raw_id || item.primary_standard.family_id,
                 title: item.primary_standard.title_en,
-                match: Math.floor(Math.random() * 8) + 90,
-                type: 'Product' as BasketStandard['type'],
-                status: 'Current' as BasketStandard['status'],
+                match: item.primary_standard.confidence_label === 'HIGH' ? 96 : item.primary_standard.confidence_label === 'MEDIUM' ? 88 : 80,
+                type: (item.primary_standard.type || 'Product') as BasketStandard['type'],
+                status: (item.primary_standard.status === 'CURRENT' ? 'Current' : item.primary_standard.status === 'SUPERSEDED' ? 'Superseded' : 'Current') as BasketStandard['status'],
                 rationale: item.certification?.is_mandatory 
-                  ? 'Mandatory standard under Quality Control Order (QCO).' 
+                  ? `Legally mandatory under ${item.certification.qco_title || 'BIS Quality Control Order (QCO)'}.` 
                   : 'Recommended baseline Indian Standard for quality compliance.'
               }));
 
@@ -1060,8 +1109,8 @@ export default function ReviewVerifyPage() {
             const customDocData: TenderDocumentData = {
               id: 'custom-' + Date.now(),
               fileName: file.name,
-              fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-              totalPages: data.document_metadata?.page_count || 12,
+              fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+              totalPages: Number(data.document_metadata?.pages) || 1,
               department: 'CENTRAL PUBLIC PROCUREMENT PORTAL (GeM / CPPP)',
               tenderNumber: `CPPP/AI-EXTRACTED/${Date.now().toString().slice(-6)}`,
               title: `TENDER SPECIFICATION: ${file.name.replace(/\.[^/.]+$/, '').toUpperCase()}`,
@@ -1072,7 +1121,7 @@ export default function ReviewVerifyPage() {
                 title: req.title,
                 text: req.requirementText,
                 isHighlighted: true,
-                highlightNote: `AI Extracted Requirement #${i+1}`,
+                highlightNote: req.isMandatoryQco ? '⚠️ Mandatory QCO Standard' : 'Recommended Indian Standard',
                 matchedRequirementId: req.id,
                 matchedStandard: req.recommendedStandard
               })),
@@ -1086,7 +1135,7 @@ export default function ReviewVerifyPage() {
           }
         }
       } catch (err) {
-        console.warn('Backend PDF upload endpoint unavailable, using neuro-symbolic client extractor:', err);
+        console.warn('Backend upload endpoint error, falling back to local extractor:', err);
       }
     }
 
@@ -1178,6 +1227,14 @@ export default function ReviewVerifyPage() {
     return 'Live Preview';
   };
 
+  // Auto-process file forwarded from New Procurement Workspace
+  useEffect(() => {
+    if (location.state && (location.state as any).autoUploadFile) {
+      const fileToUpload = (location.state as any).autoUploadFile as File;
+      processUploadedFile(fileToUpload);
+    }
+  }, [location.state]);
+
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-5">
       {/* 01. Header */}
@@ -1205,6 +1262,44 @@ export default function ReviewVerifyPage() {
           </button>
         </div>
       </div>
+
+      {/* Real-time Executive Audit Summary Banner */}
+      {auditSummary && (
+        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white rounded-xl p-4 sm:p-5 shadow-sm border border-blue-900/60 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in duration-300">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-500/30 text-blue-200 text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-blue-400/30 font-bold">
+                Tender Audit Report Active
+              </span>
+              <span className="text-xs text-blue-200/80 font-mono">
+                ⚡ {auditSummary.processingTimeSeconds}s Processing Latency
+              </span>
+            </div>
+            <h2 className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <span>{currentDoc.fileName}</span>
+              <span className="text-xs font-normal text-blue-300/80">({currentDoc.fileSize})</span>
+            </h2>
+            <p className="text-xs text-blue-100/70">
+              Verified {auditSummary.totalItems} technical line items against BIS Quality Control Orders & National Standards.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="bg-white/10 backdrop-blur-xs rounded-lg px-3.5 py-2 border border-white/10 text-center min-w-[90px]">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-blue-200">Compliance</div>
+              <div className="text-xl font-black text-white">{auditSummary.complianceScore}%</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xs rounded-lg px-3.5 py-2 border border-white/10 text-center min-w-[90px]">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-amber-300">Mandatory QCO</div>
+              <div className="text-xl font-black text-amber-400">{auditSummary.mandatoryQcoItems}</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xs rounded-lg px-3.5 py-2 border border-white/10 text-center min-w-[90px]">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-300">Voluntary IS</div>
+              <div className="text-xl font-black text-emerald-400">{auditSummary.voluntaryItems}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 02. Two Column Split View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1570,13 +1665,45 @@ export default function ReviewVerifyPage() {
                         {req.requirementText}
                       </p>
 
+                      {/* Missing Parameters / Gaps Identified by AI Engine */}
+                      {req.specificationGaps && req.specificationGaps.length > 0 && (
+                        <div className="ml-7 bg-amber-50 border border-amber-200/80 rounded-lg p-2 text-[11px] text-amber-900 space-y-1">
+                          <div className="font-bold flex items-center gap-1 text-amber-800 text-[10px] uppercase tracking-wider">
+                            <span>⚠️ Specification Gaps in Tender:</span>
+                          </div>
+                          <ul className="list-disc list-inside space-y-0.5 text-[10.5px] text-amber-800/90 pl-1 font-medium">
+                            {req.specificationGaps.map((gap, gIdx) => (
+                              <li key={gIdx}>{gap}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* AI Generated Harmonized Specification Clause */}
+                      {req.specificationClause && (
+                        <div className="ml-7 bg-emerald-50/70 border border-emerald-200/70 rounded-lg p-2.5 text-[11px] space-y-1">
+                          <div className="font-bold text-[10px] text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                            <span>Drafted BIS Tender Clause:</span>
+                          </div>
+                          <p className="text-[11px] text-emerald-950 font-mono leading-relaxed bg-white/80 p-2 rounded border border-emerald-100/80">
+                            {req.specificationClause}
+                          </p>
+                        </div>
+                      )}
+
                       {req.recommendedStandard && (
                         <div className="pl-7 pt-1 flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-[11px] text-slate-400">Standard:</span>
                             <span className="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
                               {req.recommendedStandard}
                             </span>
+                            {req.isMandatoryQco && (
+                              <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">
+                                Mandatory QCO
+                              </span>
+                            )}
                           </div>
 
                           <button
