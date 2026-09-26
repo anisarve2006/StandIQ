@@ -36,15 +36,20 @@ class GraphExpander:
             allied.append(dict(row))
 
         # 2. Check Compulsory Certification / QCO
+        std_num = family_id.replace('IS:', '').split(':')[0]
         cur.execute("""
-        SELECT scheme, category, sr_no, raw_is_no, product_name, gazette_notification, status, source_url
+        SELECT scheme, category, sr_no, raw_is_no, product_name, gazette_notification, status, source_url, family_id
         FROM cert_rules
-        WHERE family_id = ? OR raw_is_no LIKE ?;
-        """, (family_id, f"%{family_id.replace('IS:', '')}%"))
+        WHERE family_id = ? OR raw_is_no LIKE ? OR raw_is_no LIKE ?;
+        """, (family_id, f"IS {std_num}%", f"IS:{std_num}%"))
 
+        import re
+        pattern = re.compile(rf'\bIS\s*{re.escape(std_num)}(?::|\s|\(|$|\b)')
         qco_rules = []
         for row in cur.fetchall():
-            qco_rules.append(dict(row))
+            r_dict = dict(row)
+            if r_dict.get("family_id") == family_id or pattern.search(r_dict.get("raw_is_no", "")):
+                qco_rules.append(r_dict)
 
         conn.close()
 

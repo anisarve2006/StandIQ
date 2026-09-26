@@ -146,6 +146,34 @@
       "demoted_standards": ["3055"],
       "boost": 0.45,
       "penalty": -0.50
+    },
+    {
+      "id": "FIRE_PROTECTION_EQUIPMENT_RULES",
+      "category": "FIRE_SAFETY_HIERARCHY",
+      "rationale": "Fire protection specifications must strictly differentiate between delivery hoses (IS 636 - QCO), first-aid hose reels (IS 884 - QCO), pumps (IS 12469), landing valves (IS 5290), and wet/dry risers (IS 3844)",
+      "query_triggers": ["fire pump", "fire hose", "landing valve", "wet riser", "dry riser"],
+      "primary_standards": ["12469", "636", "5290", "3844"],
+      "primary_boost": 0.55
+    },
+    {
+      "id": "HVAC_VENTILATION_FAN_RULES",
+      "category": "HVAC_MEP_HIERARCHY",
+      "rationale": "Ventilation fans must resolve to IS 4894 (centrifugal) or IS 3588 (axial) and disqualify adhesives (IS 17917) and regulators (IS 11037)",
+      "query_triggers": ["ventilation fan", "centrifugal fan", "axial flow", "smoke extraction"],
+      "primary_standards": ["4894", "3588"],
+      "demoted_standards": ["17917", "11037"],
+      "primary_boost": 0.55,
+      "penalty": -0.75
+    },
+    {
+      "id": "HVAC_CHILLER_AHU_RULES",
+      "category": "HVAC_MEP_HIERARCHY",
+      "rationale": "Chillers must resolve to IS 16590 (liquid chilling units), and AHU / VRF systems must resolve to IS 8148 / IS 1391 without confusing air cargo ground equipment (IS 11436)",
+      "query_triggers": ["chiller", "chilled water", "air handling unit", "ahu", "vrf"],
+      "primary_standards": ["16590", "8148", "1391"],
+      "demoted_standards": ["10470", "11436"],
+      "primary_boost": 0.55,
+      "penalty": -0.80
     }
   ]
 }

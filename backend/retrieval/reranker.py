@@ -299,6 +299,88 @@ class LateInteractionReranker:
                 elif "3055" in cand.get("family_id", ""):
                     role_adjustment -= 0.50
 
+            # Fire Fighting Pump (IS 12469 / IS 15301) vs Hose (IS 14933)
+            if "fire" in query_lower and "pump" in query_lower:
+                if "12469" in cand.get("family_id", "") or "15301" in cand.get("family_id", "") or "fire fighting system" in title:
+                    role_adjustment += 0.60
+                elif "14933" in cand.get("family_id", "") or "hose" in title:
+                    role_adjustment -= 0.80
+
+            # Fire Hose Reel (IS 884) vs Fire Delivery Hose (IS 636)
+            if "hose reel" in query_lower or "hose-reel" in query_lower:
+                if "884" in cand.get("family_id", "") or "hose-reel" in title.lower() or "hose reel" in title.lower():
+                    role_adjustment += 0.65
+                elif "636" in cand.get("family_id", ""):
+                    role_adjustment -= 0.50
+            elif "fire hose" in query_lower:
+                if "636" in cand.get("family_id", "") or "delivery hose" in title.lower():
+                    role_adjustment += 0.55
+                elif "884" in cand.get("family_id", ""):
+                    role_adjustment -= 0.35
+
+            # Fire Hydrant Landing Valve (IS 5290)
+            if "landing valve" in query_lower:
+                if "5290" in cand.get("family_id", "") or "landing valve" in title:
+                    role_adjustment += 0.65
+                elif "909" in cand.get("family_id", ""):
+                    role_adjustment -= 0.40
+
+            # Wet / Dry Riser Systems (IS 3844)
+            if any(w in query_lower for w in ["riser system", "wet riser", "dry riser"]):
+                if "3844" in cand.get("family_id", "") or "internal fire hydrant" in title:
+                    role_adjustment += 0.65
+                elif any(irrel in cand.get("family_id", "") for irrel in ["5034", "11833"]):
+                    role_adjustment -= 0.70
+
+            # Ventilation Fans (IS 4894 / IS 3588) vs Adhesives / Regulators
+            if any(w in query_lower for w in ["ventilation fan", "centrifugal fan", "smoke extraction fan"]):
+                if "4894" in cand.get("family_id", "") or "centrifugal fan" in title:
+                    role_adjustment += 0.55
+                elif "3588" in cand.get("family_id", "") or "axial flow" in title:
+                    role_adjustment += 0.45
+                elif any(irrel in cand.get("family_id", "") for irrel in ["17917", "11037"]):
+                    role_adjustment -= 0.75
+
+            if "axial" in query_lower and "fan" in query_lower:
+                if "3588" in cand.get("family_id", "") or "axial flow" in title:
+                    role_adjustment += 0.60
+                elif "11037" in cand.get("family_id", ""):
+                    role_adjustment -= 0.65
+
+            # Air Handling Unit (AHU) & VRF vs Cargo equipment / Ducts
+            if any(w in query_lower for w in ["air handling unit", "ahu"]):
+                if "8148" in cand.get("family_id", "") or "packaged air conditioner" in title:
+                    role_adjustment += 0.60
+                elif "11436" in cand.get("family_id", ""):
+                    role_adjustment -= 0.85
+
+            if "vrf" in query_lower:
+                if "8148" in cand.get("family_id", "") or "1391" in cand.get("family_id", ""):
+                    role_adjustment += 0.55
+                elif "655" in cand.get("family_id", ""):
+                    role_adjustment -= 0.60
+
+            # Chillers (IS 16590) vs Heat exchangers
+            if "chiller" in query_lower or "chilled water" in query_lower:
+                if "16590" in cand.get("family_id", "") or "liquid chilling" in title:
+                    role_adjustment += 0.60
+                elif "10470" in cand.get("family_id", ""):
+                    role_adjustment -= 0.40
+
+            # Duct Insulation (IS 8183 / IS 3677)
+            if "duct" in query_lower and "insulation" in query_lower:
+                if "8183" in cand.get("family_id", "") or "mineral wool" in title:
+                    role_adjustment += 0.55
+                elif any(irrel in cand.get("family_id", "") for irrel in ["9743", "11050"]):
+                    role_adjustment -= 0.50
+
+            # HVAC Air Filters (IS 7613)
+            if "air filter" in query_lower and "hvac" in query_lower:
+                if "7613" in cand.get("family_id", "") or "panel type air filter" in title:
+                    role_adjustment += 0.60
+                elif "16071" in cand.get("family_id", ""):
+                    role_adjustment -= 0.45
+
             # 7. Negative Constraint Handling ("other than X")
             if "other than" in query_lower:
                 neg_match = re.search(r'other than\s+([^,;\n]+)', query_lower)
