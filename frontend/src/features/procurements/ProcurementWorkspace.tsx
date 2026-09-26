@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageContainer from '../../components/layout/PageContainer';
 import { PageHeader } from '../../components/layout/PageHeader';
@@ -20,19 +20,31 @@ export default function ProcurementWorkspace() {
   const navigate = useNavigate();
   const [draft, setDraft] = useState(initialProcurementDraft);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { mutate: createSession, isPending: isLoading, error: apiError } = useCreateSession();
 
   const handleFileSelect = () => {
-    // Simulate file selection
-    setDraft({
-      ...draft,
-      fileName: 'TENDER_SPECIFICATION_V2.PDF',
-      fileSize: '2.4 MB'
-    });
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setDraft({
+        ...draft,
+        fileName: file.name,
+        fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+      });
+      setError(null);
+    }
   };
 
   const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setDraft({ ...draft, fileName: null, fileSize: null });
   };
 
@@ -40,7 +52,7 @@ export default function ProcurementWorkspace() {
     if (draft.mode === 'describe') {
       if (!draft.description.trim()) return 'Product Description is required.';
     } else {
-      if (!draft.fileName) return 'Please upload a tender document.';
+      if (!selectedFile && !draft.fileName) return 'Please upload a tender document.';
     }
     return null;
   };
@@ -52,6 +64,12 @@ export default function ProcurementWorkspace() {
       return;
     }
     setError(null);
+
+    // If uploading a tender document, navigate directly to document review with the real file
+    if (draft.mode === 'upload' && selectedFile) {
+      navigate('/review', { state: { autoUploadFile: selectedFile } });
+      return;
+    }
     
     // We create a generic title from the draft for now
     const title = draft.mode === 'describe' ? (draft.description.slice(0, 30) || "New Procurement") : (draft.fileName || "Tender Document");
@@ -60,7 +78,6 @@ export default function ProcurementWorkspace() {
       { title },
       {
         onSuccess: (data) => {
-          // Pass sessionId to the next route or store it globally (the prompt said use existing state/routing)
           navigate(`/requirements?session_id=${data.session_id}`);
         }
       }
@@ -118,12 +135,38 @@ export default function ProcurementWorkspace() {
 
   const uploadTab = (
     <div className="flex flex-col gap-6 p-6 border border-border border-t-0 bg-surface">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileInputChange}
+        accept=".pdf,.xlsx,.xls,.csv,.txt"
+        className="hidden"
+      />
       {!draft.fileName ? (
-        <div className="border-2 border-dashed border-border p-12 flex flex-col items-center justify-center text-center rounded-sm">
-          <Mono className="text-text-secondary mb-4">DROP TENDER DOCUMENT HERE</Mono>
-          <Meta className="mb-6">PDF / DOCX / TXT</Meta>
-          <Meta className="mb-6">or</Meta>
-          <Button variant="secondary" onClick={handleFileSelect}>SELECT FILE</Button>
+        <div 
+          onClick={handleFileSelect}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files?.[0];
+            if (file) {
+              setSelectedFile(file);
+              setDraft({
+                ...draft,
+                fileName: file.name,
+                fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+              });
+              setError(null);
+            }
+          }}
+          className="border-2 border-dashed border-border p-12 flex flex-col items-center justify-center text-center rounded-sm hover:border-text-secondary cursor-pointer transition-colors"
+        >
+          <Mono className="text-text-secondary mb-2">DROP TENDER DOCUMENT HERE</Mono>
+          <Meta className="mb-4">PDF / EXCEL (XLSX, XLS) / CSV / TXT</Meta>
+          <Meta className="mb-4">or</Meta>
+          <Button variant="secondary" onClick={(e) => { e.stopPropagation(); handleFileSelect(); }}>
+            SELECT FILE
+          </Button>
         </div>
       ) : (
         <div className="flex items-center justify-between p-4 border border-border bg-surface-elevated rounded-sm">

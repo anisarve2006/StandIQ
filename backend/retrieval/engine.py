@@ -451,9 +451,9 @@ class StandardsRecommenderEngine:
             "latency_breakdown_ms": timings
         }
 
-    def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3) -> Dict[str, Any]:
+    def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3, filename: Optional[str] = None) -> Dict[str, Any]:
         """
-        Processes an entire Tender / BoQ document (PDF or Excel .xls/.xlsx):
+        Processes an entire Tender / BoQ document (PDF, Excel .xls/.xlsx, CSV, or Text):
         1. Extracts layout-aware text and structured tables with ghost-column immunity.
         2. Identifies discrete line items / procurement clauses and classifies their archetype.
         3. Runs full recommendation pipeline for products or returns deterministic non-product advisories.
@@ -461,15 +461,52 @@ class StandardsRecommenderEngine:
         """
         t0 = time.time()
         
-        # Detect if input is Excel (.xls / .xlsx) or PDF
+        # Detect if input is Excel (.xls / .xlsx / .csv) or PDF or Text
         is_excel = False
-        if isinstance(pdf_input, str) and (pdf_input.lower().endswith(".xls") or pdf_input.lower().endswith(".xlsx")):
-            is_excel = True
-        elif isinstance(pdf_input, bytes) and pdf_input[:8] == b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1':
-            is_excel = True
+        is_text = False
+        
+        if filename:
+            fn_lower = filename.lower()
+            if fn_lower.endswith(('.xls', '.xlsx', '.csv')):
+                is_excel = True
+            elif fn_lower.endswith(('.txt', '.log', '.json')):
+                is_text = True
+        
+        if isinstance(pdf_input, str):
+            if pdf_input.lower().endswith(('.xls', '.xlsx', '.csv')):
+                is_excel = True
+            elif pdf_input.lower().endswith(('.txt', '.log', '.json')):
+                is_text = True
+        elif isinstance(pdf_input, bytes):
+            if pdf_input.startswith(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1') or pdf_input.startswith(b'PK\x03\x04'):
+                is_excel = True
+            elif not pdf_input.startswith(b'%PDF'):
+                # Try decoding as text
+                try:
+                    pdf_input.decode('utf-8')
+                    is_text = True
+                except Exception:
+                    pass
 
         if is_excel:
-            doc_parsed = self.excel_processor.extract_document(pdf_input)
+            doc_parsed = self.excel_processor.extract_document(pdf_input, filename=filename)
+        elif is_text:
+            text = pdf_input.decode('utf-8', errors='ignore') if isinstance(pdf_input, bytes) else pdf_input
+            lines = [l.strip() for l in text.split('\n') if len(l.strip()) > 5]
+            extracted = []
+            for i, line in enumerate(lines[:max_items], 1):
+                extracted.append({
+                    "item_number": str(i),
+                    "source": f"Clause {i}",
+                    "raw_text": line,
+                    "page": 1,
+                    "archetype": "PHYSICAL_PRODUCT",
+                    "category": "Specification Clause"
+                })
+            doc_parsed = {
+                "metadata": {"file_type": "TEXT_DOCUMENT", "total_rows": len(lines), "extracted_items_count": len(extracted)},
+                "extracted_items": extracted
+            }
         else:
             doc_parsed = self.pdf_processor.extract_document(pdf_input)
 
