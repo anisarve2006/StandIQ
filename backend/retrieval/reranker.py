@@ -122,16 +122,73 @@ class LateInteractionReranker:
                     role_adjustment += 0.12
 
             # 5. Workmanship vs Component Material Prioritization (Primary vs Complementary)
-            # Concrete execution: IS 456 (or IS 4926 for RMC) is primary, aggregate IS 383 is component
-            if any(w in query_lower for w in ["concrete", "rcc"]) and not is_testing_query:
-                if any(m in query_lower for m in ["m-10", "m-15", "m-20", "m-25", "m10", "m15", "m20", "m25", "plain cement concrete", "rcc beam", "beams and lintels", "bedding"]):
+            # Concrete execution: IS 456 (or IS 4926 for RMC, IS 1343 for Prestressed) is primary
+            if any(w in query_lower for w in ["concrete", "rcc", "pcc"]) and not is_testing_query:
+                # Disqualify rebar standards (IS 16651, IS 18256, IS 1786) unless steel reinforcement is explicitly requested
+                if any(rebar_std in cand.get("family_id", "") for rebar_std in ["16651", "18256", "1786"]):
+                    if not any(spec_rebar in query_lower for spec_rebar in ["steel bar", "rebar", "reinforcement bar", "sariya", "fe-500", "fe 500", "stainless steel", "gfrp"]):
+                        role_adjustment -= 0.85
+
+                if any(m in query_lower for m in [
+                    "m-10", "m-15", "m-20", "m-25", "m-30", "m10", "m15", "m20", "m25", 
+                    "plain cement concrete", "plain concrete", "reinforced concrete", 
+                    "column", "beam", "slab", "staircase", "retaining wall", "footing", 
+                    "bedding", "flooring base", "foundation bed", "lean concrete",
+                    "high-strength concrete", "high strength concrete", "lightweight concrete",
+                    "fibre-reinforced", "fiber-reinforced", "pcc"
+                ]):
                     if "456" in cand.get("family_id", "") or "plain and reinforced concrete" in title:
-                        role_adjustment += 0.35
+                        role_adjustment += 0.45
                     elif "383" in cand.get("family_id", ""):
                         role_adjustment -= 0.25
-                elif "ready mix" in query_lower or "ready-mix" in query_lower or "ready-mixed" in query_lower:
+                    elif "1237" in cand.get("family_id", "") and not any(t in query_lower for t in ["tile", "terrazzo"]):
+                        role_adjustment -= 0.45
+
+                elif "ready mix" in query_lower or "ready-mix" in query_lower or "ready-mixed" in query_lower or "self-compacting" in query_lower:
                     if "4926" in cand.get("family_id", "") or "ready-mixed concrete" in title:
-                        role_adjustment += 0.45
+                        role_adjustment += 0.50
+
+            # Prestressed Concrete (IS 1343)
+            if any(w in query_lower for w in ["prestressed concrete", "prestress"]):
+                if "1343" in cand.get("family_id", "") or "prestressed concrete" in title:
+                    role_adjustment += 0.60
+                elif any(rebar_std in cand.get("family_id", "") for rebar_std in ["16651", "18256"]):
+                    role_adjustment -= 0.70
+
+            # Shotcrete / Sprayed concrete (IS 9012)
+            if any(w in query_lower for w in ["shotcrete", "gunite", "sprayed concrete"]):
+                if "9012" in cand.get("family_id", "") or "shotcreting" in title:
+                    role_adjustment += 0.65
+                elif "16651" in cand.get("family_id", ""):
+                    role_adjustment -= 0.70
+
+            # Piles and Pile Foundation (IS 2911)
+            if any(w in query_lower for w in ["pile foundation", "concrete pile", "pile cap"]):
+                if "2911" in cand.get("family_id", ""):
+                    role_adjustment += 0.50
+
+            # Raft Foundation (IS 2950 / IS 456)
+            if "raft foundation" in query_lower:
+                if "2950" in cand.get("family_id", ""):
+                    role_adjustment += 0.50
+                elif "456" in cand.get("family_id", ""):
+                    role_adjustment += 0.40
+
+            # Earthwork, site clearance, topsoil, filling (IS 1200:P1)
+            if any(w in query_lower for w in ["site clearance", "topsoil stripping", "earth filling", "compacted earth", "sand filling"]):
+                if "1200" in cand.get("family_id", ""):
+                    role_adjustment += 0.45
+
+            # Road Construction & Bituminous Pavements
+            if any(w in query_lower for w in ["bituminous macadam", "dense bituminous macadam", "bituminous concrete", "dbm"]):
+                if "73" in cand.get("family_id", "") or "paving bitumen" in title:
+                    role_adjustment += 0.50
+            if any(w in query_lower for w in ["prime coat", "tack coat"]):
+                if "8887" in cand.get("family_id", "") or "bitumen emulsion" in title:
+                    role_adjustment += 0.55
+            if any(w in query_lower for w in ["granular sub-base", "wet mix macadam", "water bound macadam", "wbm", "wmm"]):
+                if "383" in cand.get("family_id", "") or "coarse and fine aggregate" in title:
+                    role_adjustment += 0.45
 
             # Plastering: IS 1661 is primary execution code, mortar IS 2250 is component
             if any(w in query_lower for w in ["plastering", "rendering", "plaster"]) and not is_testing_query:
@@ -158,6 +215,13 @@ class LateInteractionReranker:
 
             if "reinforcement steel" in query_lower or "steel reinforcement" in query_lower:
                 if "1786" in cand.get("family_id", ""):
+                    role_adjustment += 0.50
+
+            # Grouting
+            if any(w in query_lower for w in ["grout", "grouting"]):
+                if any(rebar_std in cand.get("family_id", "") for rebar_std in ["16651", "18256", "1786"]):
+                    role_adjustment -= 0.85
+                elif "6066" in cand.get("family_id", "") and "foundation" in query_lower:
                     role_adjustment += 0.50
 
             # Brick masonry: IS 2212 is primary construction code, mortar IS 2250 is component

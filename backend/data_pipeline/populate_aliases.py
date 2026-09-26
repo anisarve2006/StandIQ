@@ -290,7 +290,40 @@ SEED_ALIASES = [
     ("m20 concrete testing", "IS:516", "hardened concrete methods of test", "Civil Engineering", "Testing Standard"),
     ("testing of sand", "IS:2386:P1", "methods of test for aggregates for concrete", "Civil Engineering", "Testing Standard"),
     ("testing is specified for sand and m20 concrete", "IS:516", "hardened concrete methods of test", "Civil Engineering", "Testing Standard"),
-    ("testing for sand and m20 concrete", "IS:516", "hardened concrete methods of test", "Civil Engineering", "Testing Standard")
+    ("testing for sand and m20 concrete", "IS:516", "hardened concrete methods of test", "Civil Engineering", "Testing Standard"),
+
+    # Civil Infrastructure & Road Pavements
+    ("shotcrete", "IS:9012", "recommended practice for shotcreting", "Civil Engineering", "Standard Spec"),
+    ("gunite", "IS:9012", "recommended practice for shotcreting", "Civil Engineering", "Trade Name"),
+    ("guniting", "IS:9012", "recommended practice for shotcreting", "Civil Engineering", "Trade Name"),
+    ("prestressed concrete", "IS:1343", "code of practice for prestressed concrete", "Civil Engineering", "Standard Spec"),
+    ("prestressed concrete beam", "IS:1343", "code of practice for prestressed concrete", "Civil Engineering", "Standard Spec"),
+    ("prestressed concrete sleeper", "IS:1343", "code of practice for prestressed concrete", "Civil Engineering", "Standard Spec"),
+    ("raft foundation", "IS:2950:P1", "code of practice for design and construction of raft foundations", "Civil Engineering", "Standard Spec"),
+    ("site clearance", "IS:1200:P1", "method of measurement of building and civil engineering works - earthwork", "Civil Engineering", "Standard Spec"),
+    ("topsoil stripping", "IS:1200:P1", "method of measurement of building and civil engineering works - earthwork", "Civil Engineering", "Standard Spec"),
+    ("earth filling", "IS:1200:P1", "method of measurement of building and civil engineering works - earthwork", "Civil Engineering", "Standard Spec"),
+    ("sand filling", "IS:1200:P1", "method of measurement of building and civil engineering works - earthwork", "Civil Engineering", "Standard Spec"),
+    ("dense bituminous macadam", "IS:73", "paving bitumen for bituminous macadam and road construction", "Civil Engineering", "Highway Standard"),
+    ("bituminous macadam", "IS:73", "paving bitumen for bituminous macadam and road construction", "Civil Engineering", "Highway Standard"),
+    ("bituminous concrete", "IS:73", "paving bitumen for bituminous macadam and road construction", "Civil Engineering", "Highway Standard"),
+    ("wet mix macadam", "IS:383", "coarse and fine aggregates for wet mix macadam road base", "Civil Engineering", "Highway Standard"),
+    ("water bound macadam", "IS:383", "coarse and fine aggregates for water bound macadam road base", "Civil Engineering", "Highway Standard"),
+    ("granular sub-base", "IS:383", "coarse and fine aggregates for granular sub-base road construction", "Civil Engineering", "Highway Standard"),
+    ("prime coat", "IS:8887", "cationic bitumen emulsion for prime coat", "Civil Engineering", "Highway Standard"),
+    ("tack coat", "IS:8887", "cationic bitumen emulsion for tack coat", "Civil Engineering", "Highway Standard"),
+
+    # Specialized Concrete & Grouting
+    ("high-strength concrete", "IS:10262", "concrete mix proportioning guidelines - high strength concrete", "Civil Engineering", "Standard Spec"),
+    ("high strength concrete", "IS:10262", "concrete mix proportioning guidelines - high strength concrete", "Civil Engineering", "Standard Spec"),
+    ("lightweight concrete", "IS:2185:P2", "concrete masonry units - lightweight aggregate concrete blocks", "Civil Engineering", "Standard Spec"),
+    ("non-shrink cementitious grout", "IS:4031:P1", "methods of physical tests for hydraulic cement and grout", "Civil Engineering", "Standard Spec"),
+    ("non-shrink grout", "IS:4031:P1", "methods of physical tests for hydraulic cement and grout", "Civil Engineering", "Standard Spec"),
+    ("concrete surface hardener", "IS:2571", "code of practice for in-situ cement concrete and surface hardened flooring", "Civil Engineering", "Standard Spec"),
+    ("pcc 1:4:8", "IS:456", "plain and reinforced concrete code of practice - nominal mixes", "Civil Engineering", "Standard Spec"),
+    ("pcc 1:3:6", "IS:456", "plain and reinforced concrete code of practice - nominal mixes", "Civil Engineering", "Standard Spec"),
+    ("lean concrete", "IS:456", "plain and reinforced concrete code of practice - foundation bedding", "Civil Engineering", "Standard Spec"),
+    ("concrete curing compound", "IS:18256", "liquid membrane forming compounds for curing concrete", "Civil Engineering", "Standard Spec")
 ]
 
 
