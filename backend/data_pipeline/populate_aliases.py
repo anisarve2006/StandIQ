@@ -538,7 +538,149 @@ SEED_ALIASES = [
     ("access control system", "IS:13252:P1", "information technology equipment safety access control systems", "Electronics and IT", "Standard Spec"),
     ("biometric attendance system", "IS:13252:P1", "information technology equipment safety biometric attendance devices", "Electronics and IT", "Standard Spec"),
     ("video intercom system", "IS:13252:P1", "information technology equipment safety video intercom systems", "Electronics and IT", "Standard Spec"),
-    ("intrusion alarm system", "IS:13252:P1", "information technology equipment safety electronic intrusion alarm systems", "Electronics and IT", "Standard Spec")
+    ("intrusion alarm system", "IS:13252:P1", "information technology equipment safety electronic intrusion alarm systems", "Electronics and IT", "Standard Spec"),
+
+    # Plumbing, Pipes, Valves & Drainage (Batch 221-260)
+    ("hdpe potable water pipes", "IS:4984", "high density polyethylene pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+    ("hdpe potable water pipe", "IS:4984", "high density polyethylene pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+    ("hdpe water pipes", "IS:4984", "high density polyethylene pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+    ("hdpe pipes", "IS:4984", "high density polyethylene pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+
+    ("hdpe drainage pipes", "IS:14333", "high density polyethylene pipe for sewerage and drainage", "Civil Engineering", "CPWD Spec"),
+    ("hdpe drainage pipe", "IS:14333", "high density polyethylene pipe for sewerage and drainage", "Civil Engineering", "CPWD Spec"),
+    ("hdpe sewerage pipes", "IS:14333", "high density polyethylene pipe for sewerage and drainage", "Civil Engineering", "CPWD Spec"),
+    ("hdpe sewerage pipe", "IS:14333", "high density polyethylene pipe for sewerage and drainage", "Civil Engineering", "CPWD Spec"),
+
+    ("ppr water supply pipes", "IS:15801", "polypropylene-random copolymer pipes for hot and cold water supplies", "Civil Engineering", "CPWD Spec"),
+    ("ppr water supply pipe", "IS:15801", "polypropylene-random copolymer pipes for hot and cold water supplies", "Civil Engineering", "CPWD Spec"),
+    ("ppr hot water pipes", "IS:15801", "polypropylene-random copolymer pipes for hot and cold water supplies", "Civil Engineering", "CPWD Spec"),
+    ("ppr hot water pipe", "IS:15801", "polypropylene-random copolymer pipes for hot and cold water supplies", "Civil Engineering", "CPWD Spec"),
+    ("ppr pipes", "IS:15801", "polypropylene-random copolymer pipes for hot and cold water supplies", "Civil Engineering", "CPWD Spec"),
+
+    ("pvc pressure pipes", "IS:4985", "unplasticized pvc pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+    ("pvc pressure pipe", "IS:4985", "unplasticized pvc pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+    ("upvc pressure pipes", "IS:4985", "unplasticized pvc pipes for potable water supplies", "Civil Engineering", "CPWD Spec"),
+
+    ("pvc drainage pipes", "IS:13592", "unplasticized polyvinyl chloride pipes for soil and waste discharge systems inside buildings", "Civil Engineering", "CPWD Spec"),
+    ("pvc drainage pipe", "IS:13592", "unplasticized polyvinyl chloride pipes for soil and waste discharge systems inside buildings", "Civil Engineering", "CPWD Spec"),
+    ("pvc swr pipes", "IS:13592", "unplasticized polyvinyl chloride pipes for soil waste and rainwater systems", "Civil Engineering", "CPWD Spec"),
+    ("pvc swr pipe", "IS:13592", "unplasticized polyvinyl chloride pipes for soil waste and rainwater systems", "Civil Engineering", "CPWD Spec"),
+    ("upvc swr pipes", "IS:13592", "unplasticized polyvinyl chloride pipes for soil waste and rainwater systems", "Civil Engineering", "CPWD Spec"),
+
+    ("cast iron soil pipes", "IS:3989", "centrifugally cast spun iron spigot and socket soil waste ventilation and rainwater pipes", "Civil Engineering", "CPWD Spec"),
+    ("cast iron soil pipe", "IS:3989", "centrifugally cast spun iron spigot and socket soil waste ventilation and rainwater pipes", "Civil Engineering", "CPWD Spec"),
+    ("ci soil pipes", "IS:3989", "centrifugally cast spun iron spigot and socket soil waste ventilation and rainwater pipes", "Civil Engineering", "CPWD Spec"),
+
+    ("ductile iron water pipes", "IS:8329", "centrifugally cast spun ductile iron pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+    ("ductile iron water pipe", "IS:8329", "centrifugally cast spun ductile iron pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+    ("di pipes for water supply", "IS:8329", "centrifugally cast spun ductile iron pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+    ("di water pipes", "IS:8329", "centrifugally cast spun ductile iron pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+
+    ("copper water supply pipes", "IS:1545", "solid drawn copper and copper alloy tubes for water and heat exchangers", "Civil Engineering", "CPWD Spec"),
+    ("copper water supply pipe", "IS:1545", "solid drawn copper and copper alloy tubes for water and heat exchangers", "Civil Engineering", "CPWD Spec"),
+    ("copper water pipes", "IS:1545", "solid drawn copper and copper alloy tubes for water and heat exchangers", "Civil Engineering", "CPWD Spec"),
+    ("copper tubes for water supply", "IS:1545", "solid drawn copper and copper alloy tubes for water and heat exchangers", "Civil Engineering", "CPWD Spec"),
+
+    ("stainless steel water pipes", "IS:17876", "stainless steel welded pipes and tubes for general service", "Civil Engineering", "CPWD Spec"),
+    ("stainless steel water pipe", "IS:17876", "stainless steel welded pipes and tubes for general service", "Civil Engineering", "CPWD Spec"),
+    ("ss water pipes", "IS:17876", "stainless steel welded pipes and tubes for general service", "Civil Engineering", "CPWD Spec"),
+
+    ("brass compression fittings", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("brass compression fitting", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("brass pipe fittings", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+
+    ("cpvc pipe fittings", "IS:17546", "chlorinated polyvinyl chloride cpvc fittings for potable hot and cold water distribution supplies", "Civil Engineering", "CPWD Spec"),
+    ("cpvc fittings", "IS:17546", "chlorinated polyvinyl chloride cpvc fittings for potable hot and cold water distribution supplies", "Civil Engineering", "CPWD Spec"),
+
+    ("upvc pipe fittings", "IS:7834:P1", "injection moulded pvc socket fittings with solvent cement joints for water supplies", "Civil Engineering", "CPWD Spec"),
+    ("pvc pipe fittings", "IS:7834:P1", "injection moulded pvc socket fittings with solvent cement joints for water supplies", "Civil Engineering", "CPWD Spec"),
+
+    ("hdpe pipe fittings", "IS:8360", "fabricated polyethylene fittings for water supply specification", "Civil Engineering", "CPWD Spec"),
+    ("hdpe fittings", "IS:8360", "fabricated polyethylene fittings for water supply specification", "Civil Engineering", "CPWD Spec"),
+
+    ("ppr pipe fittings", "IS:15801", "polypropylene-random copolymer pipes and fittings for water supplies", "Civil Engineering", "CPWD Spec"),
+    ("ppr fittings", "IS:15801", "polypropylene-random copolymer pipes and fittings for water supplies", "Civil Engineering", "CPWD Spec"),
+
+    ("ductile iron pipe fittings", "IS:9523", "ductile iron fittings for pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+    ("di pipe fittings", "IS:9523", "ductile iron fittings for pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+    ("ductile iron fittings", "IS:9523", "ductile iron fittings for pressure pipes for water gas and sewage", "Civil Engineering", "CPWD Spec"),
+
+    ("brass bib taps", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("brass bib tap", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("bib taps", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("bib tap", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+
+    ("pillar taps", "IS:1795", "pillar taps for water supply purposes", "Civil Engineering", "CPWD Spec"),
+    ("pillar tap", "IS:1795", "pillar taps for water supply purposes", "Civil Engineering", "CPWD Spec"),
+
+    ("angle valves", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("angle valve", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+    ("brass angle valve", "IS:8931", "copper alloy single taps stop valves combination tap assembly for water services", "Civil Engineering", "CPWD Spec"),
+
+    ("ball valves", "IS:9890", "general purpose ball valves specification", "Mechanical Engineering", "CPWD Spec"),
+    ("ball valve", "IS:9890", "general purpose ball valves specification", "Mechanical Engineering", "CPWD Spec"),
+
+    ("butterfly valves", "IS:13095", "butterfly valves for general purposes specification", "Mechanical Engineering", "CPWD Spec"),
+    ("butterfly valve", "IS:13095", "butterfly valves for general purposes specification", "Mechanical Engineering", "CPWD Spec"),
+
+    ("check valves", "IS:5312:P1", "swing check type reflux non-return valves for water works purposes", "Mechanical Engineering", "CPWD Spec"),
+    ("check valve", "IS:5312:P1", "swing check type reflux non-return valves for water works purposes", "Mechanical Engineering", "CPWD Spec"),
+    ("non return valve", "IS:5312:P1", "swing check type reflux non-return valves for water works purposes", "Mechanical Engineering", "CPWD Spec"),
+
+    ("pressure reducing valves", "IS:9739", "pressure reducing valves for domestic water supply systems", "Mechanical Engineering", "CPWD Spec"),
+    ("pressure reducing valve", "IS:9739", "pressure reducing valves for domestic water supply systems", "Mechanical Engineering", "CPWD Spec"),
+    ("prv", "IS:9739", "pressure reducing valves for domestic water supply systems", "Mechanical Engineering", "CPWD Spec"),
+
+    ("float valves", "IS:1703", "water fittings copper alloy float valves horizontal plunger type", "Civil Engineering", "CPWD Spec"),
+    ("float valve", "IS:1703", "water fittings copper alloy float valves horizontal plunger type", "Civil Engineering", "CPWD Spec"),
+
+    ("air release valves", "IS:14845", "resilient seated cast iron air relief valves for water works purposes", "Mechanical Engineering", "CPWD Spec"),
+    ("air release valve", "IS:14845", "resilient seated cast iron air relief valves for water works purposes", "Mechanical Engineering", "CPWD Spec"),
+    ("air relief valve", "IS:14845", "resilient seated cast iron air relief valves for water works purposes", "Mechanical Engineering", "CPWD Spec"),
+
+    ("water meters", "IS:779", "water meters domestic type specification", "Civil Engineering", "CPWD Spec"),
+    ("water meter", "IS:779", "water meters domestic type specification", "Civil Engineering", "CPWD Spec"),
+
+    ("domestic water storage tanks", "IS:12701", "rotational moulded polyethylene water storage tanks", "Civil Engineering", "CPWD Spec"),
+    ("domestic water storage tank", "IS:12701", "rotational moulded polyethylene water storage tanks", "Civil Engineering", "CPWD Spec"),
+    ("polyethylene water storage tanks", "IS:12701", "rotational moulded polyethylene water storage tanks", "Civil Engineering", "CPWD Spec"),
+    ("polyethylene water storage tank", "IS:12701", "rotational moulded polyethylene water storage tanks", "Civil Engineering", "CPWD Spec"),
+    ("overhead water storage tank", "IS:12701", "rotational moulded polyethylene water storage tanks", "Civil Engineering", "CPWD Spec"),
+    ("sintex tank", "IS:12701", "rotational moulded polyethylene water storage tanks", "Civil Engineering", "Trade Name"),
+
+    ("reinforced concrete water tanks", "IS:3370:P1", "code of practice concrete structures for the storage of liquids", "Civil Engineering", "CPWD Spec"),
+    ("reinforced concrete water tank", "IS:3370:P1", "code of practice concrete structures for the storage of liquids", "Civil Engineering", "CPWD Spec"),
+    ("rcc water tank", "IS:3370:P1", "code of practice concrete structures for the storage of liquids", "Civil Engineering", "CPWD Spec"),
+
+    ("septic tank", "IS:2470:P1", "code of practice for installation of septic tanks design criteria and construction", "Civil Engineering", "CPWD Spec"),
+    ("septic tanks", "IS:2470:P1", "code of practice for installation of septic tanks design criteria and construction", "Civil Engineering", "CPWD Spec"),
+
+    ("sewage treatment plant", "IS:2470:P2", "code of practice for installation of septic tanks secondary treatment and disposal of effluent", "Civil Engineering", "CPWD Spec"),
+    ("stp", "IS:2470:P2", "code of practice for installation of septic tanks secondary treatment and disposal of effluent", "Civil Engineering", "CPWD Spec"),
+
+    ("grease trap", "IS:1742", "code of practice for building drainage grease trap and gully trap", "Civil Engineering", "CPWD Spec"),
+    ("grease traps", "IS:1742", "code of practice for building drainage grease trap and gully trap", "Civil Engineering", "CPWD Spec"),
+
+    ("floor traps", "IS:3989", "centrifugally cast spun iron floor traps and rainwater fittings", "Civil Engineering", "CPWD Spec"),
+    ("floor trap", "IS:3989", "centrifugally cast spun iron floor traps and rainwater fittings", "Civil Engineering", "CPWD Spec"),
+
+    ("nahani traps", "IS:3989", "centrifugally cast spun iron nahani traps and floor traps", "Civil Engineering", "CPWD Spec"),
+    ("nahani trap", "IS:3989", "centrifugally cast spun iron nahani traps and floor traps", "Civil Engineering", "CPWD Spec"),
+
+    ("gully traps", "IS:651", "glazed stoneware pipes and gully traps for drainage", "Civil Engineering", "CPWD Spec"),
+    ("gully trap", "IS:651", "glazed stoneware pipes and gully traps for drainage", "Civil Engineering", "CPWD Spec"),
+
+    ("manhole covers", "IS:1726", "cast iron manhole covers and frames", "Civil Engineering", "CPWD Spec"),
+    ("manhole cover", "IS:1726", "cast iron manhole covers and frames", "Civil Engineering", "CPWD Spec"),
+    ("ci manhole covers", "IS:1726", "cast iron manhole covers and frames", "Civil Engineering", "CPWD Spec"),
+
+    ("cast iron drainage gratings", "IS:5961", "cast iron gratings for drainage purposes", "Civil Engineering", "CPWD Spec"),
+    ("cast iron drainage grating", "IS:5961", "cast iron gratings for drainage purposes", "Civil Engineering", "CPWD Spec"),
+    ("drainage gratings", "IS:5961", "cast iron gratings for drainage purposes", "Civil Engineering", "CPWD Spec"),
+
+    ("sanitary drainage inspection chambers", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec"),
+    ("inspection chambers", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec"),
+    ("inspection chamber", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec")
 ]
 
 

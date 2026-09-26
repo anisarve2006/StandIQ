@@ -566,6 +566,130 @@ class LateInteractionReranker:
                 if "1881" in cand.get("family_id", "") or "10426" in cand.get("family_id", ""):
                     role_adjustment += 0.75
 
+            # Plumbing Pipes, Fittings & Valves (Batch 221-260)
+            if "fitting" in query_lower or "fittings" in query_lower:
+                if "cpvc" in query_lower and "17546" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "upvc" in query_lower and "7834" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "hdpe" in query_lower and "8360" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "ppr" in query_lower and "15801" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "ductile iron" in query_lower and "9523" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "brass" in query_lower and "8931" in cand.get("family_id", ""):
+                    role_adjustment += 0.80
+                # Penalize pipe-only standards when query is for fittings
+                if any(pipe_only in cand.get("family_id", "") for pipe_only in ["4984", "4985", "8329", "15778", "14333"]):
+                    role_adjustment -= 0.85
+            elif "pipe" in query_lower or "pipes" in query_lower:
+                # Penalize fittings standards when query is specifically for pipes
+                if any(fitting_std in cand.get("family_id", "") for fitting_std in ["8360", "9523", "7834", "17546"]):
+                    role_adjustment -= 0.60
+                if "hdpe" in query_lower:
+                    if any(w in query_lower for w in ["drainage", "sewerage", "sewer"]):
+                        if "14333" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                        elif "4984" in cand.get("family_id", ""):
+                            role_adjustment -= 0.40
+                    elif "potable" in query_lower or "water" in query_lower:
+                        if "4984" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                        elif "14333" in cand.get("family_id", ""):
+                            role_adjustment -= 0.40
+                elif "ppr" in query_lower:
+                    if "15801" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "pvc" in query_lower:
+                    if any(w in query_lower for w in ["drainage", "swr", "soil", "waste"]):
+                        if "13592" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                        elif "4985" in cand.get("family_id", ""):
+                            role_adjustment -= 0.40
+                    elif "pressure" in query_lower or "potable" in query_lower:
+                        if "4985" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                        elif "13592" in cand.get("family_id", ""):
+                            role_adjustment -= 0.40
+                elif "soil" in query_lower and "cast iron" in query_lower:
+                    if "3989" in cand.get("family_id", "") or "1729" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "ductile iron" in query_lower:
+                    if "8329" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "copper" in query_lower:
+                    if "1545" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "stainless steel" in query_lower:
+                    if "17876" in cand.get("family_id", "") or "6913" in cand.get("family_id", "") or "17875" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+
+            # Valves & Taps
+            if any(w in query_lower for w in ["bib tap", "bib taps"]):
+                if "8931" in cand.get("family_id", "") or "781" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "pillar tap" in query_lower:
+                if "1795" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "angle valve" in query_lower:
+                if "8931" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "ball valve" in query_lower:
+                if "9890" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "butterfly valve" in query_lower:
+                if "13095" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "check valve" in query_lower:
+                if "5312" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "pressure reducing valve" in query_lower or "prv" in query_lower:
+                if "9739" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "float valve" in query_lower:
+                if "1703" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "air release valve" in query_lower or "air relief valve" in query_lower:
+                if "14845" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "water meter" in query_lower:
+                if "779" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+
+            # Tanks, Traps & Ancillary Drainage
+            if "storage tank" in query_lower or "water tank" in query_lower:
+                if "reinforced concrete" in query_lower or "rcc" in query_lower:
+                    if "3370" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif any(w in query_lower for w in ["polyethylene", "domestic", "overhead"]):
+                    if "12701" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+            if "septic tank" in query_lower:
+                if "2470:P1" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "sewage treatment plant" in query_lower or "stp" in query_lower:
+                if "2470" in cand.get("family_id", "") or "10261" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "grease trap" in query_lower:
+                if "1742" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "floor trap" in query_lower or "nahani trap" in query_lower:
+                if "3989" in cand.get("family_id", "") or "1729" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "gully trap" in query_lower:
+                if "651" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "manhole cover" in query_lower:
+                if "1726" in cand.get("family_id", "") or "12592" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "drainage grating" in query_lower:
+                if "5961" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "inspection chamber" in query_lower:
+                if "4111:P1" in cand.get("family_id", "") or "1742" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+
             # 7. Negative Constraint Handling ("other than X")
             if "other than" in query_lower:
                 neg_match = re.search(r'other than\s+([^,;\n]+)', query_lower)
