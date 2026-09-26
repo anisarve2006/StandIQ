@@ -6,7 +6,7 @@ Run with: uvicorn api_service:app --host 0.0.0.0 --port 8000 --reload
 
 import os
 from typing import Optional, Dict, Any, List
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -31,7 +31,7 @@ from schemas.api import (
     AlliedStandardsResponse, VersionResponse, CertificationResponse, 
     TenderAnalyzeRequest, TenderAnalyzeResponse, TenderHealthRequest, TenderHealthResponse,
     TenderDiffRequest, TenderDiffResponse, SpecificationGenerateRequest, SpecificationGenerateResponse,
-    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse,
+    ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse, ExportPackageRequest,
     DashboardSummary, KnowledgeGraphResponse, ChangesResponse, ProcurementListResponse,
     GraphNode, GraphEdge, StandardChange, TenderHealthFinding
 )
@@ -415,6 +415,21 @@ def get_session(session_id: str):
 def export_session(req: ExportRequest):
     try:
         return export_service.export(req)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/v1/export/package")
+def export_specification_package(req: ExportPackageRequest):
+    try:
+        file_bytes, media_type, filename = export_service.export_package(req)
+        return Response(
+            content=file_bytes,
+            media_type=media_type,
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
+        )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

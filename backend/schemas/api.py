@@ -99,6 +99,25 @@ class ExportResponse(BaseModel):
     content: str
     content_type: str
 
+class SpecificationPackageStandard(BaseModel):
+    id: Optional[str] = None
+    code: str
+    title: str
+    type: Optional[str] = "Product"
+    status: Optional[str] = "Current"
+    year: Optional[int] = None
+    reaffirmedYear: Optional[int] = None
+    mandatory: Optional[bool] = False
+    tags: Optional[List[str]] = []
+
+class ExportPackageRequest(BaseModel):
+    file_name: str
+    format: str = "pdf"
+    sections: List[str] = []
+    standards: List[SpecificationPackageStandard] = []
+    title: Optional[str] = "Indian Standards Specification Package"
+
+
 class DashboardSummary(BaseModel):
     active_procurements: int
     standards_requiring_review: int
