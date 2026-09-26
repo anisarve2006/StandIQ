@@ -173,7 +173,14 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
         r'\bsafety shoes?\b': "safety footwear",
         r'\bsurgical masks?\b': "medical face masks",
         r'\benamel paint\b': "synthetic exterior enamel finishing",
-        r'\bred oxide\b': "zinc chrome priming"
+        r'\bred oxide\b': "zinc chrome priming",
+        r'\bmccb\b': "moulded case circuit breakers low-voltage switchgear",
+        r'\brccb\b': "residual current operated circuit breakers without integral overcurrent",
+        r'\brcbo\b': "residual current operated circuit breakers with integral overcurrent",
+        r'\bmcb\b': "miniature circuit breaker overcurrent protection",
+        r'\bhrc fuse\b': "high rupturing capacity low voltage fuses",
+        r'\bxlpe\b': "crosslinked polyethylene insulated",
+        r'\blszh\b': "low smoke zero halogen fire survival cables"
     }
 
     expanded_terms = [clean_text]

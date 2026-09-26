@@ -381,6 +381,101 @@ class LateInteractionReranker:
                 elif "16071" in cand.get("family_id", ""):
                     role_adjustment -= 0.45
 
+            # Electrotechnical Disambiguation Guards
+            is_elec_query = any(w in query_lower for w in [
+                "wire", "cable", "conduit", "switch", "socket", "breaker", "fuse",
+                "earthing", "busbar", "tray", "mccb", "rccb", "rcbo", "mcb", "capacitor",
+                "trunking", "isolator", "lightning"
+            ])
+            if is_elec_query:
+                if any(rebar_std in cand.get("family_id", "") for rebar_std in ["16651", "18256", "1786", "2202", "11654", "16098", "18385", "1897", "3961", "11139"]):
+                    role_adjustment -= 0.85
+
+            # PVC vs XLPE Cables
+            if "xlpe" in query_lower:
+                if "7098" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+                elif any(other_c in cand.get("family_id", "") for other_c in ["694", "1554"]):
+                    role_adjustment -= 0.50
+
+            if "pvc" in query_lower and any(w in query_lower for w in ["wire", "armoured", "copper wire", "aluminium wire"]):
+                if "copper" in query_lower or "aluminium" in query_lower or "flexible" in query_lower:
+                    if "694" in cand.get("family_id", ""):
+                        role_adjustment += 0.65
+                elif "armoured" in query_lower:
+                    if "1554" in cand.get("family_id", ""):
+                        role_adjustment += 0.65
+                    elif "7098" in cand.get("family_id", ""):
+                        role_adjustment -= 0.60
+
+            # Electrical Conduits (IS 9537)
+            if "conduit" in query_lower:
+                if "gi" in query_lower or "steel" in query_lower:
+                    if "9537:P2" in cand.get("family_id", "") or "rigid steel conduit" in title.lower():
+                        role_adjustment += 0.65
+                elif "pvc" in query_lower:
+                    if "9537:P3" in cand.get("family_id", "") or "plain conduit" in title.lower():
+                        role_adjustment += 0.65
+                elif "flexible" in query_lower or "pliable" in query_lower:
+                    if "9537:P4" in cand.get("family_id", "") or "3480" in cand.get("family_id", ""):
+                        role_adjustment += 0.65
+                elif "9537" in cand.get("family_id", ""):
+                    role_adjustment += 0.50
+
+            # Modular Switches & Sockets
+            if "switch" in query_lower and ("modular" in query_lower or "domestic" in query_lower):
+                if "3854" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+            if "socket" in query_lower and ("modular" in query_lower or "plug" in query_lower) and "industrial" not in query_lower:
+                if "1293" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+
+            # Circuit Breakers & Switchgear
+            if "mccb" in query_lower:
+                if "60947:P2" in cand.get("family_id", "") or "circuit breaker" in title.lower():
+                    role_adjustment += 0.65
+            if "rccb" in query_lower:
+                if "12640:P1" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+            if "rcbo" in query_lower:
+                if "12640:P2" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+            if "hrc fuse" in query_lower:
+                if "13703" in cand.get("family_id", ""):
+                    role_adjustment += 0.75
+                    if "13703:P1" in cand.get("family_id", ""):
+                        role_adjustment += 0.40  # offset 0.5 withdrawn multiplier
+                elif "60127" in cand.get("family_id", "") or "miniature fuse" in title.lower():
+                    role_adjustment -= 0.85
+            if any(w in query_lower for w in ["switch disconnector", "electrical isolator", "automatic transfer switch", "transfer switch"]):
+                if "60947:P3" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+            if "distribution board" in query_lower:
+                if "mcb" in query_lower:
+                    if "13032" in cand.get("family_id", ""):
+                        role_adjustment += 0.65
+                elif "8623" in cand.get("family_id", ""):
+                    role_adjustment += 0.60
+            if "motor control centre" in query_lower or "mcc" in query_lower:
+                if "8623" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+            if "busbar trunking" in query_lower:
+                if "8623:P2" in cand.get("family_id", ""):
+                    role_adjustment += 0.65
+
+            # Capacitors & APFC
+            if "capacitor" in query_lower or "power factor" in query_lower:
+                if "13340" in cand.get("family_id", "") or "shunt power capacitor" in title.lower():
+                    role_adjustment += 0.65
+
+            # Earthing & Lightning Protection
+            if "earthing" in query_lower or "grounding" in query_lower:
+                if "3043" in cand.get("family_id", "") or "code of practice for earthing" in title.lower():
+                    role_adjustment += 0.70
+            if "lightning" in query_lower and "protection" in query_lower:
+                if "2309" in cand.get("family_id", "") or "62305" in cand.get("family_id", ""):
+                    role_adjustment += 0.70
+
             # 7. Negative Constraint Handling ("other than X")
             if "other than" in query_lower:
                 neg_match = re.search(r'other than\s+([^,;\n]+)', query_lower)
