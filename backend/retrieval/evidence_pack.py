@@ -81,7 +81,40 @@ class EvidencePackBuilder:
         gaps = []
         constraints = query_obj.get("constraints", {})
         division = primary_standard.get("division") or ""
+        clean_q = query_obj.get("clean_query", "").lower()
         
+        needs_review = False
+
+        # Specificity & Ambiguity Detection
+        if "portland pozzolana cement" in clean_q or "ppc" in clean_q:
+            if not any(w in clean_q for w in ["fly ash", "flyash", "calcined clay"]):
+                needs_review = True
+                gaps.append("Tender specifies generic PPC. Verify whether Part 1 (Fly ash based, IS 1489:P1) or Part 2 (Calcined clay based, IS 1489:P2) is intended.")
+
+        if "potable water supply pipes" in clean_q and "testing" in clean_q:
+            if not any(m in clean_q for m in ["pvc", "cpvc", "hdpe", "gi", "steel", "ductile"]):
+                needs_review = True
+                gaps.append("Ambiguous pipe material in testing specification. Specify pipe material (PVC IS 4985, CPVC IS 15778, HDPE IS 4984, or GI IS 1239:P1) to determine exact pressure test standard.")
+
+        if "cctv" in clean_q:
+            needs_review = True
+            gaps.append("CCTV Camera specification cited under general IT equipment safety (IS 13252:P1). Specialized Video Surveillance System standard IS 16910 / IEC 62676 should be reviewed.")
+
+        if "cryogenic" in clean_q and any(w in clean_q for w in ["industrial", "facility", "storage", "tank"]):
+            needs_review = True
+            gaps.append("Industrial bulk cryogenic storage tank capacity exceeds small dewar scope of IS 11552 (up to 50 L). Requires PESO (SMPV Rules) compliance and static cryogenic vessel verification.")
+
+        if "pvc insulated and sheathed cables" in clean_q and "wiring" not in clean_q and "voltage" not in constraints:
+            needs_review = True
+            gaps.append("Cable voltage/application omitted. Verify whether standard building wiring (IS 694 up to 1100 V) or heavy-duty armored feeder cable (IS 1554:P1) is required.")
+
+        if any(w in clean_q for w in ["gypsum plaster", "plaster of paris"]) and not any(w in clean_q for w in ["premixed", "lightweight", "part 1", "part 2"]):
+            needs_review = True
+            gaps.append("Generic gypsum plaster/POP specified. Verify whether standard plaster (IS 2547:P1) or premixed lightweight plaster (IS 2547:P2) is required.")
+
+        if any(w in clean_q for w in ["opc 43", "opc 53", "43 grade", "53 grade", "is 8112", "is 12269"]):
+            gaps.append("Regulatory Notice: IS 8112 (43 Grade) and IS 12269 (53 Grade) have been superseded and harmonized into unified IS 269:2015 (Sixth Revision) under mandatory QCO.")
+
         if "Electrotechnical" in division:
             if "voltage" not in constraints:
                 gaps.append("Operating voltage / rated insulation voltage not specified in tender.")
@@ -90,12 +123,12 @@ class EvidencePackBuilder:
             if "ip_rating" not in constraints:
                 gaps.append("Ingress Protection (IP rating) for environmental protection omitted.")
         elif "Civil" in division:
-            if "grade" not in constraints:
+            if "grade" not in constraints and not any(w in clean_q for w in ["excavation", "plinth", "soling", "tile", "mortar", "plaster", "brick", "paint"]):
                 gaps.append("Specific strength grade (e.g. Fe 500D, M25, Grade 43) not specified.")
-            if "environment" not in constraints:
+            if "environment" not in constraints and not any(w in clean_q for w in ["paint", "distemper", "plaster", "brick", "tile"]):
                 gaps.append("Exposure condition (Mild, Moderate, Severe, Coastal/Marine) not indicated.")
         elif "Mechanical" in division:
-            if "power" not in constraints:
+            if "power" not in constraints and "pump" in clean_q:
                 gaps.append("Rated power / discharge capacity not indicated.")
             if "environment" not in constraints:
                 gaps.append("Working fluid characteristics and temperature range omitted.")
@@ -125,6 +158,14 @@ class EvidencePackBuilder:
         overlap = len(scope_words.intersection(query_words))
         scope_match = min(1.0, round(0.5 + (overlap * 0.1), 2))
 
+        # Calibrated Confidence Determination
+        if needs_review:
+            confidence_label = "NEEDS_REVIEW"
+        elif conf_vector.get("confidence_label") == "HIGH" and len(gaps) <= 2:
+            confidence_label = "HIGH"
+        else:
+            confidence_label = conf_vector.get("confidence_label", "MEDIUM")
+
         multidim_confidence = {
             "semantic_match": conf_vector.get("semantic_match", 0.90),
             "technical_match": conf_vector.get("technical_match", 1.00),
@@ -132,7 +173,7 @@ class EvidencePackBuilder:
             "graph_support": round(graph_support, 2),
             "version_validity": conf_vector.get("version_validity", 1.00),
             "certification_evidence": 1.00 if cert_data["is_mandatory"] else 0.70,
-            "overall_label": conf_vector.get("confidence_label", "HIGH")
+            "overall_label": confidence_label
         }
 
         # Final Evidence Pack Structure

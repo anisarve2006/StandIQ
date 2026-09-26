@@ -3,8 +3,8 @@
     "total_items": 100,
     "matched_count": 100,
     "coverage_pct": 100.0,
-    "mandatory_qco_count": 31,
-    "avg_latency_ms": 686.9
+    "mandatory_qco_count": 34,
+    "avg_latency_ms": 516.3
   },
   "results": [
     {
@@ -16,29 +16,29 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 584.9
+      "latency_ms": 569.2
     },
     {
       "index": 2,
       "query": "Providing and laying ordinary Portland cement 53 grade for structural concrete works, including transportation, stacking and storage at site.",
-      "family_id": "IS:12269",
-      "raw_id": "IS 12269",
-      "title": "Specification for 53 grade ordinary Portland cement (BI-LING",
-      "qco_mandatory": false,
-      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
+      "family_id": "IS:269",
+      "raw_id": "IS 269",
+      "title": "Ordinary Portland Cement - Specification (Sixth Revision) [C",
+      "qco_mandatory": true,
+      "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 181.9
+      "latency_ms": 217.8
     },
     {
       "index": 3,
       "query": "Providing and laying OPC 43 grade cement for masonry and plastering works.",
-      "family_id": "IS:8112",
-      "raw_id": "IS 8112",
-      "title": "Specification for 43 grade ordinary Portland cement",
+      "family_id": "IS:269",
+      "raw_id": "IS 269",
+      "title": "Ordinary Portland Cement - Specification (Sixth Revision) [C",
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 167.2
+      "latency_ms": 195.4
     },
     {
       "index": 4,
@@ -48,41 +48,41 @@
       "title": "Part 2 : 2015: Portland Pozzolana Cement - Specification Par",
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
-      "confidence": "HIGH",
-      "latency_ms": 9800.2
+      "confidence": "NEEDS_REVIEW",
+      "latency_ms": 8464.5
     },
     {
       "index": 5,
       "query": "Excavation in foundation trenches in ordinary soil, murum, gravel and sand, including dressing of sides, disposal of excavated material and backfilling.",
-      "family_id": "IS:3764",
-      "raw_id": "IS 3764",
-      "title": "Code of safety for excavation work",
+      "family_id": "IS:1200:P1",
+      "raw_id": "IS 1200-1",
+      "title": "Methods of measurement of building and civil engineering wor",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 182.7
+      "latency_ms": 266.7
     },
     {
       "index": 6,
       "query": "Mechanical excavation for building foundations up to 1.5 m depth including removal of excavated earth within 50 m lead.",
-      "family_id": "IS:3764",
-      "raw_id": "IS 3764",
-      "title": "Code of safety for excavation work",
+      "family_id": "IS:1200:P1",
+      "raw_id": "IS 1200-1",
+      "title": "Methods of measurement of building and civil engineering wor",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 166.7
+      "latency_ms": 202.0
     },
     {
       "index": 7,
       "query": "Filling in plinth with approved earth in layers of 150 mm to 200 mm, including watering, levelling and mechanical compaction.",
-      "family_id": "IS:2720:P7",
-      "raw_id": "IS 2720-7",
-      "title": "Methods of test for soils, Part 7: Determination of water co",
+      "family_id": "IS:1200:P1",
+      "raw_id": "IS 1200-1",
+      "title": "Methods of measurement of building and civil engineering wor",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 233.4
+      "latency_ms": 231.2
     },
     {
       "index": 8,
@@ -93,7 +93,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 202.6
+      "latency_ms": 202.3
     },
     {
       "index": 9,
@@ -104,18 +104,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 131.5
+      "latency_ms": 149.8
     },
     {
       "index": 10,
       "query": "Providing and laying M-10 grade cement concrete using coarse aggregate and crushed sand for foundation bedding.",
-      "family_id": "IS:383",
-      "raw_id": "IS 383",
-      "title": "Specification for Coarse and Fine Aggregates From Natural So",
-      "qco_mandatory": false,
-      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
+      "family_id": "IS:456",
+      "raw_id": "IS 456",
+      "title": "Plain and Reinforced Concrete - Code of Practice",
+      "qco_mandatory": true,
+      "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 198.9
+      "latency_ms": 199.8
     },
     {
       "index": 11,
@@ -131,13 +131,13 @@
     {
       "index": 12,
       "query": "Providing and laying M-20 grade RCC concrete using crushed sand and graded coarse aggregate for beams and lintels.",
-      "family_id": "IS:383",
-      "raw_id": "IS 383",
-      "title": "Specification for Coarse and Fine Aggregates From Natural So",
-      "qco_mandatory": false,
-      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
+      "family_id": "IS:456",
+      "raw_id": "IS 456",
+      "title": "Plain and Reinforced Concrete - Code of Practice",
+      "qco_mandatory": true,
+      "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 172.5
+      "latency_ms": 195.6
     },
     {
       "index": 13,
@@ -148,7 +148,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 215.1
+      "latency_ms": 240.6
     },
     {
       "index": 14,
@@ -159,7 +159,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 190.6
+      "latency_ms": 220.1
     },
     {
       "index": 15,
@@ -170,7 +170,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 140.7
+      "latency_ms": 143.1
     },
     {
       "index": 16,
@@ -181,7 +181,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 200.6
+      "latency_ms": 214.5
     },
     {
       "index": 17,
@@ -192,51 +192,51 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 165.8
+      "latency_ms": 168.1
     },
     {
       "index": 18,
       "query": "Supply and laying cement mortar 1:6 for brick masonry in foundation and plinth.",
-      "family_id": "IS:2250",
-      "raw_id": "IS 2250",
-      "title": "Code of Practice for Preparation and Use of Masonry Mortars",
+      "family_id": "IS:2212",
+      "raw_id": "IS 2212",
+      "title": "Code of practice for brickworks",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 199.7
+      "latency_ms": 198.5
     },
     {
       "index": 19,
       "query": "Providing cement mortar 1:4 for external plastering over masonry surfaces.",
-      "family_id": "IS:2250",
-      "raw_id": "IS 2250",
-      "title": "Code of Practice for Preparation and Use of Masonry Mortars",
+      "family_id": "IS:1661",
+      "raw_id": "IS 1661",
+      "title": "Code of practice for application of cement and cement-lime p",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 91.7
+      "latency_ms": 119.6
     },
     {
       "index": 20,
       "query": "Providing cement mortar 1:3 for rendering uneven concrete and honeycombed surfaces.",
-      "family_id": "IS:2250",
-      "raw_id": "IS 2250",
-      "title": "Code of Practice for Preparation and Use of Masonry Mortars",
+      "family_id": "IS:1661",
+      "raw_id": "IS 1661",
+      "title": "Code of practice for application of cement and cement-lime p",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 102.6
+      "latency_ms": 100.2
     },
     {
       "index": 21,
       "query": "Construction of masonry walls using common burnt clay building bricks in cement mortar.",
-      "family_id": "IS:2250",
-      "raw_id": "IS 2250",
-      "title": "Code of Practice for Preparation and Use of Masonry Mortars",
+      "family_id": "IS:2212",
+      "raw_id": "IS 2212",
+      "title": "Code of practice for brickworks",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 162.6
+      "latency_ms": 171.7
     },
     {
       "index": 22,
@@ -247,7 +247,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 90.7
+      "latency_ms": 95.2
     },
     {
       "index": 23,
@@ -258,18 +258,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 129.7
+      "latency_ms": 136.4
     },
     {
       "index": 24,
       "query": "Providing and laying conventional clay bricks of uniform size and approved compressive strength for building construction.",
-      "family_id": "IS:2222",
-      "raw_id": "IS 2222",
-      "title": "Specification for burnt clay perforated building bricks",
-      "qco_mandatory": false,
-      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
+      "family_id": "IS:1077",
+      "raw_id": "IS 1077",
+      "title": "Common Burnt Clay Building Bricks -Specification",
+      "qco_mandatory": true,
+      "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 123.6
+      "latency_ms": 162.2
     },
     {
       "index": 25,
@@ -280,18 +280,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 220.8
+      "latency_ms": 216.1
     },
     {
       "index": 26,
       "query": "Providing and laying glossy finish ceramic tiles on floors using cement mortar bed.",
-      "family_id": "IS:2250",
-      "raw_id": "IS 2250",
-      "title": "Code of Practice for Preparation and Use of Masonry Mortars",
+      "family_id": "IS:15622",
+      "raw_id": "IS 15622 : 2017",
+      "title": "2017: Pressed Ceramic Tiles - Specification (First Revision)",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 213.2
+      "latency_ms": 215.6
     },
     {
       "index": 27,
@@ -302,7 +302,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 149.5
+      "latency_ms": 166.5
     },
     {
       "index": 28,
@@ -313,7 +313,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 3813.3
+      "latency_ms": 3557.1
     },
     {
       "index": 29,
@@ -324,7 +324,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 270.2
+      "latency_ms": 264.9
     },
     {
       "index": 30,
@@ -335,7 +335,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 314.6
+      "latency_ms": 261.4
     },
     {
       "index": 31,
@@ -346,7 +346,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 157.7
+      "latency_ms": 135.8
     },
     {
       "index": 32,
@@ -357,7 +357,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 303.1
+      "latency_ms": 232.8
     },
     {
       "index": 33,
@@ -368,7 +368,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 3314.5
+      "latency_ms": 3183.8
     },
     {
       "index": 34,
@@ -379,29 +379,29 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 203.4
+      "latency_ms": 224.4
     },
     {
       "index": 35,
       "query": "Providing and laying CPVC pipes for hot and cold potable water supply systems.",
-      "family_id": "IS:17546",
-      "raw_id": "IS 17546 : 2021",
-      "title": "2021: Chlorinated polyvinyl chloride CPVC fittings for potab",
+      "family_id": "IS:15778",
+      "raw_id": "IS 15778",
+      "title": "Chlorinated polyvinyl chloride (CPVC) pipes for potabvle hot",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 192.5
+      "latency_ms": 204.7
     },
     {
       "index": 36,
       "query": "Providing and fixing GI steel pipes for water supply and plumbing applications.",
-      "family_id": "IS:3589",
-      "raw_id": "IS 3589",
-      "title": "Steel Pipes for Water and Sewage (168.3 to 2 540 mm Outside ",
-      "qco_mandatory": false,
-      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
+      "family_id": "IS:1239:P1",
+      "raw_id": "IS 1239-1",
+      "title": "Steel Tubes, Tubulars and Other Wrought Steel Fittings, Part",
+      "qco_mandatory": true,
+      "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 2781.6
+      "latency_ms": 218.5
     },
     {
       "index": 37,
@@ -412,7 +412,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 216.2
+      "latency_ms": 232.5
     },
     {
       "index": 38,
@@ -423,7 +423,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 236.9
+      "latency_ms": 252.2
     },
     {
       "index": 39,
@@ -434,7 +434,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 177.5
+      "latency_ms": 184.4
     },
     {
       "index": 40,
@@ -445,7 +445,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 91.8
+      "latency_ms": 86.3
     },
     {
       "index": 41,
@@ -456,7 +456,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 194.5
+      "latency_ms": 198.7
     },
     {
       "index": 42,
@@ -467,7 +467,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 1899.9
+      "latency_ms": 2100.8
     },
     {
       "index": 43,
@@ -478,7 +478,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 165.0
+      "latency_ms": 188.6
     },
     {
       "index": 44,
@@ -489,7 +489,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 201.8
+      "latency_ms": 209.6
     },
     {
       "index": 45,
@@ -500,7 +500,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 235.7
+      "latency_ms": 268.3
     },
     {
       "index": 46,
@@ -511,7 +511,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "MEDIUM",
-      "latency_ms": 2233.7
+      "latency_ms": 2027.8
     },
     {
       "index": 47,
@@ -522,29 +522,29 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 191.7
+      "latency_ms": 205.1
     },
     {
       "index": 48,
       "query": "Providing and fixing PVC insulated electrical cables for internal wiring and power distribution.",
+      "family_id": "IS:694",
+      "raw_id": "IS 694",
+      "title": "POLYVINYL CHLORIDE INSULATED UNSHEATHED AND SHEATHED CABLES/",
+      "qco_mandatory": true,
+      "cert_status": "MANDATORY",
+      "confidence": "HIGH",
+      "latency_ms": 248.0
+    },
+    {
+      "index": 49,
+      "query": "Providing and fixing PVC insulated and sheathed cables for electrical installations.",
       "family_id": "IS:1554:P1",
       "raw_id": "IS 1554-1",
       "title": "PVC insulated (heavy duty) electric cables, Part 1: For work",
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
-      "confidence": "HIGH",
-      "latency_ms": 3036.1
-    },
-    {
-      "index": 49,
-      "query": "Providing and fixing PVC insulated and sheathed cables for electrical installations.",
-      "family_id": "IS:7098:P1",
-      "raw_id": "IS 7098-1",
-      "title": "Crosslinked polyethylene insulated PVC sheathed cables, Part",
-      "qco_mandatory": true,
-      "cert_status": "MANDATORY",
-      "confidence": "HIGH",
-      "latency_ms": 2731.3
+      "confidence": "NEEDS_REVIEW",
+      "latency_ms": 143.3
     },
     {
       "index": 50,
@@ -555,7 +555,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 200.1
+      "latency_ms": 205.1
     },
     {
       "index": 51,
@@ -565,8 +565,8 @@
       "title": "Information Technology Equipment -- Safety, Part 1: General ",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
-      "confidence": "HIGH",
-      "latency_ms": 166.3
+      "confidence": "NEEDS_REVIEW",
+      "latency_ms": 169.8
     },
     {
       "index": 52,
@@ -577,7 +577,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 184.6
+      "latency_ms": 200.4
     },
     {
       "index": 53,
@@ -588,7 +588,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 99.3
+      "latency_ms": 116.5
     },
     {
       "index": 54,
@@ -599,7 +599,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 218.0
+      "latency_ms": 231.3
     },
     {
       "index": 55,
@@ -610,7 +610,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 3148.6
+      "latency_ms": 2919.0
     },
     {
       "index": 56,
@@ -621,18 +621,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 217.3
+      "latency_ms": 198.4
     },
     {
       "index": 57,
       "query": "Supply of digital clinical thermometers for medical facilities.",
-      "family_id": "IS:3055:P2",
-      "raw_id": "IS 3055-2",
-      "title": "Clinical thermometers, Part 2: Enclosed scale type-Specifica",
-      "qco_mandatory": true,
-      "cert_status": "MANDATORY",
+      "family_id": "IS:15113",
+      "raw_id": "IS 15113",
+      "title": "Clinical Electrical Thermometers with Maximum Device",
+      "qco_mandatory": false,
+      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 2480.5
+      "latency_ms": 220.9
     },
     {
       "index": 58,
@@ -643,7 +643,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 236.6
+      "latency_ms": 214.1
     },
     {
       "index": 59,
@@ -654,7 +654,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 200.1
+      "latency_ms": 166.4
     },
     {
       "index": 60,
@@ -665,7 +665,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 220.6
+      "latency_ms": 214.7
     },
     {
       "index": 61,
@@ -676,7 +676,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 240.0
+      "latency_ms": 218.6
     },
     {
       "index": 62,
@@ -687,7 +687,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 205.5
+      "latency_ms": 202.1
     },
     {
       "index": 63,
@@ -698,7 +698,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 285.8
+      "latency_ms": 212.9
     },
     {
       "index": 64,
@@ -709,18 +709,18 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 214.1
+      "latency_ms": 196.8
     },
     {
       "index": 65,
       "query": "Providing and applying dry colour distemper to internal plastered surfaces.",
-      "family_id": "IS:428",
-      "raw_id": "IS 428 : 2013",
-      "title": "2013: Washable Distemper - Specification",
+      "family_id": "IS:427",
+      "raw_id": "IS 427 : 2013",
+      "title": "2013: Distemper, Dry, Colour as Required - Specification",
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 174.6
+      "latency_ms": 188.6
     },
     {
       "index": 66,
@@ -731,7 +731,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 192.1
+      "latency_ms": 207.5
     },
     {
       "index": 67,
@@ -742,7 +742,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 141.8
+      "latency_ms": 125.4
     },
     {
       "index": 68,
@@ -753,7 +753,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 110.8
+      "latency_ms": 133.4
     },
     {
       "index": 69,
@@ -764,7 +764,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 197.7
+      "latency_ms": 198.7
     },
     {
       "index": 70,
@@ -775,18 +775,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 198.9
+      "latency_ms": 216.1
     },
     {
       "index": 71,
       "query": "Providing 15 mm thick cement plaster in mortar 1:4 with waterproofing compound for external walls.",
-      "family_id": "IS:2645",
-      "raw_id": "IS 2645",
-      "title": "Integral Waterproofing Compounds for Cement Mortar and Concr",
+      "family_id": "IS:1661",
+      "raw_id": "IS 1661",
+      "title": "Code of practice for application of cement and cement-lime p",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 104.4
+      "latency_ms": 114.1
     },
     {
       "index": 72,
@@ -797,18 +797,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 141.4
+      "latency_ms": 149.7
     },
     {
       "index": 73,
       "query": "Providing external rendered finish to masonry and concrete surfaces including surface preparation.",
-      "family_id": "IS:3466",
-      "raw_id": "IS 3466",
-      "title": "Specification for masonry cement",
-      "qco_mandatory": true,
-      "cert_status": "MANDATORY",
+      "family_id": "IS:2402",
+      "raw_id": "IS 2402",
+      "title": "Code of Practice for External Rendered Finishes",
+      "qco_mandatory": false,
+      "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 2821.2
+      "latency_ms": 172.1
     },
     {
       "index": 74,
@@ -819,7 +819,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 216.7
+      "latency_ms": 231.2
     },
     {
       "index": 75,
@@ -830,7 +830,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 218.9
+      "latency_ms": 214.2
     },
     {
       "index": 76,
@@ -841,7 +841,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 182.9
+      "latency_ms": 185.3
     },
     {
       "index": 77,
@@ -852,7 +852,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 231.7
+      "latency_ms": 250.3
     },
     {
       "index": 78,
@@ -863,7 +863,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 103.5
+      "latency_ms": 97.7
     },
     {
       "index": 79,
@@ -874,7 +874,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 149.7
+      "latency_ms": 153.4
     },
     {
       "index": 80,
@@ -885,7 +885,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 177.2
+      "latency_ms": 163.4
     },
     {
       "index": 81,
@@ -896,7 +896,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 2823.9
+      "latency_ms": 2725.2
     },
     {
       "index": 82,
@@ -907,7 +907,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 2762.9
+      "latency_ms": 3799.1
     },
     {
       "index": 83,
@@ -918,7 +918,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 200.1
+      "latency_ms": 211.2
     },
     {
       "index": 84,
@@ -929,7 +929,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 170.9
+      "latency_ms": 181.3
     },
     {
       "index": 85,
@@ -940,7 +940,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 52.6
+      "latency_ms": 45.9
     },
     {
       "index": 86,
@@ -951,18 +951,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 129.8
+      "latency_ms": 120.7
     },
     {
       "index": 87,
       "query": "Providing gypsum plaster/Plaster of Paris for internal wall and ceiling finishing.",
-      "family_id": "IS:2547:P2",
-      "raw_id": "IS 2547-2",
-      "title": "gypsum building plaster, Part 2: Premixed lightweight plaste",
+      "family_id": "IS:2547:P1",
+      "raw_id": "IS 2547-1",
+      "title": "gypsum building plaster, Part 1: Excluding premixed lightwei",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
-      "confidence": "HIGH",
-      "latency_ms": 91.1
+      "confidence": "NEEDS_REVIEW",
+      "latency_ms": 185.5
     },
     {
       "index": 88,
@@ -973,18 +973,18 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 139.0
+      "latency_ms": 161.9
     },
     {
       "index": 89,
       "query": "Providing fly ash-lime bricks for building construction and masonry work.",
-      "family_id": "IS:13757",
-      "raw_id": "IS 13757",
-      "title": "Burnt clay fly ash building bricks-Specification",
+      "family_id": "IS:12894",
+      "raw_id": "IS 12894",
+      "title": "Pulverized Fuel Ash-Lime Bricks -",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 2987.0
+      "latency_ms": 45.1
     },
     {
       "index": 90,
@@ -995,7 +995,7 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 113.2
+      "latency_ms": 110.7
     },
     {
       "index": 91,
@@ -1006,29 +1006,29 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 199.9
+      "latency_ms": 180.2
     },
     {
       "index": 92,
       "query": "Testing of fine aggregate/sand for suitability for use in cement concrete and mortar.",
-      "family_id": "IS:383",
-      "raw_id": "IS 383",
-      "title": "Specification for Coarse and Fine Aggregates From Natural So",
+      "family_id": "IS:2386:P1",
+      "raw_id": "IS 2386-1",
+      "title": "Methods of Test for Aggregates for Concrete, Part I: Particl",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 165.7
+      "latency_ms": 183.1
     },
     {
       "index": 93,
       "query": "Testing of coarse aggregate for physical and mechanical properties before use in concrete.",
-      "family_id": "IS:383",
-      "raw_id": "IS 383",
-      "title": "Specification for Coarse and Fine Aggregates From Natural So",
+      "family_id": "IS:2386:P1",
+      "raw_id": "IS 2386-1",
+      "title": "Methods of Test for Aggregates for Concrete, Part I: Particl",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 217.4
+      "latency_ms": 216.9
     },
     {
       "index": 94,
@@ -1039,18 +1039,18 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 2918.7
+      "latency_ms": 3082.5
     },
     {
       "index": 95,
       "query": "Testing cement samples for conformity with specified physical and chemical requirements.",
-      "family_id": "IS:4031:P2",
-      "raw_id": "IS 4031-2",
-      "title": "Methods of physical tests for hydraulic cement, Part 2: Dete",
+      "family_id": "IS:4031:P1",
+      "raw_id": "IS 4031-1",
+      "title": "Methods of physical tests for hydraulic cement, Part 1: Dete",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 231.3
+      "latency_ms": 222.0
     },
     {
       "index": 96,
@@ -1061,18 +1061,18 @@
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 100.0
+      "latency_ms": 111.4
     },
     {
       "index": 97,
       "query": "Testing vitrified ceramic tiles for relevant dimensional, physical and surface characteristics.",
-      "family_id": "IS:15622",
-      "raw_id": "IS 15622 : 2017",
-      "title": "2017: Pressed Ceramic Tiles - Specification (First Revision)",
+      "family_id": "IS:13630:P1",
+      "raw_id": "IS 13630-1",
+      "title": "Ceramic Tiles-Methods of Test, Sampling and Basis of Accepta",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
       "confidence": "HIGH",
-      "latency_ms": 100.1
+      "latency_ms": 101.9
     },
     {
       "index": 98,
@@ -1082,8 +1082,8 @@
       "title": "high density polyethylene pipes for potable water supplies",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
-      "confidence": "HIGH",
-      "latency_ms": 3543.9
+      "confidence": "NEEDS_REVIEW",
+      "latency_ms": 2731.1
     },
     {
       "index": 99,
@@ -1094,7 +1094,7 @@
       "qco_mandatory": true,
       "cert_status": "MANDATORY",
       "confidence": "HIGH",
-      "latency_ms": 255.6
+      "latency_ms": 233.2
     },
     {
       "index": 100,
@@ -1104,8 +1104,8 @@
       "title": "2020: Liquid Nitrogen Vessels of Capacity up to 75 Litres — ",
       "qco_mandatory": false,
       "cert_status": "VOLUNTARY / NOT IDENTIFIED",
-      "confidence": "HIGH",
-      "latency_ms": 237.6
+      "confidence": "NEEDS_REVIEW",
+      "latency_ms": 217.9
     }
   ]
 }
