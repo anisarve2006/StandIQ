@@ -680,7 +680,94 @@ SEED_ALIASES = [
 
     ("sanitary drainage inspection chambers", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec"),
     ("inspection chambers", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec"),
-    ("inspection chamber", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec")
+    ("inspection chamber", "IS:4111:P1", "code of practice for ancillary structures in sewerage system manholes inspection chambers", "Civil Engineering", "CPWD Spec"),
+
+    # Safety, PPE & Fall Protection (Batch 381-420)
+    ("safety harness for construction workers", "IS:3521", "personal fall arrest systems full body harness", "Textiles", "CPWD Spec"),
+    ("safety harness", "IS:3521", "personal fall arrest systems full body harness", "Textiles", "CPWD Spec"),
+    ("full body harness", "IS:3521", "personal fall arrest systems full body harness", "Textiles", "CPWD Spec"),
+    ("safety lanyard", "IS:3521", "personal fall arrest systems full body harness and lanyards", "Textiles", "CPWD Spec"),
+    ("lanyard", "IS:3521", "personal fall arrest systems full body harness and lanyards", "Textiles", "CPWD Spec"),
+
+    ("reflective safety jacket", "IS:15809", "high visibility warning clothes specification", "Textiles", "CPWD Spec"),
+    ("safety jacket", "IS:15809", "high visibility warning clothes specification", "Textiles", "CPWD Spec"),
+    ("high-visibility vest", "IS:15809", "high visibility warning clothes specification", "Textiles", "CPWD Spec"),
+    ("reflective vest", "IS:15809", "high visibility warning clothes specification", "Textiles", "CPWD Spec"),
+
+    ("industrial safety goggles", "IS:5983", "eye-protectors specification", "Chemical", "CPWD Spec"),
+    ("safety goggles", "IS:5983", "eye-protectors specification", "Chemical", "CPWD Spec"),
+    ("welding protective goggles", "IS:1179", "equipment for eye and face protection during welding", "Chemical", "CPWD Spec"),
+    ("welding goggles", "IS:1179", "equipment for eye and face protection during welding", "Chemical", "CPWD Spec"),
+
+    ("face shield for workers", "IS:8521:P1", "industrial safety face shields with plastic visor", "Chemical", "CPWD Spec"),
+    ("face shield", "IS:8521:P1", "industrial safety face shields with plastic visor", "Chemical", "CPWD Spec"),
+    ("safety face shield", "IS:8521:P1", "industrial safety face shields with plastic visor", "Chemical", "CPWD Spec"),
+
+    ("industrial safety gloves", "IS:6994:P1", "safety gloves leather and cotton gloves", "Textiles", "CPWD Spec"),
+    ("safety gloves", "IS:6994:P1", "safety gloves leather and cotton gloves", "Textiles", "CPWD Spec"),
+    ("heat-resistant protective gloves", "IS:6994:P1", "safety gloves leather and cotton gloves", "Textiles", "CPWD Spec"),
+    ("chemical-resistant gloves", "IS:15354", "single-use rubber examination and protective gloves", "Chemical", "CPWD Spec"),
+    ("chemical resistant gloves", "IS:15354", "single-use rubber examination and protective gloves", "Chemical", "CPWD Spec"),
+
+    ("respiratory protective mask", "IS:9473", "respiratory protective devices filtering half masks to protect against particles", "Chemical", "CPWD Spec"),
+    ("half-mask respirator", "IS:9473", "respiratory protective devices filtering half masks to protect against particles", "Chemical", "CPWD Spec"),
+    ("half mask respirator", "IS:9473", "respiratory protective devices filtering half masks to protect against particles", "Chemical", "CPWD Spec"),
+    ("full-face respirator", "IS:14166", "respiratory protective devices full face masks", "Chemical", "CPWD Spec"),
+    ("full face respirator", "IS:14166", "respiratory protective devices full face masks", "Chemical", "CPWD Spec"),
+
+    ("ear protection earmuffs", "IS:9167", "ear protectors specification", "Chemical", "CPWD Spec"),
+    ("earmuffs", "IS:9167", "ear protectors specification", "Chemical", "CPWD Spec"),
+    ("industrial earplugs", "IS:9167", "ear protectors specification", "Chemical", "CPWD Spec"),
+    ("earplugs", "IS:9167", "ear protectors specification", "Chemical", "CPWD Spec"),
+
+    ("safety gumboots", "IS:12254", "polyvinylchloride pvc industrial boots specification", "Chemical", "CPWD Spec"),
+    ("gumboots", "IS:12254", "polyvinylchloride pvc industrial boots specification", "Chemical", "CPWD Spec"),
+    ("pvc gumboots", "IS:12254", "polyvinylchloride pvc industrial boots specification", "Chemical", "CPWD Spec"),
+    ("industrial protective footwear", "IS:15298:P2", "personal protective equipment safety footwear", "Chemical", "CPWD Spec"),
+    ("safety shoes", "IS:15298:P2", "personal protective equipment safety footwear", "Chemical", "CPWD Spec"),
+
+    # Site Safety, Barricades & Traffic Management
+    ("high-visibility traffic cones", "IS:14221", "automotive vehicles retroreflective sheets and tapes traffic cones", "Transport Engineering", "CPWD Spec"),
+    ("traffic cones", "IS:14221", "automotive vehicles retroreflective sheets and tapes traffic cones", "Transport Engineering", "CPWD Spec"),
+    ("road safety barricades", "IS:13415", "protective barriers in and around buildings code of safety", "Civil Engineering", "CPWD Spec"),
+    ("safety barricades", "IS:13415", "protective barriers in and around buildings code of safety", "Civil Engineering", "CPWD Spec"),
+    ("reflective warning signs", "IS:9457", "safety colours and safety signs code of practice", "Management and Systems", "CPWD Spec"),
+    ("temporary construction fencing", "IS:2721", "galvanized steel chain link fence fabric", "Civil Engineering", "CPWD Spec"),
+    ("construction fencing", "IS:2721", "galvanized steel chain link fence fabric", "Civil Engineering", "CPWD Spec"),
+
+    # Scaffolding & Access Systems
+    ("steel scaffolding pipes", "IS:1161", "steel tubes for structural purposes scaffolding", "Metallurgical Engineering", "CPWD Spec"),
+    ("scaffolding pipes", "IS:1161", "steel tubes for structural purposes scaffolding", "Metallurgical Engineering", "CPWD Spec"),
+    ("scaffolding couplers", "IS:2750", "steel scaffoldings specification", "Civil Engineering", "CPWD Spec"),
+    ("adjustable steel props", "IS:2750", "steel scaffoldings specification props", "Civil Engineering", "CPWD Spec"),
+    ("steel props", "IS:2750", "steel scaffoldings specification props", "Civil Engineering", "CPWD Spec"),
+    ("aluminium scaffolding system", "IS:4014:P1", "code of practice for steel tubular scaffolding and access systems", "Civil Engineering", "CPWD Spec"),
+    ("construction ladders", "IS:3696:P2", "scaffolds and ladders code of safety ladders", "Civil Engineering", "CPWD Spec"),
+    ("extension ladders", "IS:4571", "specification aluminium extension ladders for fire brigade use", "Civil Engineering", "CPWD Spec"),
+    ("mobile access platform", "IS:3696:P1", "safety code of scaffolds and ladders scaffolds", "Civil Engineering", "CPWD Spec"),
+    ("suspended scaffolding platform", "IS:3696:P1", "safety code of scaffolds and ladders scaffolds", "Civil Engineering", "CPWD Spec"),
+
+    # Hoists, Cranes, Lifting & Rigging
+    ("construction hoist", "IS:12466", "builders hoist general requirements", "Civil Engineering", "CPWD Spec"),
+    ("passenger-cum-material hoist", "IS:12466", "builders hoist general requirements", "Civil Engineering", "CPWD Spec"),
+    ("material hoist", "IS:12466", "builders hoist general requirements", "Civil Engineering", "CPWD Spec"),
+    ("tower crane", "IS:6521:P1", "code of practice for design of tower cranes static and rail mounted", "Mechanical Engineering", "CPWD Spec"),
+    ("mobile crane", "IS:4573", "power driven mobile cranes specification", "Mechanical Engineering", "CPWD Spec"),
+    ("electric chain hoist", "IS:6547", "specification for electric chain hoists", "Mechanical Engineering", "CPWD Spec"),
+    ("wire rope slings", "IS:2762", "wire rope slings and sling legs", "Mechanical Engineering", "CPWD Spec"),
+    ("shackles for lifting", "IS/ISO:2415", "forged shackles for general lifting purposes dee shackles and bow shackles", "Mechanical Engineering", "CPWD Spec"),
+    ("lifting shackles", "IS/ISO:2415", "forged shackles for general lifting purposes dee shackles and bow shackles", "Mechanical Engineering", "CPWD Spec"),
+    ("chain pulley block", "IS:3832", "hand-operated chain pulley blocks", "Mechanical Engineering", "CPWD Spec"),
+    ("hydraulic jacks", "IS:4552:P2", "automotive vehicles portable jacks hydraulic jacks", "Transport Engineering", "CPWD Spec"),
+    ("hydraulic jack", "IS:4552:P2", "automotive vehicles portable jacks hydraulic jacks", "Transport Engineering", "CPWD Spec"),
+
+    # Concrete Machinery
+    ("concrete vibrator", "IS:2505", "concrete vibrators immersion type general requirements", "Civil Engineering", "CPWD Spec"),
+    ("needle vibrator", "IS:2505", "concrete vibrators immersion type general requirements", "Civil Engineering", "CPWD Spec"),
+    ("concrete batching plant", "IS:4925", "concrete batching and mixing plant specification", "Civil Engineering", "CPWD Spec"),
+    ("batching plant", "IS:4925", "concrete batching and mixing plant specification", "Civil Engineering", "CPWD Spec"),
+    ("concrete transit mixer", "IS:5892", "concrete transit mixers specification", "Civil Engineering", "CPWD Spec"),
+    ("transit mixer", "IS:5892", "concrete transit mixers specification", "Civil Engineering", "CPWD Spec")
 ]
 
 

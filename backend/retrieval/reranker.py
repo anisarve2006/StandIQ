@@ -690,6 +690,112 @@ class LateInteractionReranker:
                 if "4111:P1" in cand.get("family_id", "") or "1742" in cand.get("family_id", ""):
                     role_adjustment += 0.85
 
+            # Safety, PPE & Fall Protection (Batch 381-420)
+            if any(w in query_lower for w in ["safety harness", "fall arrest", "lanyard"]):
+                if "3521" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if any(w in query_lower for w in ["safety jacket", "high-visibility", "reflective safety"]):
+                if "15809" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "goggles" in query_lower:
+                if "welding" in query_lower:
+                    if "1179" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "5983" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "face shield" in query_lower:
+                if "8521" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "gloves" in query_lower:
+                if "chemical" in query_lower:
+                    if "15354" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "6994" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "respirator" in query_lower or "protective mask" in query_lower:
+                if "full-face" in query_lower or "full face" in query_lower:
+                    if "14166" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "9473" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if any(w in query_lower for w in ["earmuff", "earplugs", "ear protection"]):
+                if "9167" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "gumboots" in query_lower:
+                if "12254" in cand.get("family_id", "") or "5557" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            elif "protective footwear" in query_lower or "safety shoes" in query_lower:
+                if "15298" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+
+            # Site Safety & Barricades
+            if "traffic cone" in query_lower:
+                if "14221" in cand.get("family_id", "") or "15809" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "barricade" in query_lower:
+                if "13415" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "warning sign" in query_lower:
+                if "9457" in cand.get("family_id", "") or "14221" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "fencing" in query_lower:
+                if "2721" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+
+            # Scaffolding & Access Systems
+            if "scaffolding" in query_lower or "scaffold" in query_lower or "props" in query_lower:
+                if "pipe" in query_lower or "tubes" in query_lower:
+                    if "1161" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "coupler" in query_lower or "props" in query_lower:
+                    if "2750" in cand.get("family_id", "") or "4014" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "platform" in query_lower or "access" in query_lower:
+                    if "3696:P1" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "aluminium" in query_lower:
+                    if "4014" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+            if "ladder" in query_lower:
+                if "extension" in query_lower and "4571" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "3696:P2" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+
+            # Cranes, Hoists, Rigging & Concrete Machinery
+            if "hoist" in query_lower:
+                if "chain" in query_lower and "6547" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif any(w in query_lower for w in ["construction", "passenger", "material"]):
+                    if "12466" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+            if "crane" in query_lower:
+                if "tower" in query_lower and "6521" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "mobile" in query_lower and "4573" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "slings" in query_lower:
+                if "2762" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "shackle" in query_lower:
+                if "2415" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "chain pulley block" in query_lower:
+                if "3832" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "jack" in query_lower and "hydraulic" in query_lower:
+                if "4552" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "vibrator" in query_lower and "concrete" in query_lower:
+                if "2505" in cand.get("family_id", "") or "2506" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "batching plant" in query_lower:
+                if "4925" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+            if "transit mixer" in query_lower:
+                if "5892" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+
             # 7. Negative Constraint Handling ("other than X")
             if "other than" in query_lower:
                 neg_match = re.search(r'other than\s+([^,;\n]+)', query_lower)
