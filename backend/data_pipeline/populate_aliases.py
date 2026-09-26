@@ -767,7 +767,67 @@ SEED_ALIASES = [
     ("concrete batching plant", "IS:4925", "concrete batching and mixing plant specification", "Civil Engineering", "CPWD Spec"),
     ("batching plant", "IS:4925", "concrete batching and mixing plant specification", "Civil Engineering", "CPWD Spec"),
     ("concrete transit mixer", "IS:5892", "concrete transit mixers specification", "Civil Engineering", "CPWD Spec"),
-    ("transit mixer", "IS:5892", "concrete transit mixers specification", "Civil Engineering", "CPWD Spec")
+    ("transit mixer", "IS:5892", "concrete transit mixers specification", "Civil Engineering", "CPWD Spec"),
+
+    # Testing, QA & Material Characterization (Batch 461-500)
+    ("compressive strength test of concrete cubes", "IS:516", "hardened concrete methods of test compressive strength", "Civil Engineering", "CPWD Spec"),
+    ("compressive strength test of concrete", "IS:516", "hardened concrete methods of test compressive strength", "Civil Engineering", "CPWD Spec"),
+    ("concrete cube test", "IS:516", "hardened concrete methods of test compressive strength", "Civil Engineering", "CPWD Spec"),
+    ("cube test of concrete", "IS:516", "hardened concrete methods of test compressive strength", "Civil Engineering", "CPWD Spec"),
+
+    ("flexural strength test of concrete", "IS:516", "hardened concrete methods of test flexural strength", "Civil Engineering", "CPWD Spec"),
+    ("split tensile strength test of concrete", "IS:516", "hardened concrete methods of test splitting tensile strength", "Civil Engineering", "CPWD Spec"),
+    ("concrete water absorption test", "IS:516", "hardened concrete methods of test water absorption", "Civil Engineering", "CPWD Spec"),
+
+    ("slump test of fresh concrete", "IS:1199", "fresh concrete methods of sampling testing and analysis slump test", "Civil Engineering", "CPWD Spec"),
+    ("slump test", "IS:1199", "fresh concrete methods of sampling testing and analysis slump test", "Civil Engineering", "CPWD Spec"),
+    ("concrete slump test", "IS:1199", "fresh concrete methods of sampling testing and analysis slump test", "Civil Engineering", "CPWD Spec"),
+    ("concrete density test", "IS:1199", "fresh concrete methods of sampling testing and analysis density", "Civil Engineering", "CPWD Spec"),
+
+    ("cement fineness test", "IS:4031:P1", "methods of physical tests for hydraulic cement fineness by dry sieving", "Civil Engineering", "CPWD Spec"),
+    ("cement soundness test", "IS:4031:P3", "methods of physical tests for hydraulic cement soundness", "Civil Engineering", "CPWD Spec"),
+    ("cement consistency test", "IS:4031:P4", "methods of physical tests for hydraulic cement standard consistency", "Civil Engineering", "CPWD Spec"),
+    ("cement initial and final setting time test", "IS:4031:P5", "methods of physical tests for hydraulic cement setting times", "Civil Engineering", "CPWD Spec"),
+    ("cement setting time test", "IS:4031:P5", "methods of physical tests for hydraulic cement setting times", "Civil Engineering", "CPWD Spec"),
+    ("cement compressive strength test", "IS:4031:P6", "methods of physical tests for hydraulic cement compressive strength", "Civil Engineering", "CPWD Spec"),
+    ("cement mortar strength test", "IS:4031:P6", "methods of physical tests for hydraulic cement compressive strength of mortar", "Civil Engineering", "CPWD Spec"),
+
+    ("fine aggregate sieve analysis", "IS:2386:P1", "methods of test for aggregates for concrete particle size and shape sieve analysis", "Civil Engineering", "CPWD Spec"),
+    ("coarse aggregate sieve analysis", "IS:2386:P1", "methods of test for aggregates for concrete particle size and shape sieve analysis", "Civil Engineering", "CPWD Spec"),
+    ("aggregate sieve analysis", "IS:2386:P1", "methods of test for aggregates for concrete particle size and shape sieve analysis", "Civil Engineering", "CPWD Spec"),
+    ("aggregate flakiness index test", "IS:2386:P1", "methods of test for aggregates for concrete particle size and shape flakiness index", "Civil Engineering", "CPWD Spec"),
+    ("aggregate elongation index test", "IS:2386:P1", "methods of test for aggregates for concrete particle size and shape elongation index", "Civil Engineering", "CPWD Spec"),
+
+    ("aggregate impact value test", "IS:2386:P4", "methods of test for aggregates for concrete mechanical properties impact value", "Civil Engineering", "CPWD Spec"),
+    ("aggregate crushing value test", "IS:2386:P4", "methods of test for aggregates for concrete mechanical properties crushing value", "Civil Engineering", "CPWD Spec"),
+    ("aggregate abrasion test", "IS:2386:P4", "methods of test for aggregates for concrete mechanical properties abrasion test", "Civil Engineering", "CPWD Spec"),
+    ("los angeles abrasion test", "IS:2386:P4", "methods of test for aggregates for concrete mechanical properties abrasion test", "Civil Engineering", "CPWD Spec"),
+    ("aggregate water absorption test", "IS:2386:P3", "methods of test for aggregates for concrete specific gravity density voids and absorption", "Civil Engineering", "CPWD Spec"),
+
+    ("brick compressive strength test", "IS:3495:P1", "methods of tests of burnt clay building bricks compressive strength", "Civil Engineering", "CPWD Spec"),
+    ("brick water absorption test", "IS:3495:P1", "methods of tests of burnt clay building bricks water absorption", "Civil Engineering", "CPWD Spec"),
+    ("brick efflorescence test", "IS:3495:P1", "methods of tests of burnt clay building bricks efflorescence", "Civil Engineering", "CPWD Spec"),
+    ("brick dimensional tolerance test", "IS:3495:P1", "methods of tests of burnt clay building bricks warpage and dimensions", "Civil Engineering", "CPWD Spec"),
+
+    ("concrete block compressive strength test", "IS:2185:P1", "concrete masonry units hollow and solid concrete blocks compressive strength", "Civil Engineering", "CPWD Spec"),
+    ("aac block density test", "IS:6441:P1", "methods of test for autoclaved cellular concrete products bulk density", "Civil Engineering", "CPWD Spec"),
+
+    ("tile water absorption test", "IS:13630:P2", "ceramic tiles methods of test determination of water absorption", "Civil Engineering", "CPWD Spec"),
+    ("tile breaking strength test", "IS:13630:P6", "ceramic tiles methods of test determination of modulus of rupture and breaking strength", "Civil Engineering", "CPWD Spec"),
+    ("tile modulus of rupture test", "IS:13630:P6", "ceramic tiles methods of test determination of modulus of rupture", "Civil Engineering", "CPWD Spec"),
+    ("tile dimensional tolerance test", "IS:13630:P1", "ceramic tiles methods of test determination of dimensions and surface quality", "Civil Engineering", "CPWD Spec"),
+
+    ("reinforcement steel tensile strength test", "IS:1608", "mechanical testing of metals tensile testing rebar", "Metallurgical Engineering", "CPWD Spec"),
+    ("reinforcement steel bend test", "IS:1599", "metallic materials bend test steel rebar", "Metallurgical Engineering", "CPWD Spec"),
+    ("reinforcement steel rebend test", "IS:1786", "high strength deformed steel bars and wires rebend test", "Metallurgical Engineering", "CPWD Spec"),
+    ("structural steel tensile test", "IS:1608", "mechanical testing of metals tensile testing structural steel", "Metallurgical Engineering", "CPWD Spec"),
+    ("structural steel impact test", "IS:1757", "method for charpy impact test v notch for metallic material", "Metallurgical Engineering", "CPWD Spec"),
+
+    ("pvc pipe hydrostatic pressure test", "IS:12235:P1", "thermoplastics pipes and fittings methods of test hydrostatic pressure", "Chemical", "CPWD Spec"),
+    ("hdpe pipe hydrostatic pressure test", "IS:4984", "high density polyethylene pipes for potable water supplies hydrostatic pressure test", "Civil Engineering", "CPWD Spec"),
+    ("water-tightness test of plumbing installation", "IS:2065", "code of practice for water supply in buildings testing of installations", "Civil Engineering", "CPWD Spec"),
+    ("electrical cable insulation resistance test", "IS:10810:P43", "methods of test for cables insulation resistance", "Electrotechnical", "CPWD Spec"),
+    ("earthing resistance measurement", "IS:3043", "code of practice for earthing measurement of earth resistance", "Electrotechnical", "CPWD Spec")
 ]
 
 

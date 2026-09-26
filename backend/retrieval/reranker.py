@@ -796,6 +796,100 @@ class LateInteractionReranker:
                 if "5892" in cand.get("family_id", ""):
                     role_adjustment += 0.85
 
+            # Testing, QA & Material Characterization (Batch 461-500)
+            if any(w in query_lower for w in [" test", "test ", "sieve analysis", "resistance measurement"]):
+                # Concrete testing
+                if "concrete" in query_lower:
+                    if any(w in query_lower for w in ["compressive", "flexural", "tensile", "water absorption"]):
+                        if "516" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif any(w in query_lower for w in ["slump", "density"]):
+                        if "1199" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                # Cement testing (IS 4031)
+                elif "cement" in query_lower:
+                    if "fineness" in query_lower:
+                        if "4031:P1" in cand.get("family_id", "") or "4031:P2" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "soundness" in query_lower:
+                        if "4031:P3" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "consistency" in query_lower:
+                        if "4031:P4" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "setting time" in query_lower:
+                        if "4031:P5" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif any(w in query_lower for w in ["compressive", "strength", "mortar"]):
+                        if "4031:P6" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                # Aggregate testing (IS 2386)
+                elif "aggregate" in query_lower:
+                    if any(w in query_lower for w in ["sieve", "flakiness", "elongation"]):
+                        if "2386:P1" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif any(w in query_lower for w in ["water absorption", "density", "specific gravity"]):
+                        if "2386:P3" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif any(w in query_lower for w in ["impact", "crushing", "abrasion"]):
+                        if "2386:P4" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                # Brick testing (IS 3495)
+                elif "brick" in query_lower:
+                    if "3495:P1" in cand.get("family_id", "") or "3495" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                # Block testing
+                elif "block" in query_lower:
+                    if "aac" in query_lower:
+                        if "6441:P1" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "2185:P1" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                # Tile testing (IS 13630)
+                elif "tile" in query_lower:
+                    if "water absorption" in query_lower:
+                        if "13630:P2" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif any(w in query_lower for w in ["breaking", "modulus of rupture"]):
+                        if "13630:P6" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif any(w in query_lower for w in ["dimensional", "dimensions"]):
+                        if "13630:P1" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                # Steel testing
+                elif "steel" in query_lower:
+                    if "rebend" in query_lower:
+                        if "1786" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "bend" in query_lower:
+                        if "1599" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "impact" in query_lower:
+                        if "1757" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                    elif "tensile" in query_lower:
+                        if "1608" in cand.get("family_id", ""):
+                            role_adjustment += 0.95
+                        elif "3600" in cand.get("family_id", "") and "weld" not in query_lower:
+                            role_adjustment -= 0.85
+                # Pipe & Plumbing testing
+                elif "pipe" in query_lower:
+                    if "hydrostatic" in query_lower or "pressure test" in query_lower:
+                        if "hdpe" in query_lower and "4984" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                        elif "12235:P1" in cand.get("family_id", "") or "12235" in cand.get("family_id", ""):
+                            role_adjustment += 0.85
+                elif "water-tightness" in query_lower or "plumbing installation" in query_lower:
+                    if "2065" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                # Electrical testing
+                elif "insulation resistance" in query_lower:
+                    if "10810:P43" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                elif "earthing resistance" in query_lower:
+                    if "3043" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+
             # 7. Negative Constraint Handling ("other than X")
             if "other than" in query_lower:
                 neg_match = re.search(r'other than\s+([^,;\n]+)', query_lower)
