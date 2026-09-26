@@ -4,21 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MaanakAI — Procurement Intelligence</title>
-    <meta name="description" content="AI-powered procurement standards intelligence workbench for Indian government procurement." />
-    <!-- No-flash theme init: must run before React renders -->
+    <title>StandIQ — Standards Intelligence</title>
+    <meta name="description" content="AI-powered procurement standards intelligence workbench for Indian government procurement specifications." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Theme init: default to crisp light mode -->
     <script>
       (function () {
         try {
           var stored = localStorage.getItem('maanakai-theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = stored || 'dark';
+          var theme = stored || 'light';
           if (theme === 'system') {
-            theme = prefersDark ? 'dark' : 'light';
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
           }
+          document.documentElement.classList.remove('dark', 'light');
           document.documentElement.classList.add(theme);
         } catch (e) {
-          document.documentElement.classList.add('dark');
+          document.documentElement.classList.add('light');
         }
       })();
     </script>

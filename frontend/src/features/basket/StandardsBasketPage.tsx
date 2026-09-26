@@ -1,128 +1,159 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageContainer from '../../components/layout/PageContainer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { SectionHeader } from '../../components/layout/SectionHeader';
-import { StandardCard } from '../../components/product/Standards';
-import { VerificationStatus } from '../../components/product/Evidence';
-import { Mono, Meta } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
-import { DataList } from '../../components/ui/DataList';
-import { useSearchParams } from 'react-router-dom';
-import { useGetSession } from '../../hooks/useProcurement';
-import { LoadingState } from '../../components/ui/Loading';
-import { ErrorState } from '../../components/ui/ErrorState';
-import { EmptyState } from '../../components/ui/EmptyState';
+import { 
+  Plus, 
+  Trash2, 
+  ArrowRight
+} from 'lucide-react';
+import { useStandIQ } from '../../stores/standiq.store';
 
 export default function StandardsBasketPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id') || '';
+  const { basket, removeFromBasket, clearBasket } = useStandIQ();
+  const [selectedIds, setSelectedIds] = useState<string[]>(basket.map(s => s.code));
 
-  const { data: sessionData, isLoading, error } = useGetSession(sessionId);
+  const toggleSelect = (code: string) => {
+    setSelectedIds(prev => 
+      prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]
+    );
+  };
 
-  // We rely on session.selected_standards for the basket.
-  const standards = sessionData?.selected_standards || [];
-  
-  if (isLoading) return <LoadingState message="Loading standards basket..." />;
-  if (error || !sessionId) return <PageContainer><ErrorState title="SESSION ERROR" description="Could not load the procurement session." /></PageContainer>;
-
-  const handleRemoveStandard = (id: string) => {
-    alert(`Removing standard ${id} from backend session is not implemented in the API yet.`);
+  const toggleSelectAll = () => {
+    if (selectedIds.length === basket.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(basket.map(s => s.code));
+    }
   };
 
   return (
-    <PageContainer>
-      <PageHeader
-        eyebrow="STANDARDS BASKET"
-        title="SELECTED STANDARD SET"
-        description="Review the standards and allied references that will form the basis of the procurement specification."
-      />
-      <div className="flex gap-4 items-center mb-12 flex-wrap">
-        <Meta>DISCOVERED</Meta>
-        <Mono className="text-sm">--</Mono>
-        <span className="text-border">|</span>
-        <Meta>SELECTED</Meta>
-        <Mono className="text-sm">{standards.length}</Mono>
-        <span className="text-border">|</span>
-        <Meta>VERIFIED</Meta>
-        <Mono className="text-sm">{sessionData?.verification_state}</Mono>
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+      {/* 01. Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Standards Basket</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Manage selected standards for your procurement specification.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => navigate('/standards')}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm"
+          >
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>Add Standard</span>
+          </button>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-12 pb-24">
-        
-        {/* BASKET ITEMS */}
-        <section className="flex flex-col gap-6">
-          <SectionHeader number="01" title="SELECTED STANDARDS" />
-          <div className="flex flex-col gap-6">
-            {standards.length === 0 && <EmptyState title="EMPTY BASKET" description="No standards have been added to this procurement session." />}
-            {standards.map(std => (
-              <div key={std.standard_id || std.id} className="relative">
-                <StandardCard 
-                  id={std.standard_id || std.id}
-                  year={std.year || 2024}
-                  status={std.status || 'ACTIVE'}
-                  title={std.title || 'Unknown Title'}
-                  type={std.type || 'PRODUCT_STANDARD'}
-                  relevance={{ level: 'HIGH', score: 1.0 }} 
-                />
-                <div className="absolute top-0 right-0 h-full flex flex-col md:flex-row items-end md:items-center justify-end p-4 gap-6 bg-surface md:bg-transparent pointer-events-none">
-                  <div className="flex flex-col gap-1 pointer-events-auto items-end md:items-start bg-surface p-2 rounded-sm border md:border-0 border-border">
-                    <Meta>VERIFICATION</Meta>
-                    <VerificationStatus status={std.verificationStatus || 'UNVERIFIED'} />
-                  </div>
-                  <div className="flex flex-col gap-1 pointer-events-auto items-end md:items-start bg-surface p-2 rounded-sm border md:border-0 border-border">
-                    <Meta>EVIDENCE</Meta>
-                    <Mono className="text-sm font-medium">{std.evidenceCount || 0} REFERENCES</Mono>
-                  </div>
-                  <Button variant="ghost" size="sm" className="pointer-events-auto text-error hover:text-error hover:bg-error/10 uppercase" onClick={() => handleRemoveStandard(std.standard_id || std.id)}>
-                    REMOVE
-                  </Button>
-                </div>
-              </div>
-            ))}
+      {/* 02. Basket Table Card */}
+      <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="bg-slate-50/70 border-b border-slate-100 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="py-3 px-4 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    checked={basket.length > 0 && selectedIds.length === basket.length}
+                    onChange={toggleSelectAll}
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
+                  />
+                </th>
+                <th className="py-3 px-3 w-10 text-center">#</th>
+                <th className="py-3 px-5">Standard</th>
+                <th className="py-3 px-5">Title</th>
+                <th className="py-3 px-5">Type</th>
+                <th className="py-3 px-5">Status</th>
+                <th className="py-3 px-5 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {basket.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                    Your basket is empty. Browse standards to add them to your procurement specification.
+                  </td>
+                </tr>
+              ) : (
+                basket.map((s, idx) => (
+                  <tr
+                    key={s.code}
+                    className="hover:bg-slate-50/70 transition-colors group"
+                  >
+                    <td className="py-3.5 px-4 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(s.code)}
+                        onChange={() => toggleSelect(s.code)}
+                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
+                      />
+                    </td>
+                    <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400">
+                      {idx + 1}
+                    </td>
+                    <td className="py-3.5 px-5 font-mono font-bold text-slate-900 group-hover:text-blue-600">
+                      {s.code}
+                    </td>
+                    <td className="py-3.5 px-5 font-medium text-slate-700 max-w-md">
+                      {s.title}
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">
+                        {s.type}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        {s.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-5 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => removeFromBasket(s.code)}
+                          className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Remove standard"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Footer */}
+        <div className="px-6 py-4 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <span className="font-semibold text-slate-700">
+              <strong className="text-slate-900">{selectedIds.length}</strong> of {basket.length} standards selected
+            </span>
+            {basket.length > 0 && (
+              <button
+                onClick={clearBasket}
+                className="text-slate-500 hover:text-rose-600 font-medium underline underline-offset-2 ml-2"
+              >
+                Clear All
+              </button>
+            )}
           </div>
-        </section>
 
-        {/* ALLIED REFERENCES */}
-        <section className="flex flex-col gap-6">
-          <SectionHeader number="02" title="ALLIED REFERENCES" />
-          <EmptyState title="NOT AVAILABLE" description="Allied references are not returned individually in the basket API payload." />
-        </section>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* BASKET SUMMARY */}
-          <section className="flex flex-col gap-6">
-            <SectionHeader number="03" title="BASKET SUMMARY" />
-            <div className="p-6 border border-border bg-surface rounded-sm">
-              <DataList 
-                items={[
-                  { label: 'PRIMARY STANDARDS', value: standards.filter(s => (s.type || '').includes('PRIMARY')).length.toString().padStart(2, '0') },
-                  { label: 'TEST METHODS', value: '00' },
-                  { label: 'SAFETY', value: '00' },
-                  { label: 'INSTALLATION', value: '00' },
-                  { label: 'CERTIFICATION', value: '00' }
-                ]}
-              />
-              <div className="mt-6 pt-6 border-t border-border flex justify-between items-center">
-                <Meta>TOTAL REFERENCES</Meta>
-                <Mono className="text-lg font-bold">{standards.length}</Mono>
-              </div>
-            </div>
-          </section>
-
-          {/* VERIFICATION GAPS */}
-          <section className="flex flex-col gap-6">
-            <SectionHeader number="04" title="VERIFICATION GAPS" />
-            <EmptyState title="NOT COMPUTED" description="Verification gaps are computed per standard individually, not natively on the session payload." />
-          </section>
-        </div>
-
-        <div className="mt-8 flex justify-end">
-          <Button onClick={() => navigate(`/specification-builder?session_id=${sessionId}`)} size="lg" className="w-full sm:w-auto">
-            CONTINUE TO SPECIFICATION BUILDER →
-          </Button>
+          <button
+            onClick={() => navigate('/specification-builder')}
+            disabled={basket.length === 0}
+            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium px-5 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98]"
+          >
+            <span>Proceed to Specification Builder</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
-    </PageContainer>
+    </div>
   );
 }

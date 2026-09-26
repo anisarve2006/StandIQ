@@ -20,6 +20,7 @@ import EvidenceViewerPage from '../features/evidence/EvidenceViewerPage';
 import TenderDiffPage from '../features/tender-diff/TenderDiffPage';
 import SettingsPage from '../features/settings/SettingsPage';
 import { ProcurementProvider } from '../stores/procurement.store';
+import { StandIQProvider } from '../stores/standiq.store';
 
 const router = createBrowserRouter([
   {
@@ -112,8 +113,10 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <ProcurementProvider>
-      <RouterProvider router={router} />
-    </ProcurementProvider>
+    <StandIQProvider>
+      <ProcurementProvider>
+        <RouterProvider router={router} />
+      </ProcurementProvider>
+    </StandIQProvider>
   );
 }

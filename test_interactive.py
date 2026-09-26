@@ -15,8 +15,15 @@ import time
 # Ensure UTF-8 output on Windows console
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding='utf-8')
+# Ensure backend directory is in sys.path when running from workspace root
+BACKEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
 
-from api_service import recommend_standards, recommend_tender_pdf
+try:
+    from api_service import recommend_standards, recommend_tender_pdf
+except ImportError:
+    from backend.api_service import recommend_standards, recommend_tender_pdf
 
 PRESET_TESTS = [
     {
@@ -195,7 +202,10 @@ def main():
 
         elif choice == "4":
             print("\n[*] Starting 60-Case Benchmark Suite across 17 BIS divisions...")
-            from eval.benchmark import run_benchmark
+            try:
+                from eval.benchmark import run_benchmark
+            except ImportError:
+                from backend.eval.benchmark import run_benchmark
             run_benchmark()
 
         else:

@@ -11,6 +11,8 @@ Backend is **APPLICATION-LAYER COMPLETE**, featuring hardened intelligent APIs r
 Frontend and backend consolidated into one repository.
 **API integration is the next engineering stage.**
 
+For detailed setup instructions, troubleshooting, and test scripts, see **[HOW_TO_RUN.md](file:///e:/Main%20Projects/SIH-PS108/HOW_TO_RUN.md)**.
+
 ## Development Setup
 
 ### Frontend

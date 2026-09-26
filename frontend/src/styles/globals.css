@@ -3,50 +3,279 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Light Mode */
-    --background: #f8f9fa;
+  :root,
+  .soothing {
+    /* StandIQ Eye-Soothing Warm Paper & Calm Slate Theme */
+    --background: #f7f6f2;
     --surface: #ffffff;
-    --surface-elevated: #ffffff;
+    --surface-elevated: #f0eee6;
     
-    --border: #e5e5e5;
-    --border-strong: #d4d4d4;
+    --border: #e5e2d8;
+    --border-strong: #d4cfc2;
     
-    --text-primary: #171717;
-    --text-secondary: #525252;
-    --text-muted: #737373;
+    --text-primary: #1e2633;
+    --text-secondary: #4a5568;
+    --text-muted: #6e798a;
     
-    --accent: #3b82f6;
+    --accent: #2b6cb0;
     --accent-foreground: #ffffff;
     
-    /* Status Colors */
-    --success: #16a34a;
-    --warning: #ca8a04;
-    --error: #dc2626;
-    --info: #2563eb;
+    /* Gentle, non-glare status colors */
+    --success: #15803d;
+    --warning: #b45309;
+    --error: #b91c1c;
+    --info: #2b6cb0;
   }
 
+  /* Full Eye-Soothing Calm Theme Remapping */
+  :root,
+  .soothing {
+    color-scheme: light;
+  }
+
+  body,
+  .soothing body {
+    background-color: #f7f6f2 !important;
+    color: #1e2633 !important;
+  }
+
+  /* Soften canvas wrappers */
+  .soothing .bg-slate-50,
+  .soothing .bg-slate-50\/70,
+  .soothing .bg-slate-50\/60,
+  .soothing .bg-slate-50\/50,
+  .soothing .bg-slate-50\/40,
+  .soothing .bg-slate-50\/80 {
+    background-color: #f3f1ea !important;
+  }
+
+  .soothing .bg-slate-100,
+  .soothing .bg-slate-100\/50,
+  .soothing .bg-slate-100\/80 {
+    background-color: #eae7dd !important;
+  }
+
+  /* Soften pure whites and cards to calm, glare-free surfaces */
+  .soothing .bg-white {
+    background-color: #ffffff !important;
+    color: #1e2633;
+  }
+
+  /* Gentle, low-contrast soothing borders */
+  .soothing .border-slate-200,
+  .soothing .border-slate-200\/90,
+  .soothing .border-slate-200\/80,
+  .soothing .border-slate-200\/60,
+  .soothing .border-slate-100,
+  .soothing .border-slate-300 {
+    border-color: #e5e2d8 !important;
+  }
+
+  /* Soft, legible deep charcoal typography - eliminating blinding harsh black/slate-900 */
+  .soothing .text-slate-900 {
+    color: #1e2633 !important;
+  }
+
+  .soothing .text-slate-800 {
+    color: #2d3748 !important;
+  }
+
+  .soothing .text-slate-700 {
+    color: #3b4657 !important;
+  }
+
+  .soothing .text-slate-600 {
+    color: #4a5568 !important;
+  }
+
+  .soothing .text-slate-500 {
+    color: #6a7687 !important;
+  }
+
+  .soothing .text-slate-400 {
+    color: #8c97a8 !important;
+  }
+
+  /* Gentle, eye-friendly calming blue button instead of harsh neon electric blue */
+  .soothing .bg-blue-600 {
+    background-color: #2b6cb0 !important;
+  }
+  
+  .soothing .hover\:bg-blue-700:hover,
+  .soothing .bg-blue-600:hover {
+    background-color: #235890 !important;
+  }
+
+  .soothing .text-blue-600,
+  .soothing .text-blue-700 {
+    color: #2b6cb0 !important;
+  }
+
+  .soothing .bg-blue-50,
+  .soothing .bg-blue-50\/90,
+  .soothing .bg-blue-50\/80,
+  .soothing .bg-blue-50\/70,
+  .soothing .bg-blue-50\/50,
+  .soothing .bg-blue-50\/20 {
+    background-color: #ebf3fa !important;
+  }
+
+  .soothing .border-blue-200,
+  .soothing .border-blue-200\/60,
+  .soothing .border-blue-100 {
+    border-color: #cde0f0 !important;
+  }
+
+  /* Softer amber/honey highlight callout for document review clauses */
+  .soothing .bg-amber-100\/80,
+  .soothing .bg-amber-100 {
+    background-color: #fdf6e7 !important;
+  }
+  
+  .soothing .border-amber-500 {
+    border-color: #d99b26 !important;
+  }
+  
+  .soothing .text-amber-800 {
+    color: #8c5a08 !important;
+  }
+  
+  .soothing .text-amber-700 {
+    color: #9c670a !important;
+  }
+  
+  .soothing .bg-amber-50 {
+    background-color: #fef9ee !important;
+  }
+  
+  .soothing .border-amber-200 {
+    border-color: #fae6b8 !important;
+  }
+
+  /* Soft emerald tags */
+  .soothing .bg-emerald-50 {
+    background-color: #edf7f1 !important;
+  }
+
+  .soothing .text-emerald-700,
+  .soothing .text-emerald-600 {
+    color: #1a7f4c !important;
+  }
+
+  .soothing .border-emerald-200,
+  .soothing .border-emerald-200\/60 {
+    border-color: #c9ebd7 !important;
+  }
+
+  /* Document Reader Paper Glow Softener */
+  .soothing .min-h-\[580px\] .bg-white {
+    background-color: #fdfcf9 !important;
+    border-color: #e2ded4 !important;
+  }
+
+  /* Dark Mode Palette */
   .dark {
-    /* Dark Mode (Default for this app) */
-    --background: #0a0a0a;
-    --surface: #111111;
-    --surface-elevated: #161616;
+    /* StandIQ Obsidian Slate Dark Mode */
+    --background: #11141c;
+    --surface: #181d28;
+    --surface-elevated: #222838;
     
-    --border: #2a2a2a;
-    --border-strong: #404040;
+    --border: #222938;
+    --border-strong: #333d52;
     
-    --text-primary: #f5f5f5;
-    --text-secondary: #888888;
-    --text-muted: #555555;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #8b99ad;
     
     --accent: #3b82f6;
     --accent-foreground: #ffffff;
     
-    /* Status Colors */
-    --success: #22c55e;
-    --warning: #eab308;
+    --success: #10b981;
+    --warning: #f59e0b;
     --error: #ef4444;
     --info: #3b82f6;
+
+    color-scheme: dark;
+  }
+
+  .dark body {
+    background-color: #11141c !important;
+    color: #f1f5f9 !important;
+  }
+
+  .dark .bg-white {
+    background-color: #181d28 !important;
+    color: #f1f5f9;
+  }
+
+  .dark .bg-slate-50,
+  .dark .bg-slate-50\/70,
+  .dark .bg-slate-50\/60,
+  .dark .bg-slate-50\/50,
+  .dark .bg-slate-50\/40,
+  .dark .bg-slate-50\/80 {
+    background-color: #11141c !important;
+  }
+
+  .dark .bg-slate-100,
+  .dark .bg-slate-100\/50 {
+    background-color: #222838 !important;
+  }
+
+  .dark .border-slate-200,
+  .dark .border-slate-200\/90,
+  .dark .border-slate-200\/80,
+  .dark .border-slate-200\/60,
+  .dark .border-slate-100,
+  .dark .border-slate-300 {
+    border-color: #222938 !important;
+  }
+
+  .dark .text-slate-900 {
+    color: #f1f5f9 !important;
+  }
+
+  .dark .text-slate-800 {
+    color: #e2e8f0 !important;
+  }
+
+  .dark .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+
+  .dark .text-slate-600 {
+    color: #94a3b8 !important;
+  }
+
+  .dark .text-slate-500 {
+    color: #64748b !important;
+  }
+
+  .dark input,
+  .dark select,
+  .dark textarea {
+    background-color: #222838 !important;
+    color: #f1f5f9 !important;
+    border-color: #333d52 !important;
+  }
+
+  /* Crisp Light Mode (if explicitly toggled) */
+  .light {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-elevated: #f1f5f9;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --accent: #2563eb;
+    --accent-foreground: #ffffff;
+    color-scheme: light;
+  }
+
+  .light body {
+    background-color: #f8fafc !important;
   }
 
   * {
@@ -62,6 +291,7 @@
     -moz-osx-font-smoothing: grayscale;
     margin: 0;
     padding: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   /* Typography tokens */

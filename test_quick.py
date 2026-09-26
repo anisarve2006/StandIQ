@@ -9,8 +9,16 @@ Run with:
 import sys
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding='utf-8')
+import os
+# Ensure backend directory is in sys.path
+BACKEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
 
-from api_service import recommend_standards
+try:
+    from api_service import recommend_standards
+except ImportError:
+    from backend.api_service import recommend_standards
 
 TESTS = [
     ("English Technical Spec", "12mm Fe 500D high strength deformed steel rebar for RCC work"),
