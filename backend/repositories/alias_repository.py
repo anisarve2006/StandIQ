@@ -89,7 +89,13 @@ class SQLiteAliasRepository:
                         "division": item.get("division", "Civil Engineering")
                     })
             else:
-                if term == "ups":
+                if term in ["sariya", "saria"]:
+                    pattern = r'\bsari+y*a*n*\b'
+                elif term in ["bajri", "badri"]:
+                    pattern = r'\bba[jd]ri\b'
+                elif term in ["rodi", "rori"]:
+                    pattern = r'\bro[dr]i\b'
+                elif term == "ups":
                     pattern = r'(?<!touch\s)\bups\b'
                 else:
                     pattern = rf'\b{re.escape(term)}(?:s|es|sets?)?\b'
@@ -112,23 +118,43 @@ class SQLiteAliasRepository:
         family_id: str,
         product_name: str,
         division: str = "Civil Engineering",
-        source: str = "LEARNED_BHARATGPT"
+        source: str = "LEARNED_BHARATGPT",
+        review_status: str = "PENDING_REVIEW"
     ):
         """
-        Persists a newly discovered or LLM-normalized trade synonym
-        into SQLite so future queries resolve instantaneously.
+        Persists a newly discovered or LLM-normalized trade synonym.
+        To prevent unverified LLM canonicalizations from poisoning the official catalogue,
+        new entries default to 'PENDING_REVIEW' and are logged to an audit queue.
         """
         try:
             conn = self._get_conn()
             cur = conn.cursor()
+            # Ensure review_status column exists
+            try:
+                cur.execute("ALTER TABLE standard_aliases ADD COLUMN review_status TEXT DEFAULT 'VERIFIED';")
+                conn.commit()
+            except sqlite3.OperationalError:
+                pass  # column already exists
+
             cur.execute("""
-            INSERT OR REPLACE INTO standard_aliases (alias_term, family_id, product_name, division, source)
-            VALUES (?, ?, ?, ?, ?);
-            """, (alias_term.strip().lower(), family_id, product_name, division, source))
+            INSERT OR REPLACE INTO standard_aliases (alias_term, family_id, product_name, division, source, review_status)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """, (alias_term.strip().lower(), family_id, product_name, division, source, review_status))
             conn.commit()
             conn.close()
             self.invalidate_cache()
-            logger.info(f"[AliasRepository] Persisted new trade alias '{alias_term}' -> {family_id}")
+            
+            # Log to human-in-the-loop review CSV
+            audit_file = os.path.join(DATA_DIR, "pending_aliases_audit.csv")
+            file_exists = os.path.isfile(audit_file)
+            import csv
+            with open(audit_file, mode="a", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(["alias_term", "family_id", "product_name", "division", "source", "review_status"])
+                writer.writerow([alias_term.strip().lower(), family_id, product_name, division, source, review_status])
+
+            logger.info(f"[AliasRepository] Staged candidate alias '{alias_term}' -> {family_id} (Status: {review_status})")
         except Exception as e:
             logger.warning(f"[AliasRepository] Failed to save alias '{alias_term}': {e}")
 

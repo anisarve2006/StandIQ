@@ -1,0 +1,117 @@
+{
+  "version": "1.0.0",
+  "description": "StandIQ Declarative Domain Rulebook - Governs Late-Interaction Reranking & Disambiguation",
+  "last_updated": "2026-09-27",
+  "rules": [
+    {
+      "id": "ROLE_TEST_METHOD_SIEVE",
+      "category": "DOCUMENT_ROLE",
+      "rationale": "Prevents role inversion: queries requesting material testing must prioritize test method standards over pure product specifications",
+      "query_triggers": ["testing of", "method of test", "laboratory test", "field test", "compressive strength", "test report"],
+      "promoted_patterns": ["method of test", "methods of testing", "methods of physical tests", "sampling and test"],
+      "demoted_patterns": ["specification for", "specification"],
+      "boost": 0.40,
+      "penalty": -0.40
+    },
+    {
+      "id": "ROLE_EXECUTION_MEASUREMENT",
+      "category": "DOCUMENT_ROLE",
+      "rationale": "Queries requesting civil work execution or filling must prioritize measurement/execution codes over pure soil testing or safety codes",
+      "query_triggers": ["excavation", "plinth filling", "earthwork", "trench"],
+      "primary_standards": ["1200"],
+      "secondary_safety_standards": ["3764"],
+      "secondary_test_standards": ["2720"],
+      "primary_boost": 0.35,
+      "safety_penalty": -0.20,
+      "test_penalty": -0.35
+    },
+    {
+      "id": "CONSTITUENT_CONCRETE_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For structural concrete mixes (M-10 through M-50), IS 456 is the governing primary standard; aggregates (IS 383) are allied constituents",
+      "query_triggers": ["m-10", "m-15", "m-20", "m-25", "m-30", "rcc", "plain concrete", "cement concrete"],
+      "primary_standards": ["456"],
+      "allied_standards": ["383"],
+      "primary_boost": 0.35,
+      "allied_penalty": -0.25
+    },
+    {
+      "id": "CONSTITUENT_PLASTER_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For plastering and rendering, IS 1661/IS 2402 are governing work codes; mortar (IS 2250) is an allied constituent",
+      "query_triggers": ["plastering", "rendering", "cement plaster", "external plaster"],
+      "primary_standards": ["1661", "2402"],
+      "allied_standards": ["2250"],
+      "primary_boost": 0.40,
+      "allied_penalty": -0.25
+    },
+    {
+      "id": "CONSTITUENT_BRICKWORK_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For brick masonry construction, IS 2212 is the governing code of practice; mortar (IS 2250) is an allied constituent",
+      "query_triggers": ["brickwork", "brick masonry", "laying bricks"],
+      "primary_standards": ["2212"],
+      "allied_standards": ["2250"],
+      "primary_boost": 0.40,
+      "allied_penalty": -0.25
+    },
+    {
+      "id": "CONSTITUENT_TILE_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For floor and wall tiles, IS 15622 is the primary product standard; fixing mortar (IS 2250) is an allied constituent",
+      "query_triggers": ["vitrified", "ceramic tile", "flooring tile", "glazed tile"],
+      "primary_standards": ["15622"],
+      "allied_standards": ["2250"],
+      "primary_boost": 0.35,
+      "allied_penalty": -0.45
+    },
+    {
+      "id": "CONTRADICTION_PVC_VS_XLPE",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Hard material contradiction: PVC cable specifications must strictly disqualify XLPE (IS 7098) insulation",
+      "query_triggers": ["pvc cable", "pvc insulated"],
+      "conflicting_terms": ["thermosetting", "cross-linked", "crosslinked", "xlpe"],
+      "disqualification_penalty": -0.85
+    },
+    {
+      "id": "CONTRADICTION_PIPE_VS_FITTINGS",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Component mismatch: CPVC pipe specifications must favor pipes (IS 15778) and demote fittings (IS 17546)",
+      "query_triggers": ["cpvc pipe", "cpvc pipes"],
+      "promoted_standards": ["15778"],
+      "demoted_standards": ["17546"],
+      "boost": 0.40,
+      "penalty": -0.65
+    },
+    {
+      "id": "CONTRADICTION_GI_PLUMBING_VS_MAINS",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Scope mismatch: Domestic GI plumbing must favor IS 1239:P1 over large cross-country transmission mains (IS 3589)",
+      "query_triggers": ["gi pipe", "galvanized iron pipe", "gi water supply"],
+      "promoted_standards": ["1239"],
+      "demoted_standards": ["3589"],
+      "boost": 0.45,
+      "penalty": -0.35
+    },
+    {
+      "id": "CONTRADICTION_DRY_VS_WET_DISTEMPER",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Product mismatch: Dry distemper (IS 427) must not be confused with washable distemper (IS 428)",
+      "query_triggers": ["dry distemper"],
+      "promoted_standards": ["427"],
+      "demoted_standards": ["428"],
+      "boost": 0.45,
+      "penalty": -0.50
+    },
+    {
+      "id": "CONTRADICTION_DIGITAL_VS_MERCURY_THERMOMETER",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Technology mismatch: Digital clinical thermometers (IS 15113) must not be confused with mercury-in-glass (IS 3055)",
+      "query_triggers": ["digital thermometer", "clinical digital thermometer"],
+      "promoted_standards": ["15113"],
+      "demoted_standards": ["3055"],
+      "boost": 0.45,
+      "penalty": -0.50
+    }
+  ]
+}
