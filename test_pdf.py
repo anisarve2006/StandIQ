@@ -19,7 +19,15 @@ import time
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding='utf-8')
 
-from api_service import recommend_tender_pdf
+# Ensure backend directory is in sys.path
+BACKEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
+
+try:
+    from api_service import recommend_tender_pdf
+except ImportError:
+    from backend.api_service import recommend_tender_pdf
 
 def print_banner():
     print("\n" + "=" * 80)

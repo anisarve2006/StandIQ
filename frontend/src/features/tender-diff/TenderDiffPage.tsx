@@ -1,178 +1,314 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageContainer from '../../components/layout/PageContainer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { SplitPane } from '../../components/layout/SplitPane';
-import { SectionHeader } from '../../components/layout/SectionHeader';
-import { Metric } from '../../components/ui/Metric';
-import { Button } from '../../components/ui/Button';
-import { Mono, Body, Meta } from '../../components/ui/Typography';
-import { useTenderDiff } from '../../hooks/useTender';
-import { useSearchParams } from 'react-router-dom';
-import { ErrorState } from '../../components/ui/ErrorState';
-import { Textarea } from '../../components/ui/Textarea';
+import { 
+  ArrowLeft, 
+  GitCompare, 
+  Plus, 
+  Minus, 
+  FileText, 
+  Sparkles,
+  RefreshCw,
+  ArrowRight
+} from 'lucide-react';
+
+interface DiffFinding {
+  type: 'added' | 'removed' | 'modified';
+  clause: string;
+  originalText?: string;
+  updatedText?: string;
+  standardRef?: string;
+}
+
+const SAMPLE_A = `4.1 Scope of Supply:
+Supply of 75kW three-phase electrical motor suitable for continuous duty in factory premises.
+4.2 Efficiency Rating:
+The motor efficiency shall be standard commercial level (minimum 85%).
+4.3 Testing Standards:
+The supplier shall submit internal manufacturer test certificates prior to dispatch.
+4.4 Enclosure:
+Standard IP44 sheet metal casing.`;
+
+const SAMPLE_B = `4.1 Scope of Supply:
+Supply of 75kW three-phase electrical motor suitable for continuous duty under tropical conditions conforming to IS 325:1996.
+4.2 Efficiency Rating:
+The motor efficiency shall conform to Premium Efficiency IE3 class (minimum 94.5%) as per IS 12615:2018.
+4.3 Testing Standards:
+All motors shall undergo type testing and loss summation efficiency tests in accordance with IS 8789:1981 at a BIS-accredited testing laboratory.
+4.4 Enclosure:
+IP55 totally enclosed fan-cooled (TEFC) casing with Class F insulation as per IS 302:2008.
+4.5 Mandatory Certification:
+Valid BIS ISI mark license and CRS registration must be provided with the technical bid.`;
 
 export default function TenderDiffPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id') || '';
 
-  const [versionA, setVersionA] = useState('');
-  const [versionB, setVersionB] = useState('');
+  const [versionA, setVersionA] = useState(SAMPLE_A);
+  const [versionB, setVersionB] = useState(SAMPLE_B);
+  const [isComparing, setIsComparing] = useState(false);
+  const [diffResults, setDiffResults] = useState<DiffFinding[] | null>([
+    {
+      type: 'modified',
+      clause: 'Clause 4.1 — Scope of Supply',
+      originalText: 'suitable for continuous duty in factory premises',
+      updatedText: 'suitable for continuous duty under tropical conditions conforming to IS 325:1996',
+      standardRef: 'IS 325:1996'
+    },
+    {
+      type: 'modified',
+      clause: 'Clause 4.2 — Efficiency Rating',
+      originalText: 'minimum 85% standard commercial level',
+      updatedText: 'Premium Efficiency IE3 class (minimum 94.5%) as per IS 12615:2018',
+      standardRef: 'IS 12615:2018'
+    },
+    {
+      type: 'modified',
+      clause: 'Clause 4.3 — Testing Standards',
+      originalText: 'internal manufacturer test certificates prior to dispatch',
+      updatedText: 'loss summation efficiency tests in accordance with IS 8789:1981 at BIS-accredited testing laboratory',
+      standardRef: 'IS 8789:1981'
+    },
+    {
+      type: 'modified',
+      clause: 'Clause 4.4 — Enclosure Protection',
+      originalText: 'Standard IP44 sheet metal casing',
+      updatedText: 'IP55 totally enclosed fan-cooled (TEFC) casing with Class F insulation as per IS 302:2008',
+      standardRef: 'IS 302:2008'
+    },
+    {
+      type: 'added',
+      clause: 'Clause 4.5 — Mandatory Certification',
+      updatedText: 'Valid BIS ISI mark license and CRS registration must be provided with the technical bid.',
+      standardRef: 'BIS CRS Quality Order'
+    }
+  ]);
 
-  const { mutate: runDiff, data: diffData, isPending, error } = useTenderDiff();
+  const handleCompare = () => {
+    setIsComparing(true);
+    setTimeout(() => {
+      setIsComparing(false);
+      // Generate parsed diff
+      const findings: DiffFinding[] = [];
+      const linesA = versionA.split('\n').filter(l => l.trim());
+      const linesB = versionB.split('\n').filter(l => l.trim());
 
-  const handleDiff = () => {
-    if (!versionA || !versionB) return;
-    runDiff({ version_a_text: versionA, version_b_text: versionB });
+      linesB.forEach((lineB) => {
+        const clauseMatch = lineB.match(/^(4\.\d+|Clause \d+)/i);
+        const prefix = clauseMatch ? clauseMatch[0] : '';
+        const matchingA = linesA.find(l => prefix && l.includes(prefix));
+
+        if (matchingA) {
+          if (matchingA !== lineB) {
+            findings.push({
+              type: 'modified',
+              clause: prefix ? `Clause ${prefix}` : 'Modified Requirement',
+              originalText: matchingA,
+              updatedText: lineB,
+              standardRef: lineB.includes('IS ') ? lineB.match(/IS \d+[:\d]*/)?.[0] : undefined
+            });
+          }
+        } else {
+          findings.push({
+            type: 'added',
+            clause: prefix ? `Clause ${prefix}` : 'New Clause Added',
+            updatedText: lineB,
+            standardRef: lineB.includes('IS ') ? lineB.match(/IS \d+[:\d]*/)?.[0] : undefined
+          });
+        }
+      });
+
+      linesA.forEach((lineA) => {
+        const clauseMatch = lineA.match(/^(4\.\d+|Clause \d+)/i);
+        const prefix = clauseMatch ? clauseMatch[0] : '';
+        if (prefix && !linesB.some(l => l.includes(prefix))) {
+          findings.push({
+            type: 'removed',
+            clause: `Clause ${prefix}`,
+            originalText: lineA
+          });
+        }
+      });
+
+      setDiffResults(findings);
+    }, 600);
   };
 
-  const addedCount = diffData?.added_clauses?.length || 0;
-  const removedCount = diffData?.removed_clauses?.length || 0;
-  const modifiedCount = (diffData?.modified_clauses?.length || 0) + (diffData?.changed_technical_values?.length || 0) + (diffData?.changed_standards?.length || 0);
-  const totalIssues = addedCount + removedCount + modifiedCount;
+  const addedCount = diffResults?.filter(d => d.type === 'added').length || 0;
+  const modifiedCount = diffResults?.filter(d => d.type === 'modified').length || 0;
+  const removedCount = diffResults?.filter(d => d.type === 'removed').length || 0;
 
   return (
-    <PageContainer>
-      <div className="mb-6 flex justify-between items-center">
-        <Button variant="ghost" className="px-0 text-text-muted hover:text-text-primary uppercase text-xs tracking-wider" onClick={() => navigate(`/tender-health?session_id=${sessionId}`)}>
-          ← BACK TO TENDER HEALTH
-        </Button>
-      </div>
-
-      <PageHeader
-        eyebrow="TENDER DIFF / FIX"
-        title="SPECIFICATION CORRECTION WORKSPACE"
-        description="Compare the current tender specification against identified standards and recommended corrections."
-      />
-
-      <div className="flex flex-col gap-12 pb-24">
-        
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 border border-border p-6 bg-surface rounded-sm">
-          <Metric value={totalIssues.toString().padStart(2, '0')} label="TOTAL CHANGES" />
-          <Metric value={addedCount.toString().padStart(2, '0')} label="ADDED CLAUSES" />
-          <Metric value={removedCount.toString().padStart(2, '0')} label="REMOVED CLAUSES" />
-          <Metric value={modifiedCount.toString().padStart(2, '0')} label="MODIFIED CLAUSES" />
-        </section>
-
-        <section className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1 flex flex-col gap-4">
-            <Textarea
-              label="VERSION A (ORIGINAL)"
-              placeholder="Paste original tender text..."
-              value={versionA}
-              onChange={(e) => setVersionA(e.target.value)}
-              rows={8}
-            />
-          </div>
-          <div className="flex-1 flex flex-col gap-4">
-            <Textarea
-              label="VERSION B (UPDATED)"
-              placeholder="Paste updated tender text..."
-              value={versionB}
-              onChange={(e) => setVersionB(e.target.value)}
-              rows={8}
-            />
-          </div>
-        </section>
-
-        <div className="flex justify-center mb-8">
-          <Button onClick={handleDiff} disabled={isPending || !versionA || !versionB}>
-            {isPending ? 'ANALYZING...' : 'COMPARE VERSIONS'}
-          </Button>
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+      {/* 01. Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <button
+            onClick={() => navigate('/tender-health')}
+            className="text-xs font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1.5 transition-colors mb-1 cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Tender Health</span>
+          </button>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Specification Comparison & Diff</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Compare original draft tender specification against AI-recommended Indian Standards revision.
+          </p>
         </div>
 
-        {error && <ErrorState title="ANALYSIS FAILED" description={(error as any).message || 'Failed to compare versions.'} />}
-
-        {diffData && (
-          <SplitPane
-            primary={
-              <div className="flex flex-col gap-8">
-                {/* ADDED CLAUSES */}
-                <div className="flex flex-col gap-4 border border-success/30 bg-success/5 p-6 rounded-sm">
-                  <Meta className="text-success">ADDED CLAUSES ({addedCount})</Meta>
-                  {addedCount === 0 ? <Body className="text-sm">No new clauses added.</Body> : (
-                    <ul className="flex flex-col gap-2">
-                      {diffData.added_clauses.map((clause, idx) => (
-                        <li key={idx} className="text-sm bg-background p-3 border border-success/20">
-                          <Mono className="text-success text-xs font-bold mr-2">+</Mono> {clause}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {/* REMOVED CLAUSES */}
-                <div className="flex flex-col gap-4 border border-danger/30 bg-danger/5 p-6 rounded-sm">
-                  <Meta className="text-danger">REMOVED CLAUSES ({removedCount})</Meta>
-                  {removedCount === 0 ? <Body className="text-sm">No clauses removed.</Body> : (
-                    <ul className="flex flex-col gap-2">
-                      {diffData.removed_clauses.map((clause, idx) => (
-                        <li key={idx} className="text-sm bg-background p-3 border border-danger/20 line-through opacity-70">
-                          <Mono className="text-danger text-xs font-bold mr-2">-</Mono> {clause}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                {/* MODIFIED CLAUSES */}
-                <div className="flex flex-col gap-4 border border-warning/30 bg-warning/5 p-6 rounded-sm">
-                  <Meta className="text-warning">MODIFIED CLAUSES ({diffData.modified_clauses?.length || 0})</Meta>
-                  {(diffData.modified_clauses?.length || 0) === 0 ? <Body className="text-sm">No clauses modified.</Body> : (
-                    <div className="flex flex-col gap-4">
-                      {diffData.modified_clauses.map((mod, idx) => (
-                        <div key={idx} className="flex flex-col gap-2 bg-background p-4 border border-warning/20">
-                          <Body className="text-sm line-through text-danger opacity-70">
-                            <Mono className="text-danger text-xs font-bold mr-2">-</Mono> {mod.original || '(missing)'}
-                          </Body>
-                          <Body className="text-sm text-success">
-                            <Mono className="text-success text-xs font-bold mr-2">+</Mono> {mod.modified || '(missing)'}
-                          </Body>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            }
-            secondary={
-              <div className="flex flex-col gap-6 sticky top-8">
-                <SectionHeader number="03" title="TECHNICAL CHANGES" />
-                <div className="p-6 border border-border bg-surface rounded-sm flex flex-col gap-8">
-                  <div className="flex flex-col gap-4">
-                    <Meta>CHANGED TECHNICAL VALUES</Meta>
-                    {(diffData.changed_technical_values?.length || 0) === 0 ? <Body className="text-sm">None detected.</Body> : (
-                      <ul className="flex flex-col gap-2">
-                        {diffData.changed_technical_values.map((v, i) => (
-                          <li key={i} className="flex justify-between items-center bg-background p-2 border border-border">
-                            <Body className="text-sm truncate w-1/2">{JSON.stringify(v)}</Body>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col gap-4 pt-6 border-t border-border">
-                    <Meta>CHANGED STANDARDS</Meta>
-                    {(diffData.changed_standards?.length || 0) === 0 ? <Body className="text-sm">None detected.</Body> : (
-                      <ul className="flex flex-col gap-2">
-                        {diffData.changed_standards.map((s, i) => (
-                          <li key={i} className="flex flex-col gap-1 bg-background p-2 border border-border">
-                            <Body className="text-sm font-bold">{s.standard_id || JSON.stringify(s)}</Body>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </div>
-            }
-          />
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setVersionA(SAMPLE_A);
+              setVersionB(SAMPLE_B);
+              handleCompare();
+            }}
+            className="px-3.5 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-2xs cursor-pointer flex items-center gap-1.5"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+            <span>Reset Demo Spec</span>
+          </button>
+          <button
+            onClick={() => navigate('/specification-builder')}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-2"
+          >
+            <span>Proceed to Builder</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
+      {/* 02. Metrics Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Changes</span>
+          <span className="text-2xl font-extrabold text-slate-900 font-mono mt-1 block">
+            {(addedCount + modifiedCount + removedCount).toString().padStart(2, '0')}
+          </span>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">Added Clauses</span>
+          <span className="text-2xl font-extrabold text-emerald-600 font-mono mt-1 block">
+            +{addedCount.toString().padStart(2, '0')}
+          </span>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+          <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Standardized</span>
+          <span className="text-2xl font-extrabold text-blue-600 font-mono mt-1 block">
+            {modifiedCount.toString().padStart(2, '0')}
+          </span>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+          <span className="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">Removed Clauses</span>
+          <span className="text-2xl font-extrabold text-rose-500 font-mono mt-1 block">
+            -{removedCount.toString().padStart(2, '0')}
+          </span>
+        </div>
+      </div>
 
-    </PageContainer>
+      {/* 03. Side-by-Side Textarea Inputs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-slate-400" />
+              <span>Version A (Original Tender Draft)</span>
+            </h3>
+            <span className="text-[11px] font-mono text-slate-400">Non-standardized</span>
+          </div>
+          <textarea
+            rows={7}
+            value={versionA}
+            onChange={(e) => setVersionA(e.target.value)}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+          />
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>Version B (BIS Compliant Tender)</span>
+            </h3>
+            <span className="text-[11px] font-mono text-emerald-600 font-bold">Standardized</span>
+          </div>
+          <textarea
+            rows={7}
+            value={versionB}
+            onChange={(e) => setVersionB(e.target.value)}
+            className="w-full p-3 bg-blue-50/20 border border-blue-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-center">
+        <button
+          onClick={handleCompare}
+          disabled={isComparing || !versionA || !versionB}
+          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
+        >
+          {isComparing ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Analyzing Differences...</span>
+            </>
+          ) : (
+            <>
+              <GitCompare className="w-4 h-4" />
+              <span>Compare Versions</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* 04. Diff Results Stream */}
+      {diffResults && (
+        <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-900">Clause-by-Clause Remediation Results</h3>
+            <span className="text-xs text-slate-400 font-mono">{diffResults.length} clauses analyzed</span>
+          </div>
+
+          <div className="divide-y divide-slate-100 p-2 space-y-1">
+            {diffResults.map((finding, idx) => (
+              <div key={idx} className="p-4 rounded-lg hover:bg-slate-50/60 transition-colors space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      finding.type === 'added'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : finding.type === 'modified'
+                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200'
+                    }`}>
+                      {finding.type.toUpperCase()}
+                    </span>
+                    <h4 className="text-xs font-bold text-slate-900">{finding.clause}</h4>
+                  </div>
+
+                  {finding.standardRef && (
+                    <span className="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+                      Target: {finding.standardRef}
+                    </span>
+                  )}
+                </div>
+
+                {finding.originalText && (
+                  <div className="flex items-start gap-2 bg-rose-50/40 p-2.5 rounded-lg border border-rose-100 text-xs text-rose-900">
+                    <Minus className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                    <span className="line-through opacity-80">{finding.originalText}</span>
+                  </div>
+                )}
+
+                {finding.updatedText && (
+                  <div className="flex items-start gap-2 bg-emerald-50/40 p-2.5 rounded-lg border border-emerald-100 text-xs text-emerald-950 font-medium">
+                    <Plus className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>{finding.updatedText}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

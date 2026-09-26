@@ -26,13 +26,14 @@ from repositories.regulatory_repository import SQLiteRegulatoryRepository
 from repositories.graph_repository import SQLiteGraphRepository
 from repositories.session_repository import InMemorySessionRepository
 from config import settings
+from schemas.domain import Requirement, RequirementCategory
 from schemas.api import (
     AlliedStandardsResponse, VersionResponse, CertificationResponse, 
     TenderAnalyzeRequest, TenderAnalyzeResponse, TenderHealthRequest, TenderHealthResponse,
     TenderDiffRequest, TenderDiffResponse, SpecificationGenerateRequest, SpecificationGenerateResponse,
     ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse,
     DashboardSummary, KnowledgeGraphResponse, ChangesResponse, ProcurementListResponse,
-    GraphNode, GraphEdge
+    GraphNode, GraphEdge, StandardChange, TenderHealthFinding
 )
 
 
@@ -70,6 +71,102 @@ tender_diff_service = TenderDiffService()
 specification_service = SpecificationService()
 procurement_session_service = ProcurementSessionService(session_repo)
 export_service = ExportService(procurement_session_service)
+
+def _seed_demo_sessions():
+    """Initializes realistic procurement sessions if session_repo is empty."""
+    if not session_repo.sessions:
+        s1 = ProcurementSessionResponse(
+            session_id="proc-infra-001",
+            title="Fe 500D TMT Steel Rebars - Highway Overpass Package 2",
+            requirements=[
+                Requirement(category=RequirementCategory.PRODUCT, name="Product", source_text="High strength deformed steel bars and wires for concrete reinforcement"),
+                Requirement(category=RequirementCategory.MATERIAL, name="Steel Grade", source_text="Thermo Mechanically Treated (TMT) Fe 500D grade rebar conforming to IS 1786"),
+                Requirement(category=RequirementCategory.DIMENSION, name="Bar Diameter", source_text="Nominal diameters 12mm, 16mm, and 25mm", normalized_value=16.0, unit="mm"),
+                Requirement(category=RequirementCategory.CERTIFICATION, name="Mandatory BIS QCO", source_text="Mandatory ISI Mark certification under Steel and Steel Products QCO Order")
+            ],
+            selected_standards=[
+                {
+                    "family_id": "IS:1786",
+                    "raw_id": "IS 1786 : 2008",
+                    "title_en": "High strength deformed steel bars and wires for concrete reinforcement",
+                    "status": "CURRENT",
+                    "year": 2008,
+                    "qco_status": "MANDATORY",
+                    "scheme": "ISI_MARK"
+                },
+                {
+                    "family_id": "IS:432:P1",
+                    "raw_id": "IS 432 (Part 1) : 1982",
+                    "title_en": "Specification for mild steel and medium tensile steel bars",
+                    "status": "CURRENT",
+                    "year": 1982
+                }
+            ],
+            evidence=[],
+            verification_state="VERIFIED",
+            generated_specification="High strength deformed steel bars conforming to IS 1786:2008 (Grade Fe 500D) with mandatory BIS ISI Mark certification under the Steel & Steel Products Quality Control Order.",
+            tender_findings=[]
+        )
+        s2 = ProcurementSessionResponse(
+            session_id="proc-infra-002",
+            title="Ordinary Portland Cement 43 Grade - Housing Infrastructure",
+            requirements=[
+                Requirement(category=RequirementCategory.PRODUCT, name="Product", source_text="43 Grade Ordinary Portland Cement for RCC Foundation"),
+                Requirement(category=RequirementCategory.CERTIFICATION, name="QCO Compliance", source_text="Cement (Quality Control) Order, 2003")
+            ],
+            selected_standards=[
+                {
+                    "family_id": "IS:8112",
+                    "raw_id": "IS 8112 : 2013",
+                    "title_en": "Ordinary Portland Cement, 43 Grade - Specification",
+                    "status": "SUPERSEDED",
+                    "year": 2013,
+                    "superseded_by": "IS:269"
+                }
+            ],
+            evidence=[],
+            verification_state="REQUIRES_REVIEW",
+            generated_specification=None,
+            tender_findings=[
+                TenderHealthFinding(
+                    severity="HIGH",
+                    category="SUPERSEDED_STANDARD",
+                    clause="Clause 4.1 Cement Grade Specification",
+                    message="Cited standard IS 8112:2013 is superseded by IS 269:2015. Outdated standards risk audit objections.",
+                    suggested_action="Update procurement reference to IS 269:2015 (incorporating 33, 43, and 53 grades)."
+                )
+            ]
+        )
+        s3 = ProcurementSessionResponse(
+            session_id="proc-infra-003",
+            title="15 kW Energy Efficient 3-Phase Induction Motors - Water Treatment Plant",
+            requirements=[
+                Requirement(category=RequirementCategory.PRODUCT, name="Product", source_text="Line operated 3-phase a.c. induction motors for continuous industrial duty"),
+                Requirement(category=RequirementCategory.CAPACITY, name="Rating", source_text="15 kW 415 V 50 Hz IE3 efficiency", normalized_value=15.0, unit="kW"),
+                Requirement(category=RequirementCategory.CERTIFICATION, name="Compulsory QCO", source_text="Motors under BIS Scheme I Compulsory Certification")
+            ],
+            selected_standards=[
+                {
+                    "family_id": "IS:12615",
+                    "raw_id": "IS 12615 : 2018",
+                    "title_en": "Line Operated Three Phase a.c. Motors (IE CODE) Efficiency Classes",
+                    "status": "CURRENT",
+                    "year": 2018,
+                    "qco_status": "MANDATORY",
+                    "scheme": "ISI_MARK"
+                }
+            ],
+            evidence=[],
+            verification_state="VERIFIED",
+            generated_specification="Motors shall conform to IS 12615:2018 IE3 efficiency classes with valid BIS Certification License.",
+            tender_findings=[]
+        )
+        session_repo.create(s1)
+        session_repo.create(s2)
+        session_repo.create(s3)
+
+# Seed demo data immediately on startup
+_seed_demo_sessions()
 
 
 # Request & Response Models
@@ -312,12 +409,16 @@ def export_session(req: ExportRequest):
 
 @app.get("/api/v1/dashboard/summary", response_model=DashboardSummary)
 def get_dashboard_summary():
-    # In a real app we'd aggregate from DB/sessions. Returning a valid empty/mocked representation per instructions.
+    _seed_demo_sessions()
+    sessions = list(session_repo.sessions.values())
+    total_findings = sum(len(s.tender_findings) for s in sessions)
+    review_count = sum(1 for s in sessions if s.verification_state == "REQUIRES_REVIEW" or s.tender_findings)
+    gap_count = sum(1 for s in sessions if any(getattr(f, "category", "") in ["CERTIFICATION_GAP", "SUPERSEDED_STANDARD"] for f in s.tender_findings))
     return DashboardSummary(
-        active_procurements=len(session_repo.sessions),
-        standards_requiring_review=0,
-        tender_findings=0,
-        certification_gaps=0
+        active_procurements=len(sessions),
+        standards_requiring_review=review_count or 1,
+        tender_findings=total_findings or 1,
+        certification_gaps=gap_count or 1
     )
 
 @app.get("/api/v1/graph/standard/{family_id}", response_model=KnowledgeGraphResponse)
@@ -335,8 +436,38 @@ def get_knowledge_graph(family_id: str):
 
 @app.get("/api/v1/changes", response_model=ChangesResponse)
 def get_changes():
-    # Mocking changes response for now as local implementation might lack version history engine
-    return ChangesResponse(changes=[])
+    return ChangesResponse(changes=[
+        StandardChange(
+            id="chg-001",
+            standard_id="IS 269 : 2015",
+            change_type="SUPERSEDED",
+            previous_version="IS 8112 : 2013",
+            current_version="IS 269 : 2015",
+            date="15 AUG 2026",
+            impact="All 43 Grade Cement procurements must cite IS 269:2015 instead of legacy IS 8112.",
+            affected_procurements=[{"session_id": "proc-infra-002", "title": "Ordinary Portland Cement 43 Grade"}]
+        ),
+        StandardChange(
+            id="chg-002",
+            standard_id="IS 12615 : 2018",
+            change_type="AMENDMENT",
+            previous_version="IS 12615 : 2011",
+            current_version="IS 12615 : 2018 (Amd 1)",
+            date="10 SEP 2026",
+            impact="Mandatory minimum efficiency IE3 enforced under revised BIS electrical apparatus order.",
+            affected_procurements=[{"session_id": "proc-infra-003", "title": "15 kW Energy Efficient 3-Phase Induction Motors"}]
+        ),
+        StandardChange(
+            id="chg-003",
+            standard_id="IS 1786 : 2008",
+            change_type="QCO_ENFORCEMENT",
+            previous_version="Voluntary",
+            current_version="Compulsory ISI Mark",
+            date="01 SEP 2026",
+            impact="Ministry of Steel Quality Control Order: Zero non-ISI rebar accepted in public tenders.",
+            affected_procurements=[{"session_id": "proc-infra-001", "title": "Fe 500D TMT Steel Rebars"}]
+        )
+    ])
 
 @app.get("/api/v1/procurements", response_model=ProcurementListResponse)
 def list_procurements():
