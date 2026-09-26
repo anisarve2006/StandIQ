@@ -17,6 +17,7 @@ The Top-Tier Core Orchestrator coordinating all 12 Architecture Layers:
 """
 
 import os
+import re
 import json
 import time
 from typing import Dict, Any, List, Optional
@@ -174,10 +175,78 @@ class StandardsRecommenderEngine:
         t0 = time.time()
         timings = {}
 
+        # Multi-Clause Specification / Schedule of Requirements Handling
+        clause_pattern = r'(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+(?:\n(?!\s*\d+[\.\)]\s+)[^\n]+)*)'
+        multi_clauses = re.findall(clause_pattern, query_text)
+        if len(multi_clauses) >= 2:
+            item_recommendations = []
+            alternatives = []
+            primary_rec = None
+            mandatory_count = 0
+            voluntary_count = 0
+
+            for c_num, c_body in multi_clauses:
+                clean_body = c_body.strip()
+                sub_rec = self.recommend(clean_body, top_candidates=1)
+                prim = sub_rec.get("primary_recommendation")
+                cert = sub_rec.get("certification", {})
+                if cert.get("is_mandatory"):
+                    mandatory_count += 1
+                else:
+                    voluntary_count += 1
+
+                if prim and prim.get("family_id") != "NONE":
+                    if not primary_rec:
+                        primary_rec = prim
+                    else:
+                        alternatives.append({
+                            "family_id": prim.get("family_id"),
+                            "raw_id": prim.get("raw_id", prim.get("family_id")),
+                            "title_en": prim.get("title_en", ""),
+                            "clause_number": int(c_num)
+                        })
+
+                item_recommendations.append({
+                    "item_index": int(c_num),
+                    "clause_number": int(c_num),
+                    "requirement": clean_body,
+                    "primary_standard": prim,
+                    "certification": cert,
+                    "allied_standards": sub_rec.get("allied_standards", {}),
+                    "specification_clause": sub_rec.get("specification_clause", ""),
+                    "specification_gaps": sub_rec.get("specification_gaps", [])
+                })
+
+            total_ms = round((time.time() - t0) * 1000, 2)
+            return {
+                "status": "SUCCESS",
+                "is_multi_clause": True,
+                "total_clauses": len(multi_clauses),
+                "query": query_text,
+                "primary_recommendation": primary_rec or {},
+                "item_recommendations": item_recommendations,
+                "alternative_candidates": alternatives,
+                "compliance_summary": {
+                    "total_items": len(multi_clauses),
+                    "mandatory_qco_items": mandatory_count,
+                    "voluntary_items": voluntary_count
+                },
+                "evidence_pack": {
+                    "query_summary": {"raw_query": query_text, "recognized_entities": [], "query_type": "MULTI_CLAUSE_SPECIFICATION"},
+                    "multi_clause_summary": f"Identified {len(multi_clauses)} discrete technical requirements across Civil Engineering disciplines."
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {"is_mandatory": mandatory_count > 0, "status": f"{mandatory_count} MANDATORY QCO CLAUSES"},
+                "specification_clause": "### MULTI-ITEM CONSTRUCTION SPECIFICATION\nConsolidated standards package generated for all itemized civil requirements.",
+                "total_time_ms": total_ms,
+                "latency_breakdown_ms": {"multi_clause_pipeline_ms": total_ms}
+            }
+
         # 1. Compile Query (Neuro-symbolic Layer A & B)
         t_compile = time.time()
         query_obj = compile_query(query_text)
         timings["query_compilation_ms"] = round((time.time() - t_compile) * 1000, 2)
+
 
         # Archetype Guard (Information-Theoretic Density & Non-Product Sieve)
         archetype = query_obj.get("archetype", "PHYSICAL_PRODUCT")

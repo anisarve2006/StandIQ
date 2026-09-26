@@ -127,6 +127,19 @@ class LateInteractionReranker:
                     if neg_phrase in title and "other than" not in title:
                         role_adjustment -= 0.45
 
+            # 7. Domain Cross-Contamination Guard
+            is_civil_query = any(w in query_lower for w in [
+                "concrete", "cement", "mortar", "plaster", "excavation", "rebar", "masonry", 
+                "brick", "foundation", "rcc", "soling", "tile", "tiles", "aggregate", "sand", "murum"
+            ])
+            cand_div = cand.get("division") or ""
+            if is_civil_query:
+                if cand_div in ["Food and Agriculture", "Textiles"]:
+                    role_adjustment -= 0.65
+                elif any(irrel in title for irrel in ["dosa", "food", "edible", "dyestuff", "textile", "fabric", "cloth", "garment", "oil cans"]):
+                    role_adjustment -= 0.65
+
+
             # 7. Hybrid RRF prior (if present from stage 1)
             rrf_prior = cand.get("rrf_score", 0.05) * 5.0  # scale to ~0.1 - 0.7
 
