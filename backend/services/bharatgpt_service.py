@@ -148,6 +148,46 @@ class BharatGPTService:
             logger.warning(f"[BharatGPT] Translation failed ({e}), falling back to deterministic lexicon.")
             return None
 
+    def canonicalize_trade_entity(self, text: str) -> Optional[str]:
+        """
+        Translates arbitrary colloquial, regional, or complex trade specification text
+        into canonical Bureau of Indian Standards product / material nomenclature.
+        """
+        if not self.is_available():
+            return None
+
+        prompt = (
+            "### Instruction:\n"
+            "You are an expert Bureau of Indian Standards (BIS) and GeM engineering classifier.\n"
+            "Given a trade specification or colloquial procurement term, output ONLY the formal canonical Indian Standard product or material title.\n"
+            "Examples:\n"
+            "Input: sariya Fe-500\nOutput: high strength deformed steel bars and wires for concrete reinforcement\n"
+            "Input: ready mix concrete M-20\nOutput: ready-mixed concrete / plain and reinforced concrete\n"
+            "Input: vitrified mirror glossy tiles\nOutput: pressed ceramic tiles for flooring\n"
+            "Input: dry rubble stone soling\nOutput: natural building stones soling for building works\n"
+            f"Input: {text}\n"
+            "Output:"
+        )
+
+        try:
+            with _INFERENCE_LOCK:
+                response = self.llm(
+                    prompt,
+                    max_tokens=60,
+                    stop=["\n", "###", "Input:"],
+                    temperature=0.1
+                )
+                output = response["choices"][0]["text"].strip()
+                output = re.sub(r'^(Output:|Canonical:|Title:|"|\')', '', output).strip()
+                output = output.strip('"\'')
+                if output and len(output) > 3:
+                    return output
+                return None
+        except Exception as e:
+            logger.warning(f"[BharatGPT] Canonicalization failed ({e})")
+            return None
+
+
     def draft_specification_clause(
         self,
         product_name: str,
