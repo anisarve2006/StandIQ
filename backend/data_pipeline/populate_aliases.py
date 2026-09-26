@@ -341,7 +341,29 @@ SEED_ALIASES = [
     ("terrazzo flooring", "IS:2114", "laying in-situ terrazzo floor finish code of practice", "Civil Engineering", "Standard Spec"),
     ("marble flooring", "IS:1130", "marble blocks slabs and tiles for flooring", "Civil Engineering", "Standard Spec"),
     ("cement render to external walls", "IS:2402", "code of practice for external rendered finishes", "Civil Engineering", "Standard Spec"),
-    ("brick lintels", "IS:2212", "code of practice for brickwork - brick lintels", "Civil Engineering", "Standard Spec")
+    ("brick lintels", "IS:2212", "code of practice for brickwork - brick lintels", "Civil Engineering", "Standard Spec"),
+
+    # Doors, Windows, Hardware & Roofing
+    ("steel windows", "IS:1038", "specification for steel doors windows and ventilators", "Civil Engineering", "Standard Spec"),
+    ("steel window", "IS:1038", "specification for steel doors windows and ventilators", "Civil Engineering", "Standard Spec"),
+    ("wooden panel doors", "IS:1003:P1", "timber panelled and glazed shutters - door shutters", "Civil Engineering", "Standard Spec"),
+    ("wooden panel door", "IS:1003:P1", "timber panelled and glazed shutters - door shutters", "Civil Engineering", "Standard Spec"),
+    ("wooden glazed doors", "IS:1003:P1", "timber panelled and glazed shutters - door shutters", "Civil Engineering", "Standard Spec"),
+    ("wooden glazed door", "IS:1003:P1", "timber panelled and glazed shutters - door shutters", "Civil Engineering", "Standard Spec"),
+    ("fire-rated steel doors", "IS:3614", "fire doors and doorsets specification", "Civil Engineering", "Standard Spec"),
+    ("fire-rated wooden doors", "IS:3614", "fire doors and doorsets specification", "Civil Engineering", "Standard Spec"),
+    ("toughened glass for doors", "IS:2553:P1", "safety glass - general purpose toughened glass", "Civil Engineering", "Standard Spec"),
+    ("laminated safety glass", "IS:2553:P1", "safety glass - general purpose laminated glass", "Civil Engineering", "Standard Spec"),
+    ("wired glass panels", "IS:5437", "wired glasses specification", "Civil Engineering", "Standard Spec"),
+    ("aluminium door handles", "IS:208", "door handles specification", "Civil Engineering", "Standard Spec"),
+    ("door handles", "IS:208", "door handles specification", "Civil Engineering", "Standard Spec"),
+    ("aluminium roofing sheets", "IS:1254", "corrugated aluminium sheet", "Civil Engineering", "Standard Spec"),
+    ("fibre cement roofing sheets", "IS:459", "corrugated and semi-corrugated asbestos cement sheets", "Civil Engineering", "Standard Spec"),
+    ("fiber cement roofing sheets", "IS:459", "corrugated and semi-corrugated asbestos cement sheets", "Civil Engineering", "Standard Spec"),
+    ("roof gutters and downpipes", "IS:2527", "code of practice for fixing of rainwater gutters and downpipes", "Civil Engineering", "Standard Spec"),
+    ("glass wool insulation", "IS:8183", "bonded mineral wool for thermal insulation", "Civil Engineering", "Standard Spec"),
+    ("glass wool", "IS:8183", "bonded mineral wool for thermal insulation", "Civil Engineering", "Standard Spec"),
+    ("polycarbonate roofing sheets", "IS:14434", "polycarbonate moulding and extrusion sheet materials", "Civil Engineering", "Standard Spec")
 ]
 
 
