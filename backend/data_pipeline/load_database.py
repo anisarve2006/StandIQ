@@ -200,7 +200,9 @@ def populate_sqlite(standards: List[Dict[str, Any]], qcos: List[Dict[str, Any]],
             sup_clean = sup.strip().replace(" ", "")
             edges.append((fid, f"IS:{sup_clean}", "SUPERSEDES", "CATALOGUE_STATUS", 1.0))
 
-    # 2. Committee Council edges (standards created by the same BIS technical committee)
+    # 2. Committee Council & Allied standards classified into 5 distinct categories:
+    # NORMATIVE_REFERENCE, TEST_METHOD, SAFETY_CODE, INSTALLATION_CODE, TERMINOLOGY_GLOSSARY
+    std_by_fid = {s.get("family_id"): s for s in standards if s.get("family_id")}
     committee_groups = {}
     for s in standards:
         c_code = s.get("committee_code")
@@ -208,14 +210,36 @@ def populate_sqlite(standards: List[Dict[str, Any]], qcos: List[Dict[str, Any]],
         if c_code and fid:
             committee_groups.setdefault(c_code, []).append(fid)
 
+    def classify_edge(target_fid: str) -> str:
+        tgt = std_by_fid.get(target_fid, {})
+        title_lower = (tgt.get("title_en") or "").lower()
+        is_test = tgt.get("is_test_standard", 0)
+
+        if (is_test == 1 or "method of test" in title_lower or "methods of test" in title_lower or 
+            "testing" in title_lower or "determination of" in title_lower or "sampling and test" in title_lower or 
+            "tensile test" in title_lower or "chemical analysis" in title_lower or "test method" in title_lower):
+            return "TEST_METHOD"
+        elif ("safety" in title_lower or "earthing" in title_lower or "fire protection" in title_lower or 
+              "hazard" in title_lower or "electrical safety" in title_lower or "protective equipment" in title_lower):
+            return "SAFETY_CODE"
+        elif ("installation" in title_lower or "laying" in title_lower or "erection" in title_lower or 
+              "falsework" in title_lower or "code of practice for construction" in title_lower or 
+              "fitting of" in title_lower or "fixing of" in title_lower):
+            return "INSTALLATION_CODE"
+        elif ("glossary" in title_lower or "terminology" in title_lower or "vocabulary" in title_lower or 
+              "symbols" in title_lower or "definitions" in title_lower or "abbreviations" in title_lower):
+            return "TERMINOLOGY_GLOSSARY"
+        return "NORMATIVE_REFERENCE"
+
     for c_code, fids in committee_groups.items():
         if len(fids) > 1:
-            # Connect up to first 10 neighbours per committee to prevent dense graph blowup
             sample_fids = fids[:10]
             for i in range(len(sample_fids)):
                 for j in range(i + 1, min(i + 4, len(sample_fids))):
-                    edges.append((sample_fids[i], sample_fids[j], "RELATED_PRODUCT", "COMMITTEE_COUNCIL", 0.7))
-                    edges.append((sample_fids[j], sample_fids[i], "RELATED_PRODUCT", "COMMITTEE_COUNCIL", 0.7))
+                    src_f = sample_fids[i]
+                    dst_f = sample_fids[j]
+                    edges.append((src_f, dst_f, classify_edge(dst_f), "COMMITTEE_COUNCIL", 0.7))
+                    edges.append((dst_f, src_f, classify_edge(src_f), "COMMITTEE_COUNCIL", 0.7))
 
     cur.executemany("""
     INSERT OR IGNORE INTO edges (src_family_id, dst_family_id, edge_type, provenance, confidence)

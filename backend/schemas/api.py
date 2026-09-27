@@ -1,21 +1,41 @@
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-from schemas.domain import VersionInfo, CertificationInfo, Requirement, ApplicabilityResult
+from schemas.domain import VersionInfo, CertificationInfo, Requirement, ApplicabilityResult, VersionDiffInfo, AmendmentRecord
 
 class AlliedStandardResponse(BaseModel):
+
     source_standard: str
     relationship: str
     target_standard: str
     reason: Optional[str] = None
     evidence: Optional[str] = None
 
+class AlliedStandardItem(BaseModel):
+    standard_id: str
+    title: Optional[str] = None
+    relationship: str
+    provenance: Optional[str] = None
+    year: Optional[int] = None
+    status: Optional[str] = None
+
+class CategorizedAlliedStandards(BaseModel):
+    normative_references: List[AlliedStandardItem] = []
+    test_methods: List[AlliedStandardItem] = []
+    safety_codes: List[AlliedStandardItem] = []
+    installation_codes: List[AlliedStandardItem] = []
+    terminology_glossaries: List[AlliedStandardItem] = []
+
 class AlliedStandardsResponse(BaseModel):
     family_id: str
-    allied_standards: List[AlliedStandardResponse]
+    categories: CategorizedAlliedStandards = CategorizedAlliedStandards()
+    allied_standards: List[AlliedStandardResponse] = []
+
 
 class VersionResponse(BaseModel):
     family_id: str
     version_info: VersionInfo
+    version_diff: Optional[VersionDiffInfo] = None
+
 
 class CertificationResponse(BaseModel):
     family_id: str
@@ -153,3 +173,23 @@ class ChangesResponse(BaseModel):
 
 class ProcurementListResponse(BaseModel):
     sessions: List[ProcurementSessionResponse]
+
+class ClarifyRequest(BaseModel):
+    query: str
+    context: Optional[Dict[str, Any]] = None
+
+class ClarificationQuestion(BaseModel):
+    parameter: str
+    question: str
+    options: List[str]
+    required_for: Optional[str] = None
+
+class ClarifyResponse(BaseModel):
+    query: str
+    is_ambiguous: bool
+    detected_product: Optional[str] = None
+    detected_division: Optional[str] = None
+    clarifying_questions: List[ClarificationQuestion] = []
+    candidate_standards_considered: List[str] = []
+    message: str
+

@@ -36,3 +36,20 @@ class SQLiteStandardRepository(StandardRepository):
             return []
         finally:
             conn.close()
+
+    def get_amendments(self, family_id: str) -> List[Dict[str, Any]]:
+        conn = self._get_conn()
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+            SELECT * FROM amendments 
+            WHERE family_id = ? 
+            ORDER BY amendment_no ASC
+            """, (family_id,))
+            rows = cur.fetchall()
+            return [dict(row) for row in rows]
+        except Exception:
+            return []
+        finally:
+            conn.close()
+

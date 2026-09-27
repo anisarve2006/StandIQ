@@ -10,6 +10,11 @@ class StandardRepository(ABC):
     def get_versions(self, family_id: str) -> List[Dict[str, Any]]:
         pass
 
+    @abstractmethod
+    def get_amendments(self, family_id: str) -> List[Dict[str, Any]]:
+        pass
+
+
 class RegulatoryRepository(ABC):
     @abstractmethod
     def get_certification_rules(self, family_id: str) -> List[Dict[str, Any]]:

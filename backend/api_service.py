@@ -21,7 +21,9 @@ from services.tender_diff_service import TenderDiffService
 from services.specification_service import SpecificationService
 from services.procurement_session_service import ProcurementSessionService
 from services.export_service import ExportService
+from services.completeness_service import CompletenessService
 from repositories.standard_repository import SQLiteStandardRepository
+
 from repositories.regulatory_repository import SQLiteRegulatoryRepository
 from repositories.graph_repository import SQLiteGraphRepository
 from repositories.session_repository import InMemorySessionRepository
@@ -33,8 +35,10 @@ from schemas.api import (
     TenderDiffRequest, TenderDiffResponse, SpecificationGenerateRequest, SpecificationGenerateResponse,
     ProcurementSessionCreateRequest, ProcurementSessionResponse, ExportRequest, ExportResponse, ExportPackageRequest,
     DashboardSummary, KnowledgeGraphResponse, ChangesResponse, ProcurementListResponse,
-    GraphNode, GraphEdge, StandardChange, TenderHealthFinding
+    GraphNode, GraphEdge, StandardChange, TenderHealthFinding,
+    ClarifyRequest, ClarifyResponse
 )
+
 
 
 app = FastAPI(
@@ -71,6 +75,8 @@ tender_diff_service = TenderDiffService()
 specification_service = SpecificationService()
 procurement_session_service = ProcurementSessionService(session_repo)
 export_service = ExportService(procurement_session_service)
+completeness_service = CompletenessService()
+
 
 def _seed_demo_sessions():
     """Initializes realistic procurement sessions if session_repo is empty."""
@@ -268,7 +274,18 @@ def recommend_endpoint(req: RecommendRequest):
     result = engine.recommend(req.query, top_candidates=req.top_candidates)
     return result
 
+@app.post("/api/v1/standards/clarify", response_model=ClarifyResponse)
+def clarify_standards_endpoint(req: ClarifyRequest):
+    """Analyzes a vague procurement query and generates actionable prompt questions
+    (e.g., 'Is the rating 100 kVA or 250 kVA? What is the primary voltage (11 kV or 33 kV)?')
+    with selectable options to pinpoint exact Indian Standards.
+    """
+    if not req.query or not req.query.strip():
+        raise HTTPException(status_code=400, detail="Query text cannot be empty.")
+    return completeness_service.clarify_query(req.query, context=req.context)
+
 @app.get("/api/v1/standard/{family_id}")
+
 def get_standard_details(family_id: str):
     """Direct lookup of standard metadata and allied graph neighborhood."""
     import sqlite3
@@ -370,13 +387,13 @@ def verify_clause(req: VerifyRequest):
 
 @app.get("/api/v1/standard/{family_id}/allied", response_model=AlliedStandardsResponse)
 def get_allied_standards(family_id: str):
-    allied = allied_service.get_allied_standards(family_id)
-    return AlliedStandardsResponse(family_id=family_id, allied_standards=allied)
+    return allied_service.get_allied_standards_categorized(family_id)
+
 
 @app.get("/api/v1/standard/{family_id}/versions", response_model=VersionResponse)
 def get_standard_versions(family_id: str):
-    v_info = version_service.get_version_info(family_id)
-    return VersionResponse(family_id=family_id, version_info=v_info)
+    return version_service.get_version_response(family_id)
+
 
 @app.get("/api/v1/standard/{family_id}/certification", response_model=CertificationResponse)
 def get_standard_certification(family_id: str):

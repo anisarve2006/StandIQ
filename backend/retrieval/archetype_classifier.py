@@ -170,6 +170,39 @@ class ProcurementArchetypeClassifier:
                     "explanation": f"Clause '{raw}' is a contractual condition, legal rule, or bidder qualification requirement. No BIS product standard applies."
                 }
 
+        # Rule 2d: Check for Vague Procurement Boilerplate / Empty Adjectives (Should Abstain)
+        vague_boilerplate_patterns = [
+            r'^(?:the\s+item\s+must\s+be\s+of\s+)?approved\s+make\s+and\s+best\s+quality',
+            r'^supply\s+and\s+installation\s+as\s+per\s+relevant\s+standards',
+            r'^(?:supply\s+and\s+install(?:ation)?\s+)?as\s+per\s+relevant\s+(?:is|bis|indian|international)?\s*(?:standards?|codes?)',
+            r'^good\s+quality\s+durable\s+product\s+(?:for\s+general\s+use)?',
+            r'^something\s+reliable\s+and\s+cost\s+effective',
+            r'^(?:high|best|good)\s+quality\s+(?:product|material|item)\s+(?:for\s+general\s+use)?$',
+            r'^durable\s+product\s+for\s+general\s+use',
+            r'^reliable\s+and\s+cost\s+effective'
+        ]
+        is_vague_boilerplate = any(re.search(pat, clean, re.IGNORECASE) for pat in vague_boilerplate_patterns)
+
+        # Also check if text has no physical product nouns and contains only generic filler words
+        words = re.findall(r'[a-z]+', clean)
+        generic_fillers = {
+            "good", "quality", "durable", "product", "products", "item", "items", "for", "general", "use",
+            "something", "reliable", "and", "cost", "effective", "our", "project", "the", "must", "be",
+            "of", "approved", "make", "best", "supply", "installation", "as", "per", "relevant", "standard",
+            "standards", "is", "code", "codes", "specification", "specifications", "material", "materials"
+        }
+        generic_only = len(words) > 0 and all(w in generic_fillers for w in words)
+
+        if is_vague_boilerplate or (generic_only and not has_physical_noun):
+            return {
+                "archetype": "VAGUE_TENDER_BOILERPLATE",
+                "is_physical_product": False,
+                "category": "Vague / Unspecified Boilerplate",
+                "standard_applicable": False,
+                "recommended_action": "ABSTAIN_INSUFFICIENT_SPECIFICATION",
+                "explanation": f"Clause '{raw}' contains generic procurement boilerplate or commercial adjectives without identifying any specific manufactured product or engineering parameters. No Indian Standard can be deterministically recommended."
+            }
+
         # Rule 2c: Check for Demolition & Dismantling Works
         for term in self.demolition_terms:
             if term in clean:

@@ -199,7 +199,10 @@ class LateInteractionReranker:
 
             # 5. Document Role & Scope Prior
             role_adjustment = 0.0
-            is_testing_query = any(w in query_lower for w in ["test method", "methods of test", "testing", "code of safety", "code of practice", "sampling"])
+            is_testing_query = any(w in query_lower for w in [
+                "test method", "methods of test", "testing", "code of safety", "code of practice", 
+                "sampling", "earthing", "bonding", "grounding", "wiring", "installation", "vocabulary", "definitions"
+            ])
             is_auxiliary_doc = any(phrase in title for phrase in [
                 "method of test", "methods of test", "code of safety", "code of practice", 
                 "method for evaluation", "methods of sampling", "guidelines for", "guide for"
@@ -209,6 +212,12 @@ class LateInteractionReranker:
                 role_adjustment -= 0.40
             elif "specification" in title and not is_testing_query:
                 role_adjustment += 0.12
+
+            # Curated Lexicon Channel Priority Bonus
+            if cand.get("source_channel") == "TRADE_LEXICON":
+                phrase_bonus += 0.50
+            elif cand.get("source_channel") == "EXACT_ID":
+                phrase_bonus += 0.60
 
             # Product match bonus
             cand_p = (cand.get("product_type") or "").lower()
@@ -253,6 +262,14 @@ class LateInteractionReranker:
                 elif any(w in t_words for w in ["panel", "panels"]) and not any(w in t_words for w in ["luminaire", "luminaires", "lighting"]):
                     # Query asked for luminaire, candidate is an electrical switchgear/distribution panel
                     role_adjustment -= 0.40
+            elif any(w in q_words for w in ["conduit", "conduits"]):
+                if any(w in t_words for w in ["fitting", "fittings"]) and not any(w in q_words for w in ["fitting", "fittings"]):
+                    role_adjustment -= 0.35
+                elif any(w in t_words for w in ["conduit", "conduits"]):
+                    role_adjustment += 0.25
+            elif any(w in q_words for w in ["assembly", "assemblies", "distribution board"]):
+                if any(w in t_words for w in ["assembly", "assemblies"]):
+                    role_adjustment += 0.35
 
             # 7. Material & Environmental Contradiction Checks
             if "carbon steel" in query_lower and "stainless steel" in title:

@@ -361,6 +361,42 @@ class StandardsRecommenderEngine:
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
             }
 
+        if archetype == "VAGUE_TENDER_BOILERPLATE":
+            return {
+                "status": "ABSTAIN_VAGUE_QUERY",
+                "archetype": "VAGUE_TENDER_BOILERPLATE",
+                "category": arch_details.get("category", "Vague / Unspecified Boilerplate"),
+                "query": query_text,
+                "primary_recommendation": {
+                    "family_id": "NONE",
+                    "raw_id": "N/A (Unspecified Product)",
+                    "title_en": "Insufficient Technical Specification - No Manufactured Product Identified",
+                    "status": "NOT_APPLICABLE",
+                    "division": "General Procurement Boilerplate",
+                    "confidence": {
+                        "overall_label": "LOW",
+                        "composite_score": 0.0
+                    }
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {
+                    "is_mandatory": False,
+                    "status": "UNSPECIFIED",
+                    "scheme": "None",
+                    "applicable_qco": "None"
+                },
+                "specification_clause": "### VAGUE SPECIFICATION ADVISORY\nThis requirement contains generic procurement boilerplate or commercial adjectives without identifying any specific manufactured product, material, or engineering parameter. The system abstains from recommending a standard.",
+                "specification_gaps": ["Missing tangible product noun or engineering classification."],
+                "verification_audit": {
+                    "is_verified": True,
+                    "hallucination_strip_rate": 0.0,
+                    "violations": []
+                },
+                "alternative_candidates": [],
+                "latency_breakdown_ms": timings,
+                "total_time_ms": round((time.time() - t0) * 1000, 2)
+            }
+
         if archetype == "SERVICE_OR_LABOUR" and not query_obj.get("exact_is"):
             svc_std = arch_details.get("service_standard", {
                 "family_id": "IS/ISO:9001",
