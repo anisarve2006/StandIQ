@@ -15,6 +15,7 @@ from retrieval.multilingual import (
     unmask_technical_entities
 )
 from retrieval.archetype_classifier import archetype_classifier
+from retrieval.product_classifier import product_classifier
 
 # Indian Trade & Procurement Colloquial Lexicon (Hinglish to Technical Entities)
 TRADE_LEXICON = {
@@ -28,6 +29,12 @@ TRADE_LEXICON = {
     "submersible": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
     "monoset pump": {"product": "monoset pumps for clear cold fresh water", "family_id": "IS:9079", "division": "Mechanical Engineering"},
     "pvc pipe": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "swr pipe": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    "swr pipes": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    "soil and waste pipe": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    "soil and waste pipes": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    "soil and waste piping": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
+    "soil waste ventilation piping": {"product": "upvc pipes for soil and waste discharge systems", "family_id": "IS:13592", "division": "Civil Engineering"},
     "gi pipe": {"product": "steel tubes and tubulars for water gas and air", "family_id": "IS:1239", "division": "Civil Engineering"},
     "safety shoe": {"product": "personal protective equipment safety footwear", "family_id": "IS:15298:P2", "division": "Chemical"},
     "safety footwear": {"product": "personal protective equipment safety footwear", "family_id": "IS:15298:P2", "division": "Chemical"},
@@ -336,7 +343,8 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
 
     # 5. Domain Acronym and Technical Synonym Expansion
     TECHNICAL_SYNONYMS = {
-        r'\bpvc\b': "polyvinyl chloride",
+        r'\bunplasticized\s+(?:polyvinyl\s+chloride|pvc)\b': "upvc",
+        r'\bpvc\b': "polyvinyl chloride upvc",
         r'\bgi\b': "galvanized steel zinc coated",
         r'\brcc\b': "reinforced concrete",
         r'\bgate valves?\b': "sluice valve",
@@ -348,7 +356,11 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
         r'\bsafety shoes?\b': "safety footwear",
         r'\bsurgical masks?\b': "medical face masks",
         r'\benamel paint\b': "synthetic exterior enamel finishing",
-        r'\bred oxide\b': "zinc chrome priming"
+        r'\bred oxide\b': "zinc chrome priming",
+        r'\bmcb\b': "miniature circuit breakers",
+        r'\bmccb\b': "moulded case circuit breakers",
+        r'\brccb\b': "residual current operated circuit breakers",
+        r'\bxlpe\b': "cross-linked polyethylene insulated cables"
     }
 
     expanded_terms = [clean_text]
@@ -367,6 +379,10 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
     # 5. Universal Procurement Archetype Classification
     archetype_info = archetype_classifier.classify(raw_query)
 
+    # 6. Action 1: Product / Domain Canonical Engineering Classification
+    query_for_classification = indic_info.get("canonical_english", clean_text)
+    product_spec = product_classifier.classify(query_for_classification)
+
     return {
         "raw_query": raw_query,
         "clean_query": clean_text,
@@ -374,6 +390,12 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
         "exact_is": exact_is_list,
         "trade_matches": trade_matches,
         "constraints": constraints,
+        "classification": product_spec,
+        "product": product_spec["product"],
+        "domain": product_spec["domain"],
+        "material": product_spec["material"],
+        "form": product_spec["form"],
+        "standard_type": product_spec["standard_type"],
         "query_type": query_type,
         "detected_script": indic_info.get("detected_script", "latin"),
         "is_multilingual": indic_info.get("is_multilingual", False),

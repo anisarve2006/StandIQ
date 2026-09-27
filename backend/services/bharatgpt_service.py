@@ -191,6 +191,68 @@ class BharatGPTService:
         except Exception as e:
             logger.warning(f"[BharatGPT] Clause drafting failed ({e}), falling back to deterministic template.")
             return None
+    def arbitrate_candidates(
+        self,
+        tender_query: str,
+        candidates: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Action 4: Ambiguity Judge & Tie-Breaker.
+        When candidate #1 and candidate #2 have very close retrieval scores,
+        prompts BharatGPT-3B Indic in RAM to act as an authoritative engineering judge
+        and confirm or select the winning standard.
+        """
+        if not self.is_available() or len(candidates) < 2:
+            return None
+
+        c_descriptions = []
+        for idx, c in enumerate(candidates[:3]):
+            fid = c.get("family_id", "N/A")
+            raw_id = c.get("raw_id", fid)
+            title = c.get("title_en", "")
+            scope = c.get("scope_text", "")
+            scope_str = f" (Scope: {scope})" if scope and len(scope) > 5 else ""
+            c_descriptions.append(f"Option [{chr(65+idx)}]: {raw_id} - {title}{scope_str}")
+
+        options_str = "\n".join(c_descriptions)
+
+        prompt = (
+            f"### Technical Standards Arbitration Directive:\n"
+            f"You are the Bureau of Indian Standards Technical Advisory Judge.\n"
+            f"Determine which Indian Standard specifically governs the given procurement requirement.\n\n"
+            f"### Procurement Requirement:\n\"{tender_query}\"\n\n"
+            f"### Candidate Standards:\n{options_str}\n\n"
+            f"### Output format:\n"
+            f"Selected Option: [A/B/C]\n"
+            f"Standard: [IS Code]\n"
+            f"Engineering Rationale: [One sentence rationale]\n\n"
+            f"Selected Option:"
+        )
+
+        try:
+            with _INFERENCE_LOCK:
+                response = self.llm(
+                    prompt,
+                    max_tokens=90,
+                    stop=["###", "\n\n\n"],
+                    temperature=0.1
+                )
+                output = response["choices"][0]["text"].strip()
+                # Parse choice
+                match = re.search(r'\[?([A-C])\]?', output)
+                if match:
+                    chosen_idx = ord(match.group(1).upper()) - 65
+                    if 0 <= chosen_idx < len(candidates[:3]):
+                        chosen_cand = candidates[chosen_idx]
+                        return {
+                            "chosen_candidate": chosen_cand,
+                            "rationale": output,
+                            "model": "BharatGPT-3B-Indic Sovereign Judge"
+                        }
+        except Exception as e:
+            logger.warning(f"[BharatGPT Judge] Arbitration failed ({e}): using top statistical candidate.")
+        return None
 
 # Global singleton instance loaded once at startup
 bharatgpt_engine = BharatGPTService()
+

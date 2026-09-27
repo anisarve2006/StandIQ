@@ -69,7 +69,14 @@ def init_sqlite_db(db_path: str = SQLITE_DB):
         num_amendments INTEGER DEFAULT 0,
         year INTEGER,
         archive_url TEXT,
-        pdf_url TEXT
+        pdf_url TEXT,
+        product_type TEXT,
+        domain TEXT,
+        material TEXT,
+        application TEXT,
+        standard_type TEXT,
+        is_test_standard INTEGER DEFAULT 0,
+        related_products TEXT
     );
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_std_number ON standards(number);")

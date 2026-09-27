@@ -152,9 +152,15 @@ class ProcurementArchetypeClassifier:
                     "explanation": f"Clause '{raw}' represents an accounting credit, scrap salvage adjustment, or demolition waste disposal entry. No BIS product standard applies."
                 }
 
+        # Check if text explicitly describes or specifies a physical manufacturing product
+        has_physical_noun = any(re.search(rf'\b{re.escape(noun)}\b', clean) for noun in self.physical_product_nouns)
+
         # Rule 2b: Check for Contractual Conditions / GCC / SCC / Legal Terms
         for term in self.contractual_terms:
             if term in clean:
+                # If a physical product is being procured with technical specs, ignore incidental tender words like "technical bid" or "qualification"
+                if has_physical_noun and any(p_term in clean for p_term in ["supply of", "manufacturing of", "delivery of", "procurement of", "specification for", "installation of", "design, supply"]):
+                    continue
                 return {
                     "archetype": "CONTRACTUAL_CONDITION",
                     "is_physical_product": False,

@@ -35,16 +35,42 @@ class GraphExpander:
         for row in cur.fetchall():
             allied.append(dict(row))
 
-        # 2. Check Compulsory Certification / QCO
-        cur.execute("""
+        # 2. Check Compulsory Certification / QCO (Hierarchical Inheritance)
+        parts = family_id.split(":")
+        hierarchy = [":".join(parts[:i]) for i in range(len(parts), 1, -1)]
+        if not hierarchy:
+            hierarchy = [family_id]
+        num = parts[1] if len(parts) > 1 else family_id.replace("IS:", "").strip()
+
+        placeholders = ",".join(["?"] * len(hierarchy))
+        cur.execute(f"""
         SELECT scheme, category, sr_no, raw_is_no, product_name, gazette_notification, status, source_url
         FROM cert_rules
-        WHERE family_id = ? OR raw_is_no LIKE ?;
-        """, (family_id, f"%{family_id.replace('IS:', '')}%"))
+        WHERE family_id IN ({placeholders}) OR raw_is_no LIKE ?;
+        """, (*hierarchy, f"%{num}%"))
 
+        import re
+        raw_rows = [dict(row) for row in cur.fetchall()]
         qco_rules = []
-        for row in cur.fetchall():
-            qco_rules.append(dict(row))
+        for r in raw_rows:
+            raw_is = r.get("raw_is_no") or ""
+            fid = r.get("family_id") or ""
+            if fid in hierarchy:
+                qco_rules.append(r)
+            elif re.search(rf'(?<!\d){re.escape(num)}(?!\d)', raw_is):
+                qco_rules.append(r)
+
+        # If sectional standard, prioritize specific section/part match
+        if len(parts) >= 3 and qco_rules:
+            sec_num = parts[-1].replace("S", "").replace("P", "")
+            part_num = parts[2].replace("P", "") if len(parts) > 2 else ""
+            specific = [r for r in qco_rules if (sec_num and (f"Sec {sec_num}" in r.get("raw_is_no", "") or f"Section {sec_num}" in r.get("raw_is_no", "")))]
+            if specific:
+                qco_rules = specific
+            else:
+                part_specific = [r for r in qco_rules if (part_num and (f"Part {part_num}" in r.get("raw_is_no", "") or f"P{part_num}" in r.get("raw_is_no", "")))]
+                if part_specific:
+                    qco_rules = part_specific
 
         conn.close()
 

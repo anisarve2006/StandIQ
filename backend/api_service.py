@@ -302,16 +302,16 @@ async def recommend_pdf_endpoint(
     """
     Tender Document Upload & Analysis Endpoint:
     Upload an entire tender document (BoQ, Schedule of Requirements, Technical Specs).
-    Supports PDF (.pdf), Excel (.xls, .xlsx), CSV (.csv), and Plain Text (.txt).
-    Extracts tables and itemized specifications, maps applicable Indian Standards,
-    audits compulsory QCO compliance, and generates a consolidated compliance matrix.
+    Supports PDF (.pdf), Images (.png, .jpg, .jpeg, .tiff, .bmp, .webp), Excel (.xls, .xlsx), CSV (.csv), and Plain Text (.txt).
+    Extracts tables and itemized specifications via native PyMuPDF and Sovereign PaddleOCR,
+    maps applicable Indian Standards, audits compulsory QCO compliance, and generates a consolidated compliance matrix.
     """
-    allowed_exts = (".pdf", ".xls", ".xlsx", ".csv", ".txt", ".docx")
+    allowed_exts = (".pdf", ".xls", ".xlsx", ".csv", ".txt", ".docx", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp")
     fname_lower = (file.filename or "").lower()
     if not any(fname_lower.endswith(ext) for ext in allowed_exts):
         raise HTTPException(
             status_code=400, 
-            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
+            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Images (.png, .jpg, .jpeg, .tiff, .bmp, .webp), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
         )
 
     file_bytes = await file.read()

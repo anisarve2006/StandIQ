@@ -2,11 +2,13 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
-# Create an empty schema at the default path so that module-level initialization doesn't crash
-from data_pipeline.load_database import init_sqlite_db
+# Ensure data directory exists
 default_db = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "standards.db")
 os.makedirs(os.path.dirname(default_db), exist_ok=True)
-init_sqlite_db(default_db)
+if not os.path.exists(default_db):
+    from data_pipeline.load_database import init_sqlite_db
+    init_sqlite_db(default_db)
+
 
 from api_service import app, engine
 from retrieval.engine import StandardsRecommenderEngine

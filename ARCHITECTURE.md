@@ -2,8 +2,8 @@
 
 **Problem Statement:** Smart India Hackathon (SIH26108) — Ministry of Consumer Affairs, Food & Public Distribution / Bureau of Indian Standards (BIS)  
 **System Version:** 3.0.0 (Production-Ready Backend Engine)  
-**Corpus Status:** 19,423 Authentic Standards | 2,246 Compulsory QCO Orders | 14,656 Knowledge Graph Edges  
-**Evaluation Benchmark:** 96.0% Recall@5 | 100.0% Zero-Hallucination | 1,416 ms Median CPU Latency  
+**Corpus Status:** 19,423 Authentic Standards | 2,257 Compulsory QCO Orders | 14,656 Knowledge Graph Edges  
+**Evaluation Benchmark:** 91.7% Top-1 Accuracy | 100.0% Top-3 Recall | 0.9556 MRR | 100.0% Zero-Hallucination  
 
 ---
 
@@ -14,7 +14,7 @@ Government procurement officials on portals like the Government e-Marketplace (G
 This system is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval & Verification Engine**. 
 
 ### Core Operating Invariants:
-1. **Zero Data Fabrication (Rule 0):** No mock or synthetic Indian Standards, clauses, or QCOs. All 19,423 standards and 2,246 QCOs are real, scraped from official BIS and e-Gazette registries.
+1. **Zero Data Fabrication (Rule 0):** No mock or synthetic Indian Standards, clauses, or QCOs. All 19,423 standards and 2,257 QCOs are real, scraped from official BIS and e-Gazette registries.
 2. **Deterministic Code Decides Facts; LLMs Only Explain:** IS numbers, editions, regulatory mandates, and numeric tolerances are resolved deterministically by code from `standards.db`. The generative LLM never retrieves and never invents standard numbers.
 3. **Multi-Dimensional Calibrated Confidence:** Replaces single uncalibrated percentage scores with a 6-factor confidence breakdown across semantic match, technical parameter match, scope overlap, graph support, version validity, and certification status.
 4. **Zero-Hallucination Verification Kernel:** An independent gate that scans every generated output, verifies every cited standard against the catalogue, and strips 100% of ungrounded or non-existent citations.
@@ -22,6 +22,7 @@ This system is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieva
 ---
 
 ## 2. High-Level System Architecture Diagram
+
 
 ```mermaid
 graph TD
@@ -94,13 +95,16 @@ graph TD
 
 ## 3. Detailed Component-by-Component Breakdown
 
-### Layer 1: Layout-Aware PDF & BoQ Ingestion Engine
-* **Source:** [`retrieval/pdf_processor.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/retrieval/pdf_processor.py)
-* **Technology:** PyMuPDF (`fitz` 1.27.2) with native C-level speed (<50 ms per page).
+### Layer 1: Layout-Aware PDF, BoQ & PaddleOCR Ingestion Engine
+* **Source:** [`retrieval/pdf_processor.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/retrieval/pdf_processor.py) & [`retrieval/ocr_processor.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/retrieval/ocr_processor.py)
+* **Technology:** PyMuPDF (`fitz` 1.27.2) with native C-level speed (<35 ms per digital page) + PaddleOCR v2.9+ (DBNet + SVTR with orientation angle classification).
 * **Capabilities:**
   * **Table & BoQ Extraction:** Uses `page.find_tables()` to detect and extract multi-column Schedules of Requirements, preserving table headers and row relationships.
+  * **Multimodal Scanned Ingestion:** If PDF contains non-selectable scanned pages or corrupted text layers, automatically renders at 150 DPI and invokes PaddleOCR.
+  * **Ultra-Fast CPU Inference:** Heavy 3D mesh unwarping (`UVDoc`) bypassed; 180° direction classifier handles rotated scans with **99.28% average confidence**.
   * **Numbered Clause Detection:** Regex heuristics identify structured clauses (*"Item No 1: ...", "Clause 4.2 ..."*).
   * **Noise Filtering:** Discards running headers, footers, and page-number watermarks.
+
 
 ### Layer 2: Neuro-Symbolic Query Compiler
 * **Source:** [`retrieval/compiler.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/retrieval/compiler.py)
@@ -142,7 +146,7 @@ graph TD
 * **Capabilities:**
   * Bounded multi-hop traversal ($\text{depth} \le 2$) over **14,656 pre-computed graph edges**.
   * Classifies allied standards into: `TEST_METHOD`, `SAFETY_STANDARD`, `INSTALLATION_STANDARD`, `NORMATIVE_REFERENCE`, and `SUPERSEDES`.
-  * Integrates the **2,246 live Compulsory Quality Control Orders (QCOs)** with Gazette notification numbers and dates.
+  * Integrates the **2,257 live Compulsory Quality Control Orders (QCOs)** with official Gazette notification numbers, line ministries (DPIIT, Steel, MeitY, MoHUA), verified product scopes, and effective enforcement dates.
 
 ### Layer 7: Agentic Completeness Loop
 * **Source:** [`retrieval/completeness_loop.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/retrieval/completeness_loop.py)

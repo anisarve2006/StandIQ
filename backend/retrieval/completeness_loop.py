@@ -70,7 +70,7 @@ class CompletenessEngine:
             "missing_facets": missing_facets
         }
 
-    def fetch_targeted_allied(self, family_id: str, product_keyword: str, missing_facet: str) -> List[Dict[str, Any]]:
+    def fetch_targeted_allied(self, family_id: str, product_keyword: str, missing_facet: str, primary_division: str = "") -> List[Dict[str, Any]]:
         """
         Executes a targeted sub-query against standards.db for missing facet.
         """
@@ -99,41 +99,86 @@ class CompletenessEngine:
         for row in cur.fetchall():
             discovered.append(dict(row))
 
-        # 2. If no direct edge, run targeted lexical discovery on same product
+        # 2. If no direct edge, run targeted lexical discovery on same product within same division
+        division = primary_division or ""
         if not discovered and product_keyword:
-            keyword_clean = product_keyword.strip().split()[0]  # e.g. "motor", "rebar", "pump"
-            query_pattern = f"%{keyword_clean}%"
-            
-            if missing_facet == "testing":
-                cur.execute("""
-                SELECT family_id, raw_id, title_en, year, status, division,
-                       'TEST_METHOD' as edge_type, 'INFERRED_LEXICAL' as provenance, 0.85 as confidence
-                FROM standards 
-                WHERE (title_en LIKE '%method%test%' OR title_en LIKE '%testing%')
-                  AND title_en LIKE ?
-                ORDER BY year DESC LIMIT 2;
-                """, (query_pattern,))
-            elif missing_facet == "safety":
-                cur.execute("""
-                SELECT family_id, raw_id, title_en, year, status, division,
-                       'SAFETY_STANDARD' as edge_type, 'INFERRED_LEXICAL' as provenance, 0.85 as confidence
-                FROM standards 
-                WHERE (title_en LIKE '%safety%' OR title_en LIKE '%protection%')
-                  AND title_en LIKE ?
-                ORDER BY year DESC LIMIT 2;
-                """, (query_pattern,))
-            elif missing_facet == "installation":
-                cur.execute("""
-                SELECT family_id, raw_id, title_en, year, status, division,
-                       'INSTALLATION_STANDARD' as edge_type, 'INFERRED_LEXICAL' as provenance, 0.85 as confidence
-                FROM standards 
-                WHERE (title_en LIKE '%code of practice%' OR title_en LIKE '%installation%' OR title_en LIKE '%maintenance%')
-                  AND title_en LIKE ?
-                ORDER BY year DESC LIMIT 2;
-                """, (query_pattern,))
+            # Extract substantive keyword (ignoring tender boilerplate and generic adjectives)
+            import re
+            stop_words = {
+                "specification", "specifications", "spec", "standard", "standards", "code",
+                "practice", "method", "methods", "test", "testing", "requirements", "guidelines",
+                "supply", "supplying", "providing", "fixing", "installing", "installation",
+                "procurement", "item", "items", "work", "works", "use", "used", "for", "and", "the",
+                "with", "from", "into", "under", "over", "etc", "part", "section", "clause",
+                # Generic adjectives/nouns that cause cross-domain false positives:
+                "structural", "general", "special", "commercial", "common", "various", "building",
+                "buildings", "material", "materials", "product", "products", "criteria", "design",
+                # Processing/state adjectives:
+                "oriented", "unplasticized", "plasticized", "chlorinated", "galvanized", "drawn",
+                "extruded", "moulded", "molded", "seamless", "welded", "woven", "knitted",
+                "hot", "cold", "high", "low", "medium", "heavy", "light", "rigid", "flexible", "solid", "hollow"
+            }
+            tokens = [t for t in re.findall(r'[a-zA-Z]{3,}', product_keyword.lower()) if t not in stop_words]
+            if tokens:
+                # Prioritize key substantive noun (e.g. 'bolts' -> 'bolt', 'cables' -> 'cable')
+                target_word = tokens[0].rstrip('s') if len(tokens[0]) > 4 and tokens[0].endswith('s') else tokens[0]
+                query_pattern = f"%{target_word}%"
+                
+                div_clause = "AND division = ?" if division else ""
+                div_params = (division,) if division else ()
 
-            for row in cur.fetchall():
-                discovered.append(dict(row))
+                # Domain exclusion patterns to avoid attaching concrete/timber/gas/crane to steel, etc.
+                incompatible_words = []
+                p_title = (product_keyword or "").lower()
+                if "steel" in p_title:
+                    incompatible_words = ["concrete", "bamboo", "timber", "gas cylinder", "cylinder", "lpg", "crane", "paving", "rock", "valve"]
+                elif "concrete" in p_title:
+                    incompatible_words = ["timber", "bamboo", "gas cylinder", "cylinder", "crane", "ropeway"]
+                elif any(w in p_title for w in ["pipe", "piping", "soil", "waste", "drainage", "sewerage", "plumbing", "water supply"]):
+                    incompatible_words = [
+                        "telecommunication", "telecommunications", "cable duct", "cable", "cables", 
+                        "electrical", "gas cylinder", "cylinder", "footwear", "shoe", "shoes", 
+                        "boot", "boots", "leather", "tape", "tapes"
+                    ]
+
+                if missing_facet == "testing":
+                    cur.execute(f"""
+                    SELECT family_id, raw_id, title_en, year, status, division,
+                           'TEST_METHOD' as edge_type, 'INFERRED_LEXICAL' as provenance, 0.85 as confidence
+                    FROM standards 
+                    WHERE (title_en LIKE '%method%test%' OR title_en LIKE '%testing%')
+                      AND title_en LIKE ?
+                      {div_clause}
+                    ORDER BY year DESC LIMIT 5;
+                    """, (query_pattern, *div_params))
+                elif missing_facet == "safety":
+                    cur.execute(f"""
+                    SELECT family_id, raw_id, title_en, year, status, division,
+                           'SAFETY_STANDARD' as edge_type, 'INFERRED_LEXICAL' as provenance, 0.85 as confidence
+                    FROM standards 
+                    WHERE (title_en LIKE '%safety%' OR title_en LIKE '%protection%')
+                      AND title_en LIKE ?
+                      {div_clause}
+                    ORDER BY year DESC LIMIT 5;
+                    """, (query_pattern, *div_params))
+                elif missing_facet == "installation":
+                    cur.execute(f"""
+                    SELECT family_id, raw_id, title_en, year, status, division,
+                           'INSTALLATION_STANDARD' as edge_type, 'INFERRED_LEXICAL' as provenance, 0.85 as confidence
+                    FROM standards 
+                    WHERE (title_en LIKE '%code of practice%' OR title_en LIKE '%installation%' OR title_en LIKE '%maintenance%')
+                      AND title_en LIKE ?
+                      {div_clause}
+                    ORDER BY year DESC LIMIT 5;
+                    """, (query_pattern, *div_params))
+
+                candidates = [dict(r) for r in cur.fetchall()]
+                # Filter out obvious cross-domain incompatibilities
+                valid_candidates = [
+                    c for c in candidates
+                    if not any(bad in c.get("title_en", "").lower() for bad in incompatible_words)
+                ]
+                discovered.extend(valid_candidates[:2])
 
         conn.close()
         return discovered
@@ -158,9 +203,10 @@ class CompletenessEngine:
             added_this_round = []
 
             family_id = primary_standard.get("family_id", "")
+            primary_div = primary_standard.get("division", "")
             for facet in missing:
                 if facet in ["testing", "safety", "installation"]:
-                    discovered = self.fetch_targeted_allied(family_id, product_name, facet)
+                    discovered = self.fetch_targeted_allied(family_id, product_name, facet, primary_division=primary_div)
                     for item in discovered:
                         dst_id = item.get("dst_family_id") or item.get("family_id")
                         # Avoid duplicates

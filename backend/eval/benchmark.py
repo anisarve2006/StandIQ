@@ -23,15 +23,21 @@ from retrieval.engine import StandardsRecommenderEngine
 GOLD_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gold_dataset.json")
 REPORT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "benchmark_report.md")
 
-def run_benchmark():
-    print("=" * 80)
-    print("STARTING INDIAN STANDARDS RECOMMENDER GOLD BENCHMARK SUITE (50 CASES)")
-    print("=" * 80)
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
+def run_benchmark():
     with open(GOLD_PATH, "r", encoding="utf-8") as f:
         cases = json.load(f)
+    n = len(cases)
+
+    print("=" * 80, flush=True)
+    print(f"STARTING INDIAN STANDARDS RECOMMENDER GOLD BENCHMARK SUITE ({n} CASES)", flush=True)
+    print("=" * 80, flush=True)
 
     engine = StandardsRecommenderEngine()
+
 
     results = []
     top1_hits = 0
@@ -109,7 +115,8 @@ def run_benchmark():
             zero_hallucination_count += 1
 
         status_sym = "[PASS]" if is_top1 else ("[TOP-3]" if is_top3 else ("[TOP-5]" if is_top5 else "[MISS]"))
-        print(f"[{idx:02d}/50] {status_sym} {cid} | Exp: {expected_fid} | Got: {primary_fid} ({elapsed_ms:.0f}ms)")
+        print(f"[{idx:02d}/{n}] {status_sym} {cid} | Exp: {expected_fid} | Got: {primary_fid} ({elapsed_ms:.0f}ms)", flush=True)
+
 
     # Aggregations
     n = len(cases)
@@ -143,9 +150,10 @@ def run_benchmark():
     report_lines = [
         "# Indian Standards Recommender — Gold Benchmark Report",
         "",
-        f"**Evaluation Date:** 25 September 2026",
-        f"**Benchmark Dataset:** 50 multi-domain procurement cases (`eval/gold_dataset.json`)",
+        f"**Evaluation Date:** 27 September 2026",
+        f"**Benchmark Dataset:** 75 multi-domain & multilingual procurement cases across 9 Indian languages (`eval/gold_dataset.json`)",
         f"**Hardware:** Intel Iris Xe (CPU-only, ONNX runtime FastEmbed, SQLite FTS5)",
+
         "",
         "## 1. Executive Metrics Summary",
         "",

@@ -35,6 +35,11 @@ export interface ExtractedRequirement {
   specificationGaps?: string[];
   specificationClause?: string;
   isMandatoryQco?: boolean;
+  regulatoryStatus?: 'MANDATORY' | 'NOT_VERIFIED' | 'EXEMPTED_OR_DENOTIFIED';
+  qcoEvidence?: string;
+  qcoEffectiveDate?: string;
+  qcoScope?: string;
+  qcoReason?: string;
 }
 
 export interface RecommendedStandardItem {
@@ -44,6 +49,10 @@ export interface RecommendedStandardItem {
   type: BasketStandard['type'];
   status: BasketStandard['status'];
   rationale: string;
+  regulatoryStatus?: string;
+  qcoEvidence?: string;
+  qcoEffectiveDate?: string;
+  qcoScope?: string;
 }
 
 export interface AuditSummary {
@@ -1087,7 +1096,12 @@ export default function ReviewVerifyPage() {
               category: item.category || item.archetype || 'Product',
               specificationGaps: item.specification_gaps || [],
               specificationClause: item.specification_clause || '',
-              isMandatoryQco: !!item.certification?.is_mandatory
+              isMandatoryQco: !!item.certification?.is_mandatory,
+              regulatoryStatus: item.certification?.regulatory_status || (item.certification?.is_mandatory ? 'MANDATORY' : 'NOT_VERIFIED'),
+              qcoEvidence: item.certification?.evidence || item.certification?.applicable_qco,
+              qcoEffectiveDate: item.certification?.effective_date,
+              qcoScope: item.certification?.scope,
+              qcoReason: item.certification?.reason
             }));
 
             const dynamicStds: RecommendedStandardItem[] = data.item_recommendations
@@ -1099,8 +1113,12 @@ export default function ReviewVerifyPage() {
                 type: (item.primary_standard.type || 'Product') as BasketStandard['type'],
                 status: (item.primary_standard.status === 'CURRENT' ? 'Current' : item.primary_standard.status === 'SUPERSEDED' ? 'Superseded' : 'Current') as BasketStandard['status'],
                 rationale: item.certification?.is_mandatory 
-                  ? `Legally mandatory under ${item.certification.qco_title || 'BIS Quality Control Order (QCO)'}.` 
-                  : 'Recommended baseline Indian Standard for quality compliance.'
+                  ? `Legally mandatory under ${item.certification.evidence || item.certification.applicable_qco || 'BIS Quality Control Order (QCO)'}.` 
+                  : 'Recommended baseline Indian Standard for quality compliance.',
+                regulatoryStatus: item.certification?.regulatory_status || (item.certification?.is_mandatory ? 'MANDATORY' : 'NOT_VERIFIED'),
+                qcoEvidence: item.certification?.evidence || item.certification?.applicable_qco,
+                qcoEffectiveDate: item.certification?.effective_date,
+                qcoScope: item.certification?.scope
               }));
 
             // Deduplicate standards
@@ -1231,9 +1249,11 @@ export default function ReviewVerifyPage() {
   useEffect(() => {
     if (location.state && (location.state as any).autoUploadFile) {
       const fileToUpload = (location.state as any).autoUploadFile as File;
+      navigate('/review', { replace: true, state: {} });
+      setIsUploadOpen(true);
       processUploadedFile(fileToUpload);
     }
-  }, [location.state]);
+  }, [location.state, navigate]);
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-5">
@@ -1699,9 +1719,25 @@ export default function ReviewVerifyPage() {
                             <span className="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
                               {req.recommendedStandard}
                             </span>
-                            {req.isMandatoryQco && (
-                              <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">
-                                Mandatory QCO
+                            {req.regulatoryStatus === 'MANDATORY' || req.isMandatoryQco ? (
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
+                                  <span>MANDATORY QCO</span>
+                                  {req.qcoEffectiveDate && <span className="text-[9px] font-normal text-amber-700 font-mono">({req.qcoEffectiveDate})</span>}
+                                </span>
+                                {req.qcoEvidence && (
+                                  <span className="text-[10px] text-slate-500 font-medium max-w-xs truncate" title={req.qcoEvidence}>
+                                    Order: {req.qcoEvidence}
+                                  </span>
+                                )}
+                              </div>
+                            ) : req.regulatoryStatus === 'EXEMPTED_OR_DENOTIFIED' ? (
+                              <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-200">
+                                Exempted / De-Notified
+                              </span>
+                            ) : (
+                              <span className="bg-slate-100 text-slate-600 text-[10px] font-medium px-1.5 py-0.5 rounded border border-slate-200" title={req.qcoReason || "No current QCO evidence found for this exact product/IS combination"}>
+                                Regulatory: NOT VERIFIED
                               </span>
                             )}
                           </div>
