@@ -10,7 +10,7 @@ if not os.path.exists(default_db):
     init_sqlite_db(default_db)
 
 
-from api_service import app, engine
+from api_service import app, engine, session_repo
 from retrieval.engine import StandardsRecommenderEngine
 from retrieval.compiler import compile_query
 from retrieval.verification_kernel import VerificationKernel
@@ -25,6 +25,7 @@ def inject_test_db(test_db_path):
     engine.graph_expander.db_path = test_db_path
     engine.completeness_engine.db_path = test_db_path
     engine.verification_kernel = VerificationKernel(db_path=test_db_path)
+    session_repo.set_db_path(test_db_path)
     # The hybrid search connection is requested at query time, so overriding db_path is sufficient
 
 def test_healthcheck():

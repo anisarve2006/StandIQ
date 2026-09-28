@@ -60,6 +60,34 @@ class TenderAnalyzeResponse(BaseModel):
     clauses: List[TenderClauseDetail]
     recommendations: Dict[str, Any]
 
+class AuditVulnerabilityFinding(BaseModel):
+    id: str
+    dimension: str  # "GFR_144_I", "CVC_COMPETITION", "CAG_AUDIT", "ARBITRATION_TRAP"
+    dimension_title: str
+    severity: str  # "CRITICAL", "HIGH", "MEDIUM", "LOW"
+    clause_text: str
+    rule_reference: str
+    issue: str
+    consequence: str
+    remediation: str
+    risk_points: Optional[int] = 0
+
+class DisputeRiskReport(BaseModel):
+    total_risk_score: int  # 0 to 100
+    risk_tier: str  # "SAFE", "LOW", "MODERATE", "HIGH", "CRITICAL"
+    summary: str
+    dimension_scores: Dict[str, int]  # {"gfr": int, "cvc": int, "cag": int, "arbitration": int}
+    dimension_max_scores: Optional[Dict[str, int]] = None  # Dynamic maximums (sum to 100)
+    commodity_criticality: Optional[str] = None  # e.g. "TIER_1_STRUCTURAL_SAFETY"
+    findings: List[AuditVulnerabilityFinding]
+    remediated_specification: Optional[str] = None
+    compliance_certificate_id: Optional[str] = None
+
+class DisputeRiskAuditRequest(BaseModel):
+    tender_text: Optional[str] = None
+    clauses: Optional[List[str]] = []
+    target_standard: Optional[str] = None
+
 class TenderHealthFinding(BaseModel):
     severity: str
     category: str
@@ -72,6 +100,7 @@ class TenderHealthRequest(BaseModel):
 
 class TenderHealthResponse(BaseModel):
     findings: List[TenderHealthFinding]
+    dispute_risk_report: Optional[DisputeRiskReport] = None
 
 class TenderDiffRequest(BaseModel):
     version_a_text: str

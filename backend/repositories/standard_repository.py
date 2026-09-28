@@ -1,15 +1,14 @@
 import sqlite3
 from typing import Optional, Dict, Any, List
 from .base import StandardRepository
+from db.connection import get_sqlite_connection
 
 class SQLiteStandardRepository(StandardRepository):
     def __init__(self, db_path: str):
         self.db_path = db_path
 
     def _get_conn(self):
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+        return get_sqlite_connection(self.db_path)
 
     def get_standard_by_family_id(self, family_id: str) -> Optional[Dict[str, Any]]:
         conn = self._get_conn()

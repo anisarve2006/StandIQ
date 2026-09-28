@@ -14,6 +14,7 @@ import re
 import sqlite3
 from typing import Dict, Any, List, Tuple
 from data_pipeline.ids import parse_is_identifier
+from db.connection import get_sqlite_connection
 
 class VerificationKernel:
     def __init__(self, db_path: str):
@@ -22,7 +23,7 @@ class VerificationKernel:
 
     def _load_corpus_index(self):
         """Loads canonical set of all family_ids and numbers in standards.db for instant O(1) checks."""
-        conn = sqlite3.connect(self.db_path)
+        conn = get_sqlite_connection(self.db_path)
         cur = conn.cursor()
         cur.execute("SELECT family_id, number FROM standards")
         self.valid_family_ids = set()

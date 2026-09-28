@@ -20,6 +20,8 @@ import os
 import re
 import json
 import time
+import copy
+from threading import Lock
 from typing import Dict, Any, List, Optional
 from loguru import logger
 
@@ -50,6 +52,11 @@ class StandardsRecommenderEngine:
         self.pdf_processor = TenderPDFProcessor()
         self.excel_processor = tender_excel_processor
         
+        # In-memory recommendation LRU cache
+        self._recommend_cache: Dict[tuple, Dict[str, Any]] = {}
+        self._recommend_cache_lock = Lock()
+        self._max_cache_size = 512
+        
         # Initialize local sovereign LLM (BharatGPT-3B Indic)
         self.bharatgpt = None
         try:
@@ -57,6 +64,13 @@ class StandardsRecommenderEngine:
             self.bharatgpt = bharatgpt_engine
         except Exception as e:
             logger.warning(f"Could not initialize BharatGPT service: {e}")
+
+    def clear_cache(self) -> None:
+        """Clear recommendation cache and underlying component caches."""
+        with self._recommend_cache_lock:
+            self._recommend_cache.clear()
+        if hasattr(self.graph_expander, "clear_cache"):
+            self.graph_expander.clear_cache()
 
     def generate_tender_clause_deterministic(self, evidence_pack: Dict[str, Any]) -> str:
         """
@@ -176,6 +190,20 @@ class StandardsRecommenderEngine:
         t0 = time.time()
         timings = {}
 
+        cache_key = (self.db_path, query_text.strip(), top_candidates)
+        with self._recommend_cache_lock:
+            if cache_key in self._recommend_cache:
+                cached = copy.deepcopy(self._recommend_cache[cache_key])
+                cached["total_time_ms"] = round((time.time() - t0) * 1000, 2)
+                return cached
+
+        def _return_cached(res: Dict[str, Any]) -> Dict[str, Any]:
+            with self._recommend_cache_lock:
+                if len(self._recommend_cache) >= self._max_cache_size:
+                    self._recommend_cache.pop(next(iter(self._recommend_cache)))
+                self._recommend_cache[cache_key] = copy.deepcopy(res)
+            return res
+
         # Multi-Clause Specification / Schedule of Requirements Handling
         clause_pattern = r'(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+(?:\n(?!\s*\d+[\.\)]\s+)[^\n]+)*)'
         multi_clauses = re.findall(clause_pattern, query_text)
@@ -219,7 +247,7 @@ class StandardsRecommenderEngine:
                 })
 
             total_ms = round((time.time() - t0) * 1000, 2)
-            return {
+            return _return_cached({
                 "status": "SUCCESS",
                 "is_multi_clause": True,
                 "total_clauses": len(multi_clauses),
@@ -241,7 +269,7 @@ class StandardsRecommenderEngine:
                 "specification_clause": "### MULTI-ITEM CONSTRUCTION SPECIFICATION\nConsolidated standards package generated for all itemized civil requirements.",
                 "total_time_ms": total_ms,
                 "latency_breakdown_ms": {"multi_clause_pipeline_ms": total_ms}
-            }
+            })
 
         # 1. Compile Query (Neuro-symbolic Layer A & B)
         t_compile = time.time()
@@ -254,7 +282,7 @@ class StandardsRecommenderEngine:
         arch_details = query_obj.get("archetype_details", {})
 
         if archetype == "SERVICE_RATE_SLAB":
-            return {
+            return _return_cached({
                 "status": "NON_PRODUCT_LINE",
                 "archetype": "SERVICE_RATE_SLAB",
                 "category": arch_details.get("category", "Logistics & Freight Rate Slab"),
@@ -287,10 +315,10 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         if archetype == "FINANCIAL_ADJUSTMENT":
-            return {
+            return _return_cached({
                 "status": "NON_PRODUCT_LINE",
                 "archetype": "FINANCIAL_ADJUSTMENT",
                 "category": arch_details.get("category", "Financial / Scrap Credit / Disposal Adjustment"),
@@ -323,10 +351,10 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         if archetype == "CONTRACTUAL_CONDITION":
-            return {
+            return _return_cached({
                 "status": "NON_PRODUCT_LINE",
                 "archetype": "CONTRACTUAL_CONDITION",
                 "category": arch_details.get("category", "Contractual / Legal Condition"),
@@ -359,10 +387,10 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         if archetype == "VAGUE_TENDER_BOILERPLATE":
-            return {
+            return _return_cached({
                 "status": "ABSTAIN_VAGUE_QUERY",
                 "archetype": "VAGUE_TENDER_BOILERPLATE",
                 "category": arch_details.get("category", "Vague / Unspecified Boilerplate"),
@@ -395,7 +423,7 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         if archetype == "SERVICE_OR_LABOUR" and not query_obj.get("exact_is"):
             svc_std = arch_details.get("service_standard", {
@@ -404,7 +432,7 @@ class StandardsRecommenderEngine:
                 "title_en": "Quality Management Systems - Requirements (Service Governance)",
                 "status": "CURRENT"
             })
-            return {
+            return _return_cached({
                 "status": "SUCCESS",
                 "archetype": "SERVICE_OR_LABOUR",
                 "category": arch_details.get("category", "Operational Service Contract"),
@@ -437,7 +465,7 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         # 2. Adaptive Retrieval (Parallel Multi-Path + RRF)
         t_ret = time.time()
@@ -445,13 +473,13 @@ class StandardsRecommenderEngine:
         timings["parallel_retrieval_ms"] = round((time.time() - t_ret) * 1000, 2)
 
         if not initial_candidates:
-            return {
+            return _return_cached({
                 "status": "ABSTAIN",
                 "message": "No relevant Indian Standard found in official catalogue with sufficient confidence.",
                 "query": query_obj,
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         # 3. Hard Negative Gating (Pre-Rerank Architecture Layer)
         # Query product = Steel Tube immediately eliminates Pump, Motor, Valve, Cable, Testing Equipment before expensive reranking
@@ -560,7 +588,7 @@ class StandardsRecommenderEngine:
                 "confidence_label": alt["constraint_result"]["confidence_vector"]["confidence_label"]
             })
 
-        return {
+        return _return_cached({
             "status": "SUCCESS",
             "query": query_text,
             "evidence_pack": evidence_pack,
@@ -592,7 +620,7 @@ class StandardsRecommenderEngine:
             "alternative_candidates": alternatives,
             "arbitration_audit": arbitration_audit,
             "latency_breakdown_ms": timings
-        }
+        })
 
     def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3, filename: Optional[str] = None) -> Dict[str, Any]:
         """

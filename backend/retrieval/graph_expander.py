@@ -4,11 +4,22 @@ Expands candidate standards into normative references, test methods, safety code
 """
 
 import sqlite3
+import copy
+from threading import Lock
 from typing import List, Dict, Any
+from db.connection import get_sqlite_connection
 
 class GraphExpander:
-    def __init__(self, db_path: str):
+    def __init__(self, db_path: str, cache_size: int = 2048):
         self.db_path = db_path
+        self._cache: Dict[tuple, Dict[str, Any]] = {}
+        self._cache_lock = Lock()
+        self._max_cache_size = cache_size
+
+    def clear_cache(self) -> None:
+        """Clear graph expansion cache."""
+        with self._cache_lock:
+            self._cache.clear()
 
     def expand_standard(self, family_id: str, max_allied: int = 10) -> Dict[str, Any]:
         """
@@ -17,8 +28,12 @@ class GraphExpander:
         - supersedes / superseded_by version chain
         - compulsory QCO rules
         """
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
+        cache_key = (self.db_path, family_id, max_allied)
+        with self._cache_lock:
+            if cache_key in self._cache:
+                return copy.deepcopy(self._cache[cache_key])
+
+        conn = get_sqlite_connection(self.db_path)
         cur = conn.cursor()
 
         # 1. Traverse Graph Edges
@@ -83,8 +98,15 @@ class GraphExpander:
             "orders": qco_rules
         }
 
-        return {
+        result = {
             "family_id": family_id,
             "allied_standards": allied,
             "certification": cert_summary
         }
+
+        with self._cache_lock:
+            if len(self._cache) >= self._max_cache_size:
+                self._cache.pop(next(iter(self._cache)))
+            self._cache[cache_key] = result
+
+        return copy.deepcopy(result)

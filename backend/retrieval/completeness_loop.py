@@ -17,6 +17,7 @@ coverage for tender specifications.
 
 import sqlite3
 from typing import Dict, Any, List, Optional
+from db.connection import get_sqlite_connection
 
 class CompletenessEngine:
     def __init__(self, db_path: str):
@@ -74,8 +75,7 @@ class CompletenessEngine:
         """
         Executes a targeted sub-query against standards.db for missing facet.
         """
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
+        conn = get_sqlite_connection(self.db_path)
         cur = conn.cursor()
         discovered = []
 

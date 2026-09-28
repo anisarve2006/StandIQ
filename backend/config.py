@@ -1,5 +1,9 @@
 import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+DEFAULT_DB_PATH = os.path.join(DATA_DIR, "standards.db")
+
 class Settings:
     application_env: str = os.getenv("APPLICATION_ENV", "DEVELOPMENT")
     postgres_host: str = os.getenv("POSTGRES_HOST", "localhost")
@@ -7,7 +11,7 @@ class Settings:
     postgres_db: str = os.getenv("POSTGRES_DB", "maanakai")
     postgres_user: str = os.getenv("POSTGRES_USER", "postgres")
     postgres_password: str = os.getenv("POSTGRES_PASSWORD", "password")
-    db_path: str = os.getenv("DB_PATH", "data/standards.db")
+    db_path: str = os.getenv("DB_PATH", DEFAULT_DB_PATH)
     qdrant_host: str = os.getenv("QDRANT_HOST", "localhost")
     qdrant_port: int = int(os.getenv("QDRANT_PORT", "6333"))
     qdrant_collection: str = os.getenv("QDRANT_COLLECTION", "standards")
@@ -18,5 +22,9 @@ class Settings:
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     use_bharatgpt: bool = os.getenv("USE_BHARATGPT", "true").lower() == "true"
     bharatgpt_model_path: str = os.getenv("BHARATGPT_MODEL_PATH", "BharatGPT-3B-Indic.Q8_0.gguf")
+    
+    # Engine & SQLite Tuning
+    sqlite_busy_timeout_ms: int = int(os.getenv("SQLITE_BUSY_TIMEOUT_MS", "10000"))
+    cache_max_size: int = int(os.getenv("CACHE_MAX_SIZE", "512"))
 
 settings = Settings()

@@ -19,6 +19,8 @@ import numpy as np
 from typing import List, Dict, Any, Optional
 from fastembed import TextEmbedding
 
+from db.connection import get_sqlite_connection
+
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 SQLITE_DB = os.path.join(DATA_DIR, "standards.db")
 
@@ -49,9 +51,7 @@ class HybridRetriever:
         return self._embedder
 
     def get_db_connection(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+        return get_sqlite_connection(self.db_path)
 
     def search_exact(self, query_obj: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Path A: Exact ID and Trade Term Matching."""
