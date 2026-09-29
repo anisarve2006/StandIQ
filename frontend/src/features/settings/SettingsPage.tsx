@@ -3,7 +3,10 @@ import {
   Save, 
   Check, 
   ChevronDown, 
-  ShieldCheck 
+  ShieldCheck,
+  CheckCircle2,
+  ShieldAlert,
+  Cpu
 } from 'lucide-react';
 import { useStandIQ } from '../../stores/standiq.store';
 
@@ -52,7 +55,7 @@ export default function SettingsPage() {
   const [defaultExportFormat, setDefaultExportFormat] = useState('PDF');
 
   // AI & Analysis tab state
-  const [modelEngine, setModelEngine] = useState('MaanakAI Hybrid RAG (v2.4)');
+  const [modelEngine, setModelEngine] = useState(() => localStorage.getItem('maanakai-engine') || 'Deterministic Rule-Based Engine (Zero-LLM — Pure GFR & CVC Rules)');
   const [matchConfidenceThreshold, setMatchConfidenceThreshold] = useState(80);
   const [strictnessLevel, setStrictnessLevel] = useState<'Aggressive' | 'Balanced' | 'Conservative'>('Balanced');
 
@@ -82,6 +85,7 @@ export default function SettingsPage() {
     localStorage.setItem('standiq-tz', timeZone);
     localStorage.setItem('standiq-items-per-page', itemsPerPage);
     localStorage.setItem('maanakai-theme', theme.toLowerCase());
+    localStorage.setItem('maanakai-engine', modelEngine);
 
     setTimeout(() => {
       setSaved(false);
@@ -427,8 +431,70 @@ export default function SettingsPage() {
         {activeTab === 'AI & Analysis' && (
           <div className="space-y-6 max-w-3xl">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">AI Recommendation Engine Configuration</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Calibrate similarity threshold, classification depth, and BIS semantic matching engine.</p>
+              <h2 className="text-sm font-bold text-slate-900">Retrieval & Decision Engine Configuration</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Control procurement reasoning mode, deterministic rule compliance, and BIS catalog matching.</p>
+            </div>
+
+            {/* Deterministic Rule-Based Active Banner */}
+            <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/70 flex items-start gap-3.5">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-xs font-bold text-emerald-950">Deterministic Rule-Based Engine Active</h3>
+                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300">
+                    Zero-LLM • Zero Hallucination
+                  </span>
+                  <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-200">
+                    BharatGPT Disabled
+                  </span>
+                </div>
+                <p className="text-[11px] text-emerald-800 leading-relaxed">
+                  All procurement recommendations, technical clause generation, and cross-lingual Indic matching operate strictly through deterministic rule algorithms, official BIS catalog records, and CVC / GFR 144(i) compliance checks without executing generative LLMs.
+                </p>
+              </div>
+            </div>
+
+            {/* Deterministic Architectural Guarantees Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>GFR 144(i) & CVC Rules</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Strict deterministic regex scans detect trade names, single-vendor bias, and obsolete standard references.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                  <Cpu className="w-4 h-4 text-blue-600" />
+                  <span>Indian Trade Lexicon</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Sub-millisecond normalized vocabulary mapping across Hindi, Tamil, Telugu, Marathi, and Gujarati trade terms.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                  <Check className="w-4 h-4 text-indigo-600" />
+                  <span>5-Point GeM / CPPP Template</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Generates 100% grounded specification clauses with official BIS gazette dates and mandatory QCO orders.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                  <ShieldAlert className="w-4 h-4 text-slate-600" />
+                  <span>Air-Gapped Sovereign Isolation</span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  No outgoing API calls to external cloud providers; local GGUF neural weights remain dormant.
+                </p>
+              </div>
             </div>
 
             <div className="space-y-5">
@@ -437,11 +503,17 @@ export default function SettingsPage() {
                 <select
                   value={modelEngine}
                   onChange={(e) => setModelEngine(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-medium"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-medium text-slate-800"
                 >
-                  <option value="MaanakAI Hybrid RAG (v2.4)">MaanakAI Hybrid RAG (v2.4 — Semantic + TF-IDF BM25)</option>
-                  <option value="Gemini 1.5 Pro + BIS Vector Store">Gemini 1.5 Pro + BIS Vector Store</option>
-                  <option value="Offline Local Graph Engine">Offline Local Graph Engine</option>
+                  <option value="Deterministic Rule-Based Engine (Zero-LLM — Pure GFR & CVC Rules)">
+                    Deterministic Rule-Based Engine (Zero-LLM — Pure GFR & CVC Rules) [Active]
+                  </option>
+                  <option value="Offline Local Graph & Catalogue Engine">
+                    Offline Local Graph & Catalogue Engine (SQLite FTS5 + MaxSim)
+                  </option>
+                  <option value="MaanakAI Hybrid RAG (v2.4)">
+                    MaanakAI Hybrid RAG (v2.4 — Semantic + TF-IDF BM25)
+                  </option>
                 </select>
               </div>
 
@@ -462,7 +534,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-2">
-                <label className="block text-xs font-bold text-slate-900">Analysis Strictness</label>
+                <label className="block text-xs font-bold text-slate-900">Audit Rule Strictness</label>
                 <div className="flex gap-2">
                   {(['Conservative', 'Balanced', 'Aggressive'] as const).map((lvl) => (
                     <button

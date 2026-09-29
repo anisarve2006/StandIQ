@@ -699,10 +699,16 @@ def get_system_health():
     Comprehensive System Health Check with Circuit Breaker and Resource Status.
     """
     metrics = metrics_collector.get_summary()
+    from services.bharatgpt_service import bharatgpt_engine
+    is_llm_active = bharatgpt_engine.is_available()
     return {
         "status": "HEALTHY",
         "engine": "StandardsRecommenderEngine v3.0",
-        "sovereign_llm_state": metrics["circuit_breaker"]["state"],
+        "engine_mode": "HYBRID_LLM" if is_llm_active else "DETERMINISTIC_RULE_BASED",
+        "deterministic_mode": not is_llm_active,
+        "llm_enabled": is_llm_active,
+        "bharatgpt_active": is_llm_active,
+        "sovereign_llm_state": metrics["circuit_breaker"]["state"] if is_llm_active else "DISABLED_DETERMINISTIC_MODE",
         "cache_size": metrics["cache"]["size"],
         "uptime_seconds": metrics["uptime_seconds"],
         "database": metrics["database_health"]

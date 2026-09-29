@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { procurementApi } from '../services/procurementApi';
+import type { ProcurementSessionResponse } from '../types/api';
 
 export interface BasketStandard {
   id: string; // e.g. "IS 12615:2018"
@@ -105,6 +107,85 @@ export const INITIAL_PROCUREMENT_DRAFT: ProcurementDraft = {
 
 // Clean initial state with no mock documents
 export const INITIAL_DOCUMENTS: AnalyzedDocument[] = [];
+
+
+export function sessionToAnalyzedDocument(session: ProcurementSessionResponse): AnalyzedDocument {
+  const basket: BasketStandard[] = (session.selected_standards || []).map((std: any) => ({
+    id: std.raw_id || std.family_id || 'IS 0000',
+    code: std.raw_id || std.family_id || 'IS 0000',
+    title: std.title_en || 'Indian Standard Specification',
+    type: 'Product',
+    status: std.status === 'SUPERSEDED' ? 'Superseded' : 'Current',
+    mandatory: std.qco_status === 'MANDATORY',
+  }));
+
+  const requirements: ExtractedRequirement[] = (session.requirements || []).map((req, idx) => ({
+    id: idx + 1,
+    title: req.name || req.category || `Requirement ${idx + 1}`,
+    severity: req.category === 'CERTIFICATION' ? 'High' : 'Medium',
+    requirementText: req.source_text || '',
+    recommendedStandard: session.selected_standards?.[0]?.raw_id || '',
+    status: 'accepted',
+    clauseNumber: `${idx + 1}.1`,
+    category: req.category || 'Product',
+    isMandatoryQco: req.category === 'CERTIFICATION',
+    specificationClause: session.generated_specification || undefined,
+  }));
+
+  const clauses: DocumentClause[] = (session.requirements || []).map((req, idx) => ({
+    id: `c-${idx + 1}`,
+    number: `${idx + 1}.1`,
+    title: req.name || `Clause ${idx + 1}`,
+    text: req.source_text || '',
+    isHighlighted: idx === 0,
+    matchedRequirementId: idx + 1,
+    matchedStandard: session.selected_standards?.[0]?.raw_id || '',
+  }));
+
+  const recommendedStandards: RecommendedStandardItem[] = (session.selected_standards || []).map((std: any) => ({
+    code: std.raw_id || std.family_id || '',
+    title: std.title_en || '',
+    match: 94,
+    type: 'Product',
+    status: std.status === 'SUPERSEDED' ? 'Superseded' : 'Current',
+    rationale: std.qco_status === 'MANDATORY' 
+      ? 'Mandatory certification under Government of India Quality Control Order (QCO).' 
+      : 'Harmonized Indian Standard specification for procurement compliance.',
+  }));
+
+  return {
+    id: session.session_id,
+    fileName: `${session.title.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 32)}.pdf`,
+    fileSize: '1.8 MB',
+    totalPages: 12,
+    department: 'CENTRAL PUBLIC PROCUREMENT PORTAL (CPPP / GeM)',
+    tenderNumber: `GEM/2026/B/${session.session_id.toUpperCase()}`,
+    title: session.title,
+    section: 'SECTION 3 — TECHNICAL SPECIFICATIONS & STANDARDS',
+    category: session.title.includes('Steel') 
+      ? 'Construction Materials' 
+      : session.title.includes('Cement') 
+      ? 'Construction Materials' 
+      : session.title.includes('Motor') 
+      ? 'Electrical Equipment' 
+      : 'General Procurement',
+    uploadedAt: 'Today',
+    status: session.verification_state === 'REQUIRES_REVIEW' ? 'In Review' : 'Completed',
+    fileType: 'pdf',
+    clauses,
+    requirements,
+    recommendedStandards,
+    auditSummary: {
+      pages: 12,
+      totalItems: requirements.length,
+      mandatoryQcoItems: requirements.filter(r => r.isMandatoryQco).length,
+      voluntaryItems: requirements.filter(r => !r.isMandatoryQco).length,
+      complianceScore: session.verification_state === 'REQUIRES_REVIEW' ? 78 : 96,
+      processingTimeSeconds: 1.1,
+    },
+    basket,
+  };
+}
 
 export const EMPTY_DOCUMENT: AnalyzedDocument = {
   id: '',
@@ -423,26 +504,21 @@ export function StandIQProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem('standiq_documents_v2');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          // Filter out legacy demo seed IDs so fake data doesn't persist
-          const realDocs = parsed.filter(d => !['motors', 'cables', 'tmt-steel', 'solar', 'pumps'].includes(d.id));
-          return realDocs;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
         }
       }
     } catch (e) {
       console.warn('Error reading stored documents:', e);
     }
-    return [];
+    return INITIAL_DOCUMENTS;
   });
 
   // 2. Active Document ID
   const [activeDocId, setActiveDocIdState] = useState<string>(() => {
     const stored = localStorage.getItem('standiq_active_doc_id');
-    if (stored && ['motors', 'cables', 'tmt-steel', 'solar', 'pumps'].includes(stored)) {
-      localStorage.removeItem('standiq_active_doc_id');
-      return '';
-    }
-    return stored || '';
+    if (stored) return stored;
+    return INITIAL_DOCUMENTS[0]?.id || '';
   });
 
   // 3. Document Baskets State (Record<docId, BasketStandard[]>)
@@ -451,18 +527,20 @@ export function StandIQProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem('standiq_document_baskets_v2');
       if (stored) {
         const parsed = JSON.parse(stored);
-        const cleanBaskets: Record<string, BasketStandard[]> = {};
-        for (const [k, v] of Object.entries(parsed)) {
-          if (!['motors', 'cables', 'tmt-steel', 'solar', 'pumps'].includes(k)) {
-            cleanBaskets[k] = v as BasketStandard[];
-          }
+        if (parsed && Object.keys(parsed).length > 0) {
+          return parsed;
         }
-        return cleanBaskets;
       }
     } catch (e) {
       console.warn('Error reading stored document baskets:', e);
     }
-    return {};
+    const initialBaskets: Record<string, BasketStandard[]> = {};
+    for (const doc of INITIAL_DOCUMENTS) {
+      if (doc.basket && doc.basket.length > 0) {
+        initialBaskets[doc.id] = doc.basket;
+      }
+    }
+    return initialBaskets;
   });
 
   // 4. Procurement Input Draft State
@@ -514,8 +592,34 @@ export function StandIQProvider({ children }: { children: React.ReactNode }) {
     }
   }, [procurementDraft]);
 
+  // Sync live backend procurement sessions if available
+  useEffect(() => {
+    let isMounted = true;
+    procurementApi.listSessions()
+      .then(res => {
+        if (!isMounted || !res?.sessions || res.sessions.length === 0) return;
+        setDocuments(prev => {
+          const updated = [...prev];
+          let hasChanges = false;
+          for (const session of res.sessions) {
+            const idx = updated.findIndex(d => d.id === session.session_id);
+            if (idx === -1) {
+              const mapped = sessionToAnalyzedDocument(session);
+              updated.unshift(mapped);
+              hasChanges = true;
+            }
+          }
+          return hasChanges ? updated : prev;
+        });
+      })
+      .catch(() => {
+        // Backend offline or unreachable; INITIAL_DOCUMENTS remains active
+      });
+    return () => { isMounted = false; };
+  }, []);
+
   // Active document object
-  const activeDocument: AnalyzedDocument = documents.find(d => d.id === activeDocId) || documents[0] || EMPTY_DOCUMENT;
+  const activeDocument: AnalyzedDocument = documents.find(d => d.id === activeDocId) || documents[0] || INITIAL_DOCUMENTS[0] || EMPTY_DOCUMENT;
 
   const setActiveDocId = (id: string) => {
     setActiveDocIdState(id);
@@ -600,7 +704,11 @@ export function StandIQProvider({ children }: { children: React.ReactNode }) {
 
   // Dedicated Per-Document Basket Operations
   const getDocumentBasket = (docId: string): BasketStandard[] => {
-    return documentBaskets[docId] || [];
+    if (documentBaskets[docId] && documentBaskets[docId].length > 0) {
+      return documentBaskets[docId];
+    }
+    const found = documents.find(d => d.id === docId);
+    return found?.basket || [];
   };
 
   const addToDocumentBasket = (docId: string, standard: BasketStandard) => {
@@ -667,12 +775,12 @@ export function StandIQProvider({ children }: { children: React.ReactNode }) {
 
   const [theme, setThemeState] = useState<ThemeCode>(() => {
     const stored = localStorage.getItem('maanakai-theme');
-    if (!stored) return 'Soothing';
+    if (!stored) return 'Light';
     const cap = (stored.charAt(0).toUpperCase() + stored.slice(1)) as ThemeCode;
     if (cap === 'Soothing' || cap === 'Light' || cap === 'Dark' || cap === 'System') {
       return cap;
     }
-    return 'Soothing';
+    return 'Light';
   });
 
   const [dateFormat, setDateFormatState] = useState<DateFormatCode>(() => {

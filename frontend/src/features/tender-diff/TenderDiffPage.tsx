@@ -6,7 +6,7 @@ import {
   Plus, 
   Minus, 
   FileText, 
-  Sparkles,
+  CheckCircle2,
   RefreshCw,
   ArrowRight
 } from 'lucide-react';
@@ -174,7 +174,7 @@ export default function TenderDiffPage() {
         <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
               <span>Version B (BIS Compliant Tender)</span>
             </h3>
             <span className="text-[11px] font-mono text-emerald-600 font-bold">Standardized</span>

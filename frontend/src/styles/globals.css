@@ -3,7 +3,30 @@
 @tailwind utilities;
 
 @layer base {
-  :root,
+  :root {
+    /* Modern BISense Crisp Light Theme */
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-elevated: #f1f5f9;
+    
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    
+    --accent: #2563eb;
+    --accent-foreground: #ffffff;
+    
+    --success: #16a34a;
+    --warning: #d97706;
+    --error: #dc2626;
+    --info: #2563eb;
+
+    color-scheme: light;
+  }
+
   .soothing {
     /* StandIQ Eye-Soothing Warm Linen & Natural Parchment Theme */
     --background: #faf7f2;
@@ -20,7 +43,6 @@
     --accent: #1e3f66;
     --accent-foreground: #ffffff;
     
-    /* Gentle, non-glare warm status colors */
     --success: #15803d;
     --warning: #b45309;
     --error: #b91c1c;
@@ -29,12 +51,15 @@
     color-scheme: light;
   }
 
-  /* Full Eye-Soothing Warm Palette Remapping across DOM */
-  body,
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    text-rendering: optimizeLegibility;
+  }
+
   .soothing body {
     background-color: #faf7f2 !important;
     color: #1c2229 !important;
-    text-rendering: optimizeLegibility;
   }
 
   /* Warm Canvas Softener - Replaces cold blue-slate backgrounds */
@@ -356,12 +381,24 @@
     font-size: 0.875rem;
     color: var(--text-muted);
   }
-  .code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.875rem;
-    background-color: var(--surface);
-    padding: 0.2rem 0.4rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+  /* Line clamping utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
+

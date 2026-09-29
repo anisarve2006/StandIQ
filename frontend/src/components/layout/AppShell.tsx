@@ -8,7 +8,8 @@ import {
   ChevronDown, 
   Menu, 
   X,
-  Sun
+  Sun,
+  ShoppingBag
 } from 'lucide-react';
 import { useStandIQ } from '../../stores/standiq.store';
 import { GlobalSearch } from '../search/GlobalSearch';
@@ -16,7 +17,7 @@ import { GlobalSearch } from '../search/GlobalSearch';
 export function AppShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const { user, unreadAlertsCount, t, theme, setTheme } = useStandIQ();
+  const { user, basket, unreadAlertsCount, theme, setTheme } = useStandIQ();
   const navigate = useNavigate();
 
   return (
@@ -41,24 +42,27 @@ export function AppShell() {
         {/* Global StandIQ Top Header Bar */}
         <header className="h-14 border-b border-slate-200 bg-white px-4 md:px-6 flex items-center justify-between gap-4 shrink-0 z-10 shadow-xs">
           {/* Mobile menu toggle */}
-          <div className="flex items-center gap-3 md:hidden">
+          <div className="flex items-center gap-2.5 md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <span className="font-bold text-slate-900 text-sm">BISense</span>
+            <div className="flex items-center gap-1.5">
+              <img src="/emblem.png" alt="Emblem of India" className="w-6 h-7 object-contain" />
+              <span className="font-bold text-slate-900 text-sm">BISense</span>
+            </div>
           </div>
 
-          {/* Global Search Bar */}
-          <div className="flex-1 max-w-xl hidden sm:block">
+          {/* Global Search Bar - Prominent & Wide */}
+          <div className="flex-1 max-w-2xl hidden sm:block">
             <GlobalSearch 
               triggerButton={
-                <div className="flex items-center justify-between w-full h-9 px-3.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg cursor-pointer transition-colors text-slate-400 group">
+                <div className="flex items-center justify-between w-full h-9 px-3.5 bg-slate-50 hover:bg-slate-100/70 border border-slate-200/90 rounded-lg cursor-pointer transition-colors text-slate-400 group">
                   <div className="flex items-center gap-2.5 text-xs text-slate-500">
                     <Search className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
-                    <span>{t('searchPlaceholder')}</span>
+                    <span>Search standards, procurements, requirements…</span>
                   </div>
                   <kbd className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-400 font-semibold shadow-2xs">
                     ⌘K
@@ -69,21 +73,20 @@ export function AppShell() {
           </div>
 
           {/* Right Action Icons & User Profile */}
-          <div className="flex items-center gap-2.5 ml-auto shrink-0">
-            {/* Eye-Comfort Warmth Toggle */}
-            <button
-              onClick={() => {
-                const nextTheme = theme === 'Soothing' ? 'Dark' : theme === 'Dark' ? 'Light' : 'Soothing';
-                setTheme(nextTheme as any);
-              }}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all bg-amber-50/90 hover:bg-amber-100 text-amber-800 border border-amber-200/90 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
-              title={`Active Mode: ${theme === 'Soothing' ? 'Warm Eye-Comfort Paper (Anti-Strain)' : theme === 'Dark' ? 'Midnight Slate' : 'Clean Studio Light'}. Click to toggle.`}
+          <div className="flex items-center gap-2 ml-auto shrink-0">
+            {/* Standards Basket Quick Access */}
+            <Link
+              to="/basket"
+              className="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors shrink-0"
+              title="Pinned Standards Basket"
             >
-              <Sun className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-              <span className="hidden sm:inline text-[11px] font-medium whitespace-nowrap">
-                {theme === 'Soothing' ? 'Eye-Comfort Warmth' : theme === 'Dark' ? 'Dark Mode' : 'Light Mode'}
-              </span>
-            </button>
+              <ShoppingBag className="w-4 h-4" />
+              {basket.length > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-blue-600 text-white font-mono font-bold text-[9px] flex items-center justify-center ring-2 ring-white">
+                  {basket.length}
+                </span>
+              )}
+            </Link>
 
             {/* Notifications Alert Bell */}
             <Link
@@ -93,7 +96,9 @@ export function AppShell() {
             >
               <Bell className="w-4 h-4" />
               {unreadAlertsCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono font-bold text-[9px] flex items-center justify-center ring-2 ring-white">
+                  {unreadAlertsCount}
+                </span>
               )}
             </Link>
 
@@ -107,10 +112,10 @@ export function AppShell() {
             </button>
 
             {/* User Profile Pill */}
-            <div className="relative shrink-0">
+            <div className="relative shrink-0 ml-1">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors whitespace-nowrap"
+                className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors whitespace-nowrap cursor-pointer"
               >
                 <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
                   {user.initials}
@@ -122,7 +127,7 @@ export function AppShell() {
               {/* Profile Dropdown */}
               {profileDropdownOpen && (
                 <div 
-                  className="absolute right-0 mt-1.5 w-56 bg-white border border-slate-200 rounded-xl shadow-lg p-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-100"
+                  className="absolute right-0 mt-1.5 w-60 bg-white border border-slate-200 rounded-xl shadow-lg p-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-100"
                   onClick={() => setProfileDropdownOpen(false)}
                 >
                   <div className="px-3 py-2 border-b border-slate-100">
@@ -133,7 +138,24 @@ export function AppShell() {
                     </span>
                   </div>
                   <div className="py-1">
-                    <Link to="/settings" className="block px-3 py-1.5 rounded-md hover:bg-slate-50 text-slate-700">Settings</Link>
+                    {/* Theme / Appearance Quick Switcher */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const nextTheme = theme === 'Soothing' ? 'Dark' : theme === 'Dark' ? 'Light' : 'Soothing';
+                        setTheme(nextTheme as any);
+                      }}
+                      className="w-full text-left px-3 py-1.5 rounded-md hover:bg-slate-50 text-slate-700 flex items-center justify-between cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Sun className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Theme</span>
+                      </span>
+                      <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                        {theme}
+                      </span>
+                    </button>
+                    <Link to="/settings" className="block px-3 py-1.5 rounded-md hover:bg-slate-50 text-slate-700">Settings &amp; Appearance</Link>
                     <Link to="/basket" className="block px-3 py-1.5 rounded-md hover:bg-slate-50 text-slate-700">Standards Basket</Link>
                     <Link to="/approval" className="block px-3 py-1.5 rounded-md hover:bg-slate-50 text-slate-700">Approval Queue</Link>
                   </div>

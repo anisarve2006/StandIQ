@@ -16,13 +16,13 @@ import {
   ArrowRight,
   SlidersHorizontal,
   RefreshCw,
-  Sparkles,
+  ShieldCheck,
+  FileCheck2,
   FileSpreadsheet,
   FileCode2,
   ImageIcon,
   Copy,
   Download,
-  FolderOpen,
   Clock,
   ShoppingBag,
   AlertCircle
@@ -127,44 +127,84 @@ export default function ReviewVerifyPage() {
     isInBasket 
   } = useStandIQ();
 
-  // Track whether a document has been uploaded or chosen for review in this session
+  // Track whether a real user document has been uploaded in this session
   const [isDocumentLoaded, setIsDocumentLoaded] = useState<boolean>(() => {
     try {
       const state = location.state as any;
-      if (state?.autoUploadFile || state?.selectedDocId) return true;
-      if (activeDocId && activeDocument) return true;
+      if (state?.autoUploadFile) return true;
       const stored = sessionStorage.getItem('standiq_review_active_doc');
-      return Boolean(stored && stored !== 'none' && stored !== 'motors' && stored !== 'pumps' && stored !== 'cables' && stored !== 'tmt-steel' && stored !== 'solar' && stored !== 'transformers');
+      // Strictly accept only user-uploaded documents (uploaded-* or custom-*)
+      return Boolean(stored && (stored.startsWith('uploaded-') || stored.startsWith('custom-')));
     } catch {
       return false;
     }
   });
 
-  // Active document data & state (only populated if isDocumentLoaded is true)
-  const initialDoc = (activeDocument as any) || EMPTY_TENDER_DOC;
-  const [currentDoc, setCurrentDoc] = useState<TenderDocumentData>(initialDoc as any);
-  const [requirements, setRequirements] = useState<ExtractedRequirement[]>(
-    isDocumentLoaded ? (initialDoc.requirements || []) : []
-  );
-  const [recommendedStandards, setRecommendedStandards] = useState<RecommendedStandardItem[]>(
-    isDocumentLoaded ? (initialDoc.recommendedStandards || []) : []
-  );
+  // Active document data & state (only populated if a user-uploaded document is loaded)
+  const [currentDoc, setCurrentDoc] = useState<TenderDocumentData>(() => {
+    try {
+      const stored = sessionStorage.getItem('standiq_review_active_doc');
+      if (stored && (stored.startsWith('uploaded-') || stored.startsWith('custom-'))) {
+        const found = documents.find(d => d.id === stored);
+        if (found) return found as any;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return EMPTY_TENDER_DOC;
+  });
+
+  const [requirements, setRequirements] = useState<ExtractedRequirement[]>(() => {
+    try {
+      const stored = sessionStorage.getItem('standiq_review_active_doc');
+      if (stored && (stored.startsWith('uploaded-') || stored.startsWith('custom-'))) {
+        const found = documents.find(d => d.id === stored);
+        if (found?.requirements) return found.requirements;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return [];
+  });
+
+  const [recommendedStandards, setRecommendedStandards] = useState<RecommendedStandardItem[]>(() => {
+    try {
+      const stored = sessionStorage.getItem('standiq_review_active_doc');
+      if (stored && (stored.startsWith('uploaded-') || stored.startsWith('custom-'))) {
+        const found = documents.find(d => d.id === stored);
+        if (found?.recommendedStandards) return found.recommendedStandards;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return [];
+  });
   
   // Custom uploaded file state
   const [uploadedBlobUrl, setUploadedBlobUrl] = useState<string | null>(null);
-  const [uploadedFileType, setUploadedFileType] = useState<'pdf' | 'image' | 'text' | 'office' | 'other'>(
-    (initialDoc as any).fileType || 'pdf'
-  );
-  const [rawTextContent, setRawTextContent] = useState<string | null>(initialDoc.rawTextContent || null);
+  const [uploadedFileType, setUploadedFileType] = useState<'pdf' | 'image' | 'text' | 'office' | 'other'>('pdf');
+  const [rawTextContent, setRawTextContent] = useState<string | null>(null);
   const [viewerMode, setViewerMode] = useState<'preview' | 'document'>('document');
   const [isDragOver, setIsDragOver] = useState(false);
-  const [auditSummary, setAuditSummary] = useState<AuditSummary | null>(
-    isDocumentLoaded ? (initialDoc.auditSummary || null) : null
-  );
+  const [auditSummary, setAuditSummary] = useState<AuditSummary | null>(() => {
+    try {
+      const stored = sessionStorage.getItem('standiq_review_active_doc');
+      if (stored && (stored.startsWith('uploaded-') || stored.startsWith('custom-'))) {
+        const found = documents.find(d => d.id === stored);
+        if (found?.auditSummary) return found.auditSummary;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return null;
+  });
 
   // Tab & viewer controls
   const [activeTab, setActiveTab] = useState<'extracted' | 'standards'>('extracted');
   const [currentPage, setCurrentPage] = useState(1);
+  const [clausesPerPage, setClausesPerPage] = useState(5);
+  const [reqPage, setReqPage] = useState(1);
+  const [reqsPerPage, setReqsPerPage] = useState(5);
   const [zoom, setZoom] = useState(100);
   const [selectedClause, setSelectedClause] = useState<string | null>(null);
   const [severityFilter, setSeverityFilter] = useState<'All' | 'High' | 'Medium' | 'Low'>('All');
@@ -210,15 +250,20 @@ export default function ReviewVerifyPage() {
       console.warn('Could not remove session storage:', e);
     }
     setIsDocumentLoaded(false);
+    setCurrentDoc(EMPTY_TENDER_DOC);
+    setRequirements([]);
+    setRecommendedStandards([]);
+    setAuditSummary(null);
     setUploadedBlobUrl(null);
     setRawTextContent(null);
     setSelectedClause(null);
-    setAuditSummary(null);
+    setCurrentPage(1);
+    setReqPage(1);
   };
 
-  // Sync state whenever activeDocId changes in the global store, only when a document is active
+  // Sync state whenever activeDocId changes in the global store, only when a real uploaded document is active
   useEffect(() => {
-    if (activeDocument && isDocumentLoaded) {
+    if (activeDocument && isDocumentLoaded && (activeDocument.id.startsWith('uploaded-') || activeDocument.id.startsWith('custom-'))) {
       setCurrentDoc(activeDocument as any);
       setRequirements(activeDocument.requirements || []);
       setRecommendedStandards(activeDocument.recommendedStandards || []);
@@ -496,9 +541,30 @@ export default function ReviewVerifyPage() {
               recommendedStandards: uniqueStds
             };
 
+            const persistentDoc: AnalyzedDocument = {
+              ...customDocData,
+              category: 'Uploaded Tender',
+              uploadedAt: 'Today',
+              status: 'In Review',
+              fileType: fileCategory,
+              rawTextContent: textContent || null,
+              basket: []
+            };
+            addOrUpdateDocument(persistentDoc);
+            setActiveDocId(customDocData.id);
+
             setCurrentDoc(customDocData);
             setRequirements(dynamicReqs);
             setRecommendedStandards(customDocData.recommendedStandards);
+            setCurrentPage(1);
+            setReqPage(1);
+            setIsDocumentLoaded(true);
+            try {
+              sessionStorage.setItem('standiq_review_active_doc', customDocData.id);
+            } catch (e) {
+              console.warn('Could not store session doc:', e);
+            }
+            showToast(`Ingested ${dynamicReqs.length} clauses from ${file.name}!`);
           }
         }
       } catch (err) {
@@ -506,7 +572,7 @@ export default function ReviewVerifyPage() {
       }
     }
 
-    // Local extraction if backend was unreachable
+    // Local extraction fallback if backend was unreachable or returned 0 items
     if (!backendSuccess) {
       const lines = textContent
         ? textContent.split('\n').map(l => l.trim()).filter(l => l.length > 15)
@@ -557,30 +623,53 @@ export default function ReviewVerifyPage() {
         basket: []
       };
       addOrUpdateDocument(persistentDoc);
+      setActiveDocId(customDocData.id);
 
       setCurrentDoc(customDocData);
       setRequirements(customReqs);
       setRecommendedStandards([]);
+      setCurrentPage(1);
+      setReqPage(1);
       setIsDocumentLoaded(true);
       try {
         sessionStorage.setItem('standiq_review_active_doc', customDocData.id);
       } catch (e) {
         console.warn('Could not store session doc:', e);
       }
+
+      if (customClauses.length > 0) {
+        showToast(`Document uploaded with ${customClauses.length} extracted text items.`);
+      } else {
+        showToast('Document uploaded. You can preview file contents.');
+      }
     }
 
-    setTimeout(() => {
-      clearTimeout(stepTimer1);
-      clearTimeout(stepTimer2);
-      setUploading(false);
-      setIsUploadOpen(false);
-    }, 1300);
+    clearTimeout(stepTimer1);
+    clearTimeout(stepTimer2);
+    setUploading(false);
+    setIsUploadOpen(false);
   };
 
   const filteredRequirements = requirements.filter(req => {
     if (severityFilter === 'All') return true;
     return req.severity === severityFilter;
   });
+
+  // Pagination for Document Clauses View
+  const totalClauseCount = currentDoc.clauses?.length || 0;
+  const totalClausePages = Math.max(1, Math.ceil(totalClauseCount / clausesPerPage));
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalClausePages);
+  const paginatedClauses = totalClauseCount === 0 
+    ? [] 
+    : currentDoc.clauses.slice((safeCurrentPage - 1) * clausesPerPage, safeCurrentPage * clausesPerPage);
+
+  // Pagination for Extracted Requirements Tab
+  const totalReqCount = filteredRequirements?.length || 0;
+  const totalReqPages = Math.max(1, Math.ceil(totalReqCount / reqsPerPage));
+  const safeReqPage = Math.min(Math.max(1, reqPage), totalReqPages);
+  const paginatedRequirements = totalReqCount === 0 
+    ? [] 
+    : filteredRequirements.slice((safeReqPage - 1) * reqsPerPage, safeReqPage * reqsPerPage);
 
   // Label for the Preview Toggle button based on file type
   const getPreviewToggleLabel = () => {
@@ -806,106 +895,36 @@ export default function ReviewVerifyPage() {
             </div>
           </div>
 
-          {/* Existing Procurements Picker (if any) */}
-          {documents.length > 0 && (
-            <div className="pt-6 border-t border-slate-100 text-left">
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                  Or select an existing procurement
-                </span>
-                <span className="text-[10px] text-slate-400 font-mono">{documents.length} available</span>
-              </div>
-              <div className="space-y-2 max-h-56 overflow-y-auto pr-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                {documents.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 hover:border-slate-300 bg-white hover:bg-slate-50/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 pr-3">
-                      <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
-                        <FileText className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-medium text-slate-900 truncate">{doc.title}</div>
-                        <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                          <span>{doc.category || 'General'}</span>
-                          <span>•</span>
-                          <span>{doc.uploadedAt || 'Recent'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleSelectExistingDoc(doc)}
-                      className="px-2.5 py-1 text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded transition-colors shrink-0 cursor-pointer flex items-center gap-1"
-                    >
-                      <span>Open</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       ) : (
         <>
-          {/* 01b. Recent Documents & Output Switcher Bar - Clean Minimalist Strip */}
-          <div className="bg-white border border-slate-200 rounded-lg p-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1 mr-1 whitespace-nowrap">
-                <FolderOpen className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                <span>Recent:</span>
-              </span>
-              {documents.map((doc) => {
-                const isActive = doc.id === currentDoc.id;
-                const docBasket = doc.basket || [];
-                return (
-                  <button
-                    key={doc.id}
-                    onClick={() => {
-                      setActiveDocId(doc.id);
-                      setUploadedBlobUrl(null);
-                      setViewerMode('document');
-                    }}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium shrink-0 transition-colors flex items-center gap-2 border cursor-pointer whitespace-nowrap ${
-                      isActive
-                        ? 'bg-slate-900 text-white border-slate-900'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                    }`}
-                  >
-                    <FileText className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span className="max-w-[130px] truncate">{doc.title}</span>
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold whitespace-nowrap shrink-0 ${
-                        isActive
-                          ? 'bg-slate-800 text-slate-200'
-                          : 'bg-slate-200/80 text-slate-600'
-                      }`}
-                    >
-                      {doc.auditSummary?.complianceScore ?? 90}%
-                    </span>
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded font-mono whitespace-nowrap shrink-0 inline-flex items-center gap-1 ${
-                        isActive
-                          ? 'bg-slate-800 text-slate-300'
-                          : 'bg-white text-slate-600 border border-slate-200'
-                      }`}
-                      title={`${docBasket.length} standards in this document's basket`}
-                    >
-                      <ShoppingBag className="w-2.5 h-2.5 shrink-0" />
-                      <span>{docBasket.length}</span>
-                    </span>
-                  </button>
-                );
-              })}
+          {/* Active Document Header Strip */}
+          <div className="bg-white border border-slate-200 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-600">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-900 truncate">
+                    {currentDoc.fileName || currentDoc.title}
+                  </span>
+                  <span className="text-[10px] bg-slate-100 text-slate-600 font-mono px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+                    {currentDoc.fileSize}
+                  </span>
+                </div>
+                <span className="text-[11px] text-slate-400 block truncate">
+                  {currentDoc.department} • Ref: {currentDoc.tenderNumber}
+                </span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => navigate('/basket')}
-                className="text-xs text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-50 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="text-xs text-slate-700 hover:text-slate-900 font-medium flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
+                <ShoppingBag className="w-3.5 h-3.5 text-slate-500" />
                 <span>Document Basket ({basket.length})</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
               </button>
@@ -913,7 +932,7 @@ export default function ReviewVerifyPage() {
               <button
                 type="button"
                 onClick={handleUnloadDocument}
-                className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-100 transition-colors cursor-pointer whitespace-nowrap shrink-0 border border-slate-200"
+                className="text-xs text-slate-600 hover:text-rose-700 hover:border-rose-200 hover:bg-rose-50 font-medium flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 border border-slate-200"
                 title="Close document view"
               >
                 <X className="w-3.5 h-3.5 text-slate-400" />
@@ -1008,15 +1027,19 @@ export default function ReviewVerifyPage() {
                   <div className="flex items-center gap-1 text-slate-600">
                     <button
                       onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                      className="p-1 rounded hover:bg-slate-200/70 cursor-pointer"
+                      disabled={safeCurrentPage <= 1}
+                      className="p-1 rounded hover:bg-slate-200/70 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       title="Previous Page"
                     >
                       <ChevronLeft className="w-3.5 h-3.5" />
                     </button>
-                    <span className="font-mono text-[11px] px-1">{currentPage} / {currentDoc.totalPages}</span>
+                    <span className="font-mono text-[11px] px-1 font-semibold text-slate-700">
+                      Page {safeCurrentPage} / {totalClausePages}
+                    </span>
                     <button
-                      onClick={() => setCurrentPage(p => Math.min(p + 1, currentDoc.totalPages))}
-                      className="p-1 rounded hover:bg-slate-200/70 cursor-pointer"
+                      onClick={() => setCurrentPage(p => Math.min(p + 1, totalClausePages))}
+                      disabled={safeCurrentPage >= totalClausePages}
+                      className="p-1 rounded hover:bg-slate-200/70 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       title="Next Page"
                     >
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -1046,7 +1069,7 @@ export default function ReviewVerifyPage() {
           </div>
 
           {/* Rendered Document View */}
-          <div className="p-4 sm:p-6 bg-slate-100/50 min-h-[580px] max-h-[640px] flex justify-center overflow-auto">
+          <div className="p-4 sm:p-6 bg-white min-h-[580px] max-h-[680px] flex justify-center items-start overflow-auto">
             {uploadedBlobUrl && viewerMode === 'preview' ? (
               uploadedFileType === 'pdf' ? (
                 /* PDF Viewer */
@@ -1061,8 +1084,8 @@ export default function ReviewVerifyPage() {
                 /* Scanned Document Image Viewer */
                 <div className="w-full h-full min-h-[580px] flex flex-col items-center justify-center p-4 bg-slate-900/5 rounded-lg overflow-auto">
                   <div className="mb-3 flex items-center gap-1.5 bg-blue-100 text-blue-800 text-[11px] font-semibold px-3 py-1 rounded-full border border-blue-200">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Scanned Image Document • AI OCR Processed</span>
+                    <FileCheck2 className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Scanned Image Document • RapidOCR Processed</span>
                   </div>
                   <img
                     src={uploadedBlobUrl}
@@ -1124,8 +1147,8 @@ export default function ReviewVerifyPage() {
             ) : (
               /* Structured Clause View (For all formats) */
               <div 
-                className="bg-white border border-slate-300 shadow-md p-6 sm:p-8 max-w-xl w-full text-slate-800 space-y-5 text-xs leading-relaxed transition-transform rounded-sm"
-                style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
+                className="bg-white border border-slate-200/90 shadow-sm p-6 sm:p-8 max-w-2xl w-full text-slate-800 space-y-5 text-xs leading-relaxed transition-transform rounded-lg min-h-full h-fit"
+                style={{ transform: zoom !== 100 ? `scale(${zoom / 100})` : undefined, transformOrigin: 'top center' }}
               >
                 {/* Document Header */}
                 <div className="border-b border-slate-200 pb-3 text-center space-y-1">
@@ -1143,9 +1166,30 @@ export default function ReviewVerifyPage() {
                   </span>
                 </div>
 
+                {/* Clauses Header & Range Selector */}
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-[11px] text-slate-500">
+                  <span className="font-medium">
+                    Showing {totalClauseCount > 0 ? (safeCurrentPage - 1) * clausesPerPage + 1 : 0}–{Math.min(safeCurrentPage * clausesPerPage, totalClauseCount)} of {totalClauseCount} clauses
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-slate-400">Per page:</span>
+                    {[5, 10, 20].map(cnt => (
+                      <button
+                        key={cnt}
+                        onClick={() => { setClausesPerPage(cnt); setCurrentPage(1); }}
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer ${
+                          clausesPerPage === cnt ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {cnt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Clauses List */}
                 <div className="space-y-4">
-                  {currentDoc.clauses.map((clause) => {
+                  {paginatedClauses.map((clause) => {
                     const isSelected = selectedClause === clause.number;
                     return (
                       <div
@@ -1173,8 +1217,8 @@ export default function ReviewVerifyPage() {
                             <p className="text-xs leading-relaxed">{clause.text}</p>
                             <div className="mt-2 flex items-center justify-between text-[10px] text-amber-800 font-mono">
                               <span className="font-bold flex items-center gap-1">
-                                <Sparkles className="w-3 h-3 text-amber-600" />
-                                <span>{clause.highlightNote || 'AI Extracted Requirement'}</span>
+                                <FileCheck2 className="w-3 h-3 text-amber-600" />
+                                <span>{clause.highlightNote || 'Extracted Parameter'}</span>
                               </span>
                               <span className="font-semibold text-blue-700">
                                 {clause.matchedStandard ? `Matches ${clause.matchedStandard}` : 'Verified Parameter'}
@@ -1191,9 +1235,57 @@ export default function ReviewVerifyPage() {
                   })}
                 </div>
 
-                {/* Document Footer */}
-                <div className="pt-4 border-t border-slate-200 text-center text-[10px] text-slate-400 font-mono">
-                  <span>Page {currentPage} of {currentDoc.totalPages} — Official Technical Specifications</span>
+                {/* Document Footer with Numbered Pagination */}
+                <div className="pt-4 border-t border-slate-200 space-y-3">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <span className="text-[11px] text-slate-400 font-mono text-center sm:text-left">
+                      Page {safeCurrentPage} of {totalClausePages} ({totalClauseCount} clauses total)
+                    </span>
+
+                    {totalClausePages > 1 && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                          disabled={safeCurrentPage <= 1}
+                          className="px-2 py-1 rounded-md text-xs font-semibold border border-slate-200 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 text-slate-700"
+                        >
+                          <ChevronLeft className="w-3 h-3" />
+                          <span>Prev</span>
+                        </button>
+
+                        {Array.from({ length: totalClausePages }, (_, i) => i + 1).map(pageNum => {
+                          if (totalClausePages > 7 && Math.abs(pageNum - safeCurrentPage) > 2 && pageNum !== 1 && pageNum !== totalClausePages) {
+                            if (pageNum === 2 || pageNum === totalClausePages - 1) {
+                              return <span key={pageNum} className="px-1 text-slate-400 text-xs">...</span>;
+                            }
+                            return null;
+                          }
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-6 h-6 rounded-md font-mono text-xs font-bold transition-all cursor-pointer ${
+                                safeCurrentPage === pageNum
+                                  ? 'bg-blue-600 text-white shadow-2xs'
+                                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+
+                        <button
+                          onClick={() => setCurrentPage(p => Math.min(p + 1, totalClausePages))}
+                          disabled={safeCurrentPage >= totalClausePages}
+                          className="px-2 py-1 rounded-md text-xs font-semibold border border-slate-200 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 text-slate-700"
+                        >
+                          <span>Next</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -1250,25 +1342,48 @@ export default function ReviewVerifyPage() {
 
           {/* Filter Bar for Extracted Requirements */}
           {activeTab === 'extracted' && (
-            <div className="px-4 py-2 border-b border-slate-100 bg-white flex items-center justify-between text-[11px]">
-              <div className="flex items-center gap-1.5 text-slate-500 font-medium">
-                <SlidersHorizontal className="w-3 h-3 text-slate-400" />
-                <span>Severity:</span>
+            <div className="px-4 py-2 border-b border-slate-100 bg-white flex items-center justify-between text-[11px] flex-wrap gap-2">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                  <SlidersHorizontal className="w-3 h-3 text-slate-400" />
+                  <span>Severity:</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {(['All', 'High', 'Medium', 'Low'] as const).map(sev => (
+                    <button
+                      key={sev}
+                      onClick={() => { setSeverityFilter(sev); setReqPage(1); }}
+                      className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${
+                        severityFilter === sev
+                          ? 'bg-slate-900 text-white font-bold'
+                          : 'text-slate-500 hover:bg-slate-100'
+                      }`}
+                    >
+                      {sev}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                {(['All', 'High', 'Medium', 'Low'] as const).map(sev => (
-                  <button
-                    key={sev}
-                    onClick={() => setSeverityFilter(sev)}
-                    className={`px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer ${
-                      severityFilter === sev
-                        ? 'bg-slate-900 text-white font-bold'
-                        : 'text-slate-500 hover:bg-slate-100'
-                    }`}
-                  >
-                    {sev}
-                  </button>
-                ))}
+
+              {/* Per-page selector & item range */}
+              <div className="flex items-center gap-2.5 text-slate-500 font-medium">
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {totalReqCount > 0 ? (safeReqPage - 1) * reqsPerPage + 1 : 0}–{Math.min(safeReqPage * reqsPerPage, totalReqCount)} of {totalReqCount}
+                </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-slate-400">Per page:</span>
+                  {[5, 10, 20].map(cnt => (
+                    <button
+                      key={cnt}
+                      onClick={() => { setReqsPerPage(cnt); setReqPage(1); }}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer ${
+                        reqsPerPage === cnt ? 'bg-blue-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {cnt}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -1281,7 +1396,7 @@ export default function ReviewVerifyPage() {
                   No requirements match the selected filter.
                 </div>
               ) : (
-                filteredRequirements.map((req) => {
+                paginatedRequirements.map((req) => {
                   const isClauseActive = selectedClause === req.clauseNumber;
                   const isAccepted = req.status === 'accepted' || (req.recommendedStandard ? isInBasket(req.recommendedStandard) : false);
 
@@ -1346,7 +1461,7 @@ export default function ReviewVerifyPage() {
                       {req.specificationClause && (
                         <div className="ml-7 bg-emerald-50/70 border border-emerald-200/70 rounded-lg p-2.5 text-[11px] space-y-1">
                           <div className="font-bold text-[10px] text-emerald-800 uppercase tracking-wider flex items-center gap-1">
-                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                            <ShieldCheck className="w-3 h-3 text-emerald-600" />
                             <span>Drafted BIS Tender Clause:</span>
                           </div>
                           <p className="text-[11px] text-emerald-950 font-mono leading-relaxed bg-white/80 p-2 rounded border border-emerald-100/80">
@@ -1471,6 +1586,55 @@ export default function ReviewVerifyPage() {
             )}
           </div>
 
+          {/* Extracted Requirements Pagination Bar */}
+          {activeTab === 'extracted' && totalReqPages > 1 && (
+            <div className="px-4 py-2.5 bg-slate-50/90 border-t border-slate-200 flex items-center justify-between text-xs">
+              <span className="text-[11px] text-slate-500 font-medium">
+                Page <span className="font-bold text-slate-800">{safeReqPage}</span> of {totalReqPages} ({totalReqCount} requirements)
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setReqPage(p => Math.max(p - 1, 1))}
+                  disabled={safeReqPage <= 1}
+                  className="px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[11px] font-semibold text-slate-700 flex items-center gap-0.5 cursor-pointer shadow-2xs"
+                  title="Previous page"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Prev</span>
+                </button>
+
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: totalReqPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setReqPage(page)}
+                      className={`min-w-6 h-6 px-1.5 rounded text-[11px] font-mono font-bold transition-colors cursor-pointer ${
+                        safeReqPage === page
+                          ? 'bg-blue-600 text-white shadow-2xs'
+                          : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setReqPage(p => Math.min(p + 1, totalReqPages))}
+                  disabled={safeReqPage >= totalReqPages}
+                  className="px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[11px] font-semibold text-slate-700 flex items-center gap-0.5 cursor-pointer shadow-2xs"
+                  title="Next page"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Footer Action */}
           <div className="p-4 bg-slate-50 border-t border-slate-200 mt-auto flex items-center justify-between">
             <span className="text-xs text-slate-500">
@@ -1491,77 +1655,77 @@ export default function ReviewVerifyPage() {
       </>
       )}
 
-      {/* Upload Tender Document Modal - Supports Any File Format */}
+      {/* Upload Tender Document Modal - Clean & Simple */}
       {isUploadOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white rounded-xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95">
+            {/* Header */}
+            <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Upload className="w-4 h-4 text-blue-600" />
-                <h2 className="font-bold text-slate-900 text-sm">Upload Any Specification Document</h2>
+                <h2 className="font-bold text-slate-900 text-sm">Upload Tender Document</h2>
               </div>
               {!uploading && (
                 <button 
                   onClick={() => setIsUploadOpen(false)}
-                  className="p-1 rounded-md text-slate-400 hover:text-slate-700 cursor-pointer"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            {/* Modal Tabs: File/Scan Upload vs Direct Text Input */}
+            {/* Segmented Mode Selector */}
             {!uploading && (
-              <div className="flex border-b border-slate-200 bg-slate-50/70 px-6 pt-2.5">
-                <button
-                  type="button"
-                  onClick={() => setUploadModalTab('file')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-                    uploadModalTab === 'file' 
-                      ? 'border-blue-600 text-blue-600' 
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload Document / Image (Hybrid OCR)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUploadModalTab('text')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-                    uploadModalTab === 'text' 
-                      ? 'border-blue-600 text-blue-600' 
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Input Specification Text</span>
-                </button>
+              <div className="px-5 pt-3.5">
+                <div className="flex p-0.5 bg-slate-100 rounded-lg text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setUploadModalTab('file')}
+                    className={`flex-1 py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer font-medium ${
+                      uploadModalTab === 'file' 
+                        ? 'bg-white text-slate-900 shadow-xs font-semibold' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload File</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUploadModalTab('text')}
+                    className={`flex-1 py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer font-medium ${
+                      uploadModalTab === 'text' 
+                        ? 'bg-white text-slate-900 shadow-xs font-semibold' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Paste Text</span>
+                  </button>
+                </div>
               </div>
             )}
 
-            <div className="p-6 space-y-5">
+            <div className="p-5">
               {uploading ? (
-                <div className="py-8 flex flex-col items-center justify-center text-center space-y-4">
+                /* Processing State */
+                <div className="py-8 flex flex-col items-center justify-center text-center space-y-3">
                   <div className="relative">
-                    <div className="w-12 h-12 border-3 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
-                    <Sparkles className="w-5 h-5 text-blue-600 absolute inset-0 m-auto" />
+                    <div className="w-10 h-10 border-2 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+                    <ShieldCheck className="w-4 h-4 text-blue-600 absolute inset-0 m-auto" />
                   </div>
                   
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <p className="text-xs font-bold text-slate-900">
-                      {analysisStep === 1 && 'Ingesting & Parsing Document Structure...'}
-                      {analysisStep === 2 && 'Extracting Technical Parameters & Running OCR if Scanned...'}
-                      {analysisStep === 3 && 'Cross-Referencing Bureau of Indian Standards (BIS)...'}
+                      Processing Tender Document...
                     </p>
                     <p className="text-[11px] text-slate-500">
-                      {analysisStep === 1 && 'Universal parser reading text layer, raster images, and tables'}
-                      {analysisStep === 2 && 'Digital extraction for electronic files • RapidOCR for scanned images'}
-                      {analysisStep === 3 && 'Matching clauses to official IS codes & Quality Control Orders'}
+                      Extracting clauses and cross-referencing BIS standards
                     </p>
                   </div>
 
-                  <div className="w-full max-w-xs bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-44 bg-slate-100 h-1.5 rounded-full overflow-hidden mt-2">
                     <div 
                       className="bg-blue-600 h-full transition-all duration-300 rounded-full"
                       style={{ width: `${(analysisStep / 3) * 100}%` }}
@@ -1569,97 +1733,39 @@ export default function ReviewVerifyPage() {
                   </div>
                 </div>
               ) : uploadModalTab === 'text' ? (
-                /* Mode 2: Direct Specification Text Input Field */
-                <div className="space-y-4 animate-in fade-in duration-200">
-                  <div className="bg-blue-50/70 border border-blue-200/80 rounded-lg p-3 flex items-start gap-2.5 text-xs text-blue-900">
-                    <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold">Direct Specification Input:</span> Paste tender clauses, technical schedules, or BoQ items directly. Our neuro-symbolic engine parses requirements, checks mandatory QCOs, and maps applicable Indian Standards.
-                    </div>
-                  </div>
-
-                  {/* Document / Tender Title Input */}
+                /* Direct Text Mode */
+                <div className="space-y-3.5 animate-in fade-in duration-150">
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      Tender Reference / Specification Title
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      Tender Reference (Optional)
                     </label>
                     <input
                       type="text"
                       value={inputSpecTitle}
                       onChange={(e) => setInputSpecTitle(e.target.value)}
-                      placeholder="e.g. CPWD Package 4 - 3-Phase Induction Motors & Switchgear"
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 bg-white"
+                      placeholder="e.g. Technical Specification Schedule"
+                      className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder:text-slate-400 bg-white"
                     />
                   </div>
 
-                  {/* Specification Text Field */}
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-800">
-                        Technical Requirements / Specification Text <span className="text-red-500">*</span>
-                      </label>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {inputSpecText.length} characters
-                      </span>
-                    </div>
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      Specification Clauses <span className="text-rose-500">*</span>
+                    </label>
                     <textarea
-                      rows={6}
+                      rows={5}
                       value={inputSpecText}
                       onChange={(e) => setInputSpecText(e.target.value)}
-                      placeholder="Enter or paste technical specification clauses. For example:&#10;Item 1: 15 kW, 415 V, 50 Hz, 3-Phase Squirrel Cage Induction Motor with IE3 premium efficiency conforming to IS 12615. IP55 protection rating, Class F insulation.&#10;Item 2: Thermo Mechanically Treated (TMT) Fe 500D grade reinforcement steel bars conforming to IS 1786 with mandatory BIS ISI Mark certification."
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 font-sans leading-relaxed bg-white"
+                      placeholder="Paste tender specifications, requirements, or BoQ clauses here..."
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder:text-slate-400 leading-relaxed bg-white font-sans"
                     />
                   </div>
 
-                  {/* Quick-Fill Sample Pills */}
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-500 block mb-1.5">
-                      Or Insert Sample Specification Snippet:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        {
-                          label: 'IE3 Induction Motor (IS 12615)',
-                          title: 'Three-Phase IE3 Induction Motors',
-                          text: 'Supply and delivery of 15 kW, 415 V ± 10%, 50 Hz, 3-Phase squirrel cage induction motor conforming to IS 12615:2018 with IE3 energy efficiency rating, IP55 enclosure, and Class F insulation.'
-                        },
-                        {
-                          label: 'Fe 500D TMT Steel (IS 1786)',
-                          title: 'Fe 500D TMT Rebars Procurement',
-                          text: 'High strength deformed steel bars and wires for concrete reinforcement, Grade Fe 500D, nominal diameter 16mm conforming to IS 1786:2008 with mandatory BIS ISI certification under the Steel Products QCO.'
-                        },
-                        {
-                          label: 'Centrifugal Pump (IS 1520)',
-                          title: 'Centrifugal Clear Water Pumps',
-                          text: 'Horizontal centrifugal water pump suitable for clear cold water discharge of 50 LPS at 40 meters total head conforming to IS 1520 with mechanical shaft seal and cast iron casing.'
-                        },
-                        {
-                          label: 'Solar PV Inverter (IS 16221)',
-                          title: 'Grid-Connected Solar Inverter',
-                          text: 'Three-phase 100 kW grid-tied solar photovoltaic inverter with anti-islanding protection and minimum 98% efficiency conforming to IS 16221 (Part 2) and IS 16169.'
-                        }
-                      ].map((chip) => (
-                        <button
-                          key={chip.label}
-                          type="button"
-                          onClick={() => {
-                            setInputSpecTitle(chip.title);
-                            setInputSpecText(chip.text);
-                          }}
-                          className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-slate-200 text-slate-700 transition-colors cursor-pointer"
-                        >
-                          {chip.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Submit Action */}
                   <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
                     <button
                       type="button"
                       onClick={() => setIsUploadOpen(false)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -1667,117 +1773,53 @@ export default function ReviewVerifyPage() {
                       type="button"
                       disabled={!inputSpecText.trim()}
                       onClick={handleDirectTextSubmit}
-                      className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
                         inputSpecText.trim()
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20'
-                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                       }`}
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Analyze Specification Text</span>
+                      Analyze Clauses
                     </button>
                   </div>
                 </div>
               ) : (
-                /* Mode 1: Hybrid Digital & OCR File Dropzone */
-                <>
-                  {/* Intelligent Engine Banner */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex items-center gap-2 text-[11px] text-slate-700">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                    <span>
-                      <strong className="text-slate-900">Hybrid Extraction Engine:</strong> Digital PDFs are parsed instantly. Scanned PDFs and images automatically execute ONNX RapidOCR.
-                    </span>
+                /* File Dropzone Mode */
+                <label 
+                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) processUploadedFile(file);
+                  }}
+                  className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
+                    isDragOver 
+                      ? 'border-blue-500 bg-blue-50/50' 
+                      : 'border-slate-300 hover:border-blue-400 bg-slate-50/60 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="w-11 h-11 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 mb-3 shadow-2xs">
+                    <Upload className="w-5 h-5" />
                   </div>
-
-                  {/* File Dropzone - Any Format Allowed (Digital PDF, Scanned PDF, Images, Excel, CSV, Text) */}
-                  <label 
-                    onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-                    onDragLeave={() => setIsDragOver(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsDragOver(false);
-                      const file = e.dataTransfer.files?.[0];
+                  <span className="text-xs font-bold text-slate-800">
+                    Click to browse or drag & drop tender
+                  </span>
+                  <span className="text-[11px] text-slate-400 mt-1">
+                    PDF, DOCX, Images, CSV, or TXT (up to 50 MB)
+                  </span>
+                  <input 
+                    ref={fileInputRef}
+                    type="file" 
+                    accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif,.docx,.doc,.xlsx,.xls,.csv,.txt"
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
                       if (file) processUploadedFile(file);
-                    }}
-                    className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group ${
-                      isDragOver 
-                        ? 'border-blue-600 bg-blue-50/50' 
-                        : 'border-slate-300 hover:border-blue-500 bg-slate-50 hover:bg-blue-50/20'
-                    }`}
-                  >
-                    <FileCheck className="w-9 h-9 text-slate-400 group-hover:text-blue-600 mb-2 transition-colors" />
-                    <span className="text-xs font-bold text-slate-800">Upload Specification Document or Scanned Image</span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">Supports Digital PDF, Scanned PDF (with OCR), PNG, JPG, WEBP, Excel, CSV, TXT (up to 50 MB)</span>
-                    
-                    {/* Format Badges */}
-                    <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2.5">
-                      {[
-                        { label: 'PDF (DIGITAL & OCR)', color: 'bg-red-50 text-red-700 border-red-200' },
-                        { label: 'SCANNED IMAGE (PNG/JPG)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-                        { label: 'DOCX / EXCEL / CSV', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-                        { label: 'TXT', color: 'bg-slate-100 text-slate-700 border-slate-200' }
-                      ].map(fmt => (
-                        <span key={fmt.label} className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${fmt.color}`}>
-                          {fmt.label}
-                        </span>
-                      ))}
-                    </div>
-
-                    <span className="text-[11px] text-blue-600 font-semibold mt-2.5">Click to browse or drag & drop any document/image</span>
-                    <input 
-                      ref={fileInputRef}
-                      type="file" 
-                      accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif,.docx,.doc,.xlsx,.xls,.csv,.txt"
-                      className="hidden" 
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) processUploadedFile(file);
-                      }} 
-                    />
-                  </label>
-
-                  {/* Inline Direct Text Entry Prompt */}
-                  <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/90 flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-blue-600" />
-                        Quick Specification Text Input
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setUploadModalTab('text')}
-                        className="text-[11px] text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
-                      >
-                        Open full editor →
-                      </button>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={inputSpecText}
-                        onChange={(e) => setInputSpecText(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleDirectTextSubmit();
-                        }}
-                        placeholder="Or paste technical specification clause here..."
-                        className="flex-1 px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white placeholder:text-slate-400"
-                      />
-                      <button
-                        type="button"
-                        disabled={!inputSpecText.trim()}
-                        onClick={handleDirectTextSubmit}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${
-                          inputSpecText.trim()
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                        }`}
-                      >
-                        Analyze
-                      </button>
-                    </div>
-                  </div>
-
-                  </>
+                    }} 
+                  />
+                </label>
               )}
             </div>
           </div>

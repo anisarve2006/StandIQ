@@ -1,4 +1,14 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://bisense-swl4.onrender.com').replace(/\/+$/, '');
+const resolveApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    const configured = import.meta.env.VITE_API_BASE_URL;
+    if (configured && configured.startsWith('http://')) {
+      return ''; // Use relative path so Vite proxy forwards requests securely without mixed-content errors
+    }
+  }
+  return (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+};
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 export class ApiError extends Error {
   status: number;

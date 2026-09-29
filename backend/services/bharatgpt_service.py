@@ -77,9 +77,9 @@ class BharatGPTService:
 
     def _init_model(self):
         """Loads BharatGPT-3B GGUF into RAM or configures Modal Serverless GPU endpoint."""
-        if os.getenv("USE_BHARATGPT", "true").lower() == "false":
-            self._load_error = "BharatGPT disabled via USE_BHARATGPT=false"
-            logger.info("[BharatGPT] USE_BHARATGPT=false. Running in fast deterministic mode.")
+        if os.getenv("USE_BHARATGPT", "false").lower() == "false":
+            self._load_error = "BharatGPT disabled: Deterministic Rule-Based Mode ACTIVE"
+            logger.info("[BharatGPT] USE_BHARATGPT=false. Running in 100% deterministic rule-based mode.")
             return
 
         modal_url = os.getenv("BHARATGPT_MODAL_URL", "").strip().rstrip("/")
@@ -128,7 +128,7 @@ class BharatGPTService:
             logger.error(f"[BharatGPT] Failed to load GGUF model: {e}. Running in FALLBACK mode.")
 
     def is_available(self) -> bool:
-        if os.getenv("USE_BHARATGPT", "true").lower() == "false":
+        if os.getenv("USE_BHARATGPT", "false").lower() == "false":
             return False
         if getattr(self, "_modal_url", None):
             return True
