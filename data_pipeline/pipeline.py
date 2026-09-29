@@ -32,7 +32,7 @@ except ImportError:
 
 # Paths configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(BASE_DIR, "data")
+DATA_DIR = os.path.join(BASE_DIR, "backend", "data") if os.path.exists(os.path.join(BASE_DIR, "backend", "data")) else os.path.join(BASE_DIR, "data")
 STANDARDS_JSONL = os.path.join(DATA_DIR, "standards_master.jsonl")
 STANDARDS_CSV = os.path.join(DATA_DIR, "standards_master.csv")
 QCO_JSON = os.path.join(DATA_DIR, "qco_master.json")

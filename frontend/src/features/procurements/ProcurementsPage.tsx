@@ -90,9 +90,20 @@ const INITIAL_PROCUREMENTS: ProcurementItem[] = [
 export default function ProcurementsPage() {
   const navigate = useNavigate();
   const { setCurrentProcurement } = useProcurement();
-  const { formatDate } = useStandIQ();
+  const { formatDate, documents, setActiveDocId, getDocumentBasket, addOrUpdateDocument } = useStandIQ();
 
-  const [procurements, setProcurements] = useState<ProcurementItem[]>(INITIAL_PROCUREMENTS);
+  // Map persistent documents to procurement items (with INITIAL_PROCUREMENTS fallback)
+  const mappedStoreItems: ProcurementItem[] = documents.length > 0
+    ? documents.map(d => ({
+        id: d.id,
+        title: d.title,
+        category: d.category || 'Electrical Equipment',
+        status: d.status,
+        standardsCount: getDocumentBasket(d.id).length,
+        updated: d.uploadedAt
+      }))
+    : INITIAL_PROCUREMENTS;
+
   const [activeTab, setActiveTab] = useState<'All' | 'Active' | 'Drafts' | 'In Review' | 'Completed'>('All');
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
@@ -121,30 +132,33 @@ export default function ProcurementsPage() {
   ];
 
   const handleOpenProcurement = (p: ProcurementItem) => {
+    setActiveDocId(p.id);
     setCurrentProcurement({ id: p.id, name: p.title, category: p.category });
-    navigate('/tender-health');
+    navigate('/review', { state: { selectedDocId: p.id } });
   };
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    const newItem: ProcurementItem = {
-      id: `pr-${Date.now()}`,
+    const newId = `pr-${Date.now()}`;
+    addOrUpdateDocument({
+      id: newId,
       title: newTitle,
       category: newCategory,
       status: 'Draft',
-      standardsCount: 0,
-      updated: 'Just now'
-    };
+      uploadedAt: 'Today',
+      fileType: 'pdf',
+      basket: []
+    });
 
-    setProcurements([newItem, ...procurements]);
     setIsCreateOpen(false);
     setNewTitle('');
-    handleOpenProcurement(newItem);
+    setActiveDocId(newId);
+    navigate('/review', { state: { selectedDocId: newId } });
   };
 
-  const filteredProcurements = procurements.filter(p => {
+  const filteredProcurements = mappedStoreItems.filter(p => {
     // Tab filter
     if (activeTab === 'Active' && p.status !== 'Ready') return false;
     if (activeTab === 'Drafts' && p.status !== 'Draft') return false;
@@ -265,18 +279,18 @@ export default function ProcurementsPage() {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="bg-slate-50/70 border-b border-slate-100 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                <th className="py-3 px-6">Title</th>
-                <th className="py-3 px-6">Category</th>
-                <th className="py-3 px-6">Status</th>
-                <th className="py-3 px-6 text-center">Standards</th>
-                <th className="py-3 px-6">Updated</th>
-                <th className="py-3 px-6 text-right">Actions</th>
+                <th className="py-3 px-6 whitespace-nowrap">Title</th>
+                <th className="py-3 px-6 whitespace-nowrap">Category</th>
+                <th className="py-3 px-6 whitespace-nowrap">Status</th>
+                <th className="py-3 px-6 text-center whitespace-nowrap">Standards</th>
+                <th className="py-3 px-6 whitespace-nowrap">Updated</th>
+                <th className="py-3 px-6 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredProcurements.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-slate-400 whitespace-nowrap">
                     No procurements match your current search or filters.
                   </td>
                 </tr>
@@ -287,18 +301,18 @@ export default function ProcurementsPage() {
                     onClick={() => handleOpenProcurement(p)}
                     className="hover:bg-slate-50/70 cursor-pointer transition-colors group"
                   >
-                    <td className="py-3.5 px-6 font-semibold text-slate-900 group-hover:text-blue-600">
-                      <div className="flex items-center gap-2">
+                    <td className="py-3.5 px-6 font-semibold text-slate-900 group-hover:text-blue-600 whitespace-nowrap">
+                      <div className="flex items-center gap-2 whitespace-nowrap">
                         <FileText className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500 shrink-0" />
-                        <span>{p.title}</span>
+                        <span className="whitespace-nowrap">{p.title}</span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-6 text-slate-600">
+                    <td className="py-3.5 px-6 text-slate-600 whitespace-nowrap">
                       {p.category}
                     </td>
-                    <td className="py-3.5 px-6">
+                    <td className="py-3.5 px-6 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border whitespace-nowrap ${
                           p.status === 'Completed'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : p.status === 'In Review'
@@ -311,18 +325,18 @@ export default function ProcurementsPage() {
                         {p.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-6 text-center">
-                      <span className="font-mono font-semibold text-slate-800 bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60">
+                    <td className="py-3.5 px-6 text-center whitespace-nowrap">
+                      <span className="font-mono font-semibold text-slate-800 bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60 whitespace-nowrap">
                         {p.standardsCount}
                       </span>
                     </td>
-                    <td className="py-3.5 px-6 text-slate-500 font-mono text-[11px]">
+                    <td className="py-3.5 px-6 text-slate-500 font-mono text-[11px] whitespace-nowrap">
                       {formatDate(p.updated)}
                     </td>
-                    <td className="py-3.5 px-6 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3.5 px-6 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       <button 
                         onClick={() => handleOpenProcurement(p)}
-                        className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                        className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap shrink-0"
                         title="Open Procurement Analysis"
                       >
                         <MoreHorizontal className="w-4 h-4" />

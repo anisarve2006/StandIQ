@@ -1,7 +1,7 @@
 """
-Layout-Aware PDF & Image Ingestion Engine with PaddleOCR.
-Uses PyMuPDF (fitz) and Sovereign PaddleOCR for high-precision optical character
-recognition on scanned pages, images, and multi-item Bill of Quantities (BoQ).
+Layout-Aware PDF & Image Ingestion with Hybrid Digital / OCR Extractor.
+Uses PyMuPDF (fitz) for high-speed digital text & vector table detection.
+Seamlessly activates RapidOCR (ONNX Runtime) when scanned pages or images are detected.
 """
 
 import io
@@ -11,11 +11,11 @@ import numpy as np
 from typing import Dict, Any, List, Union, Optional
 from loguru import logger
 import fitz  # PyMuPDF
-from PIL import Image
-from retrieval.ocr_processor import ocr_processor
+from retrieval.ocr_engine import OCREngine
 
 class TenderPDFProcessor:
     def __init__(self):
+        self.ocr_engine = OCREngine.get_instance()
         # Common Tender Document Section Headers
         self.section_keywords = [
             "technical specification",
@@ -156,9 +156,13 @@ class TenderPDFProcessor:
     def extract_document(self, pdf_input: Union[str, bytes], use_ocr: bool = True) -> Dict[str, Any]:
         """
         Parses PDF file path or raw bytes into:
-        - metadata: page count, title, author, OCR engine
-        - pages: page number, text, detected tables, OCR confidence
+        - metadata: page count, digital vs OCR breakdown, table count
+        - pages: page number, text, detected tables, extraction mode (DIGITAL vs OCR)
         - extracted_items: discrete line items or specification chunks for standards matching
+        
+        Strategy:
+        If page is digitally encoded -> extract text and tables digitally (fast & exact).
+        If page is scanned -> render to image and perform ONNX RapidOCR.
         """
         if isinstance(pdf_input, bytes):
             doc = fitz.open(stream=pdf_input, filetype="pdf")
@@ -173,43 +177,28 @@ class TenderPDFProcessor:
 
         total_pages = len(doc)
 
-        # 1. Scan for dedicated BoQ / Schedule of Quantities pages
+        # 1. Pre-scan for text content & BoQ indices
         boq_page_indices = []
+        page_scanned_flags = []
+
         for pno in range(total_pages):
             page = doc[pno]
-            page_text = page.get_text("text").strip()
+            is_scanned = self.ocr_engine.is_page_scanned(page)
+            page_scanned_flags.append(is_scanned)
 
-            # Always OCR: Run PaddleOCR on every page as requested
-            ocr_text = ""
-            ocr_conf = 0.0
-            if use_ocr:
-                try:
-                    pix = page.get_pixmap(dpi=150)
-                    img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-                    ocr_res = ocr_processor.ocr_image(img)
-                    ocr_text = ocr_res.get("full_text", "").strip()
-                    ocr_conf = ocr_res.get("avg_confidence", 0.0)
-                    if ocr_conf > 0:
-                        ocr_confidences.append(ocr_conf)
-                except Exception as e:
-                    logger.warning(f"[PaddleOCR] Page {pno + 1} OCR exception: {e}")
-
-            # Merge optical text with digital text
-            if ocr_text:
-                if len(page_text) < 30 or len(ocr_text) > len(page_text) * 0.7:
-                    combined_page_text = ocr_text
-                else:
-                    combined_page_text = f"{page_text}\n{ocr_text}".strip()
+            if not is_scanned:
+                p_text = page.get_text("text").strip()
             else:
-                combined_page_text = page_text
+                p_text = ""  # Will be extracted via OCR in stage 2
 
-            raw_full_text.append(combined_page_text)
-            if any(k in combined_page_text.upper() for k in ["SCHEDULE OF QUANTIT", "BILL OF QUANTIT", "SCHEDULE 'A'", "SCHEDULE \x27A\x27"]):
+            raw_full_text.append(p_text)
+
+            if p_text and any(k in p_text.upper() for k in ["SCHEDULE OF QUANTIT", "BILL OF QUANTIT", "SCHEDULE 'A'", "SCHEDULE \x27A\x27"]):
                 tabs = page.find_tables()
                 if tabs.tables:
                     boq_page_indices.append(pno)
 
-        # If a dedicated BoQ start was found, track consecutive continuation pages
+        # Track consecutive continuation pages if dedicated BoQ start was found
         if boq_page_indices and total_pages > 10:
             start_pno = boq_page_indices[-1]
             curr = start_pno
@@ -224,79 +213,73 @@ class TenderPDFProcessor:
         else:
             boq_target_pages = None
 
-        # 2. Extract structured line items
+        # 2. Extract structured line items and text per page
         for pno in range(total_pages):
             page = doc[pno]
-            page_text = raw_full_text[pno] if pno < len(raw_full_text) else page.get_text("text").strip()
-
-            if boq_target_pages is not None and pno not in boq_target_pages:
-                pages_data.append({
-                    "page_number": pno + 1,
-                    "text_length": len(page_text),
-                    "has_tables": False,
-                    "table_count": 0
-                })
-                continue
+            is_scanned = page_scanned_flags[pno]
+            page_mode = "OCR" if is_scanned else "DIGITAL"
 
             page_tables = []
-            try:
-                tabs = page.find_tables()
-                for t in tabs:
-                    tab_df = t.extract()
-                    if tab_df and len(tab_df) > 1:
-                        if total_pages > 10 and boq_target_pages is None and not self._is_boq_table(tab_df[0]):
-                            continue
 
-                        page_tables.append({
-                            "page": pno + 1,
-                            "headers": tab_df[0],
-                            "rows": tab_df[1:]
-                        })
-                        all_tables.append(tab_df)
+            if not is_scanned:
+                # Digital extraction
+                page_text = raw_full_text[pno] if raw_full_text[pno] else page.get_text("text").strip()
 
-                        for row in tab_df:
-                            if not row:
+                # If dedicated BoQ block exists, prioritize those pages
+                if boq_target_pages is not None and pno not in boq_target_pages:
+                    pages_data.append({
+                        "page_number": pno + 1,
+                        "text_length": len(page_text),
+                        "has_tables": False,
+                        "table_count": 0,
+                        "extraction_mode": page_mode
+                    })
+                    continue
+
+                try:
+                    tabs = page.find_tables()
+                    for t in tabs:
+                        tab_df = t.extract()
+                        if tab_df and len(tab_df) > 1:
+                            if total_pages > 10 and boq_target_pages is None and not self._is_boq_table(tab_df[0]):
                                 continue
-                            item_no = None
-                            desc = None
 
-                            for cell in row:
-                                if cell is None:
-                                    continue
-                                cs = str(cell).strip()
-                                if cs.isdigit() and int(cs) < 500 and item_no is None:
-                                    item_no = cs
-                                elif len(cs) > 20 and not self._is_admin_boilerplate(cs) and desc is None:
-                                    if not any(h in cs.lower() for h in ["description of item", "name of work", "sub head"]):
-                                        desc = cs
+                            page_tables.append({
+                                "page": pno + 1,
+                                "headers": tab_df[0],
+                                "rows": tab_df[1:]
+                            })
+                            all_tables.append(tab_df)
+                            self._extract_items_from_table(tab_df, pno + 1, extracted_items)
+                except Exception:
+                    pass
 
-                            if not desc and len(row) >= 2:
-                                r_label = str(row[0]).strip().lower()
-                                if any(lbl in r_label for lbl in ["title", "work description", "item description"]):
-                                    val = str(row[1]).strip() if len(row) > 1 and row[1] else ""
-                                    if len(val) > 15:
-                                        desc = val
+            else:
+                # Scanned page -> Perform efficient OCR
+                ocr_result = self.ocr_engine.extract_text_from_page(page, dpi=150)
+                page_text = ocr_result.get("text", "").strip()
+                raw_full_text[pno] = page_text
 
-                            if desc:
-                                clean_desc = " ".join(desc.split())
-                                source_lbl = f"BoQ Item {item_no}" if item_no else f"Table (Page {pno + 1})"
-                                extracted_items.append({
-                                    "item_number": item_no,
-                                    "source": source_lbl,
-                                    "raw_text": clean_desc,
-                                    "page": pno + 1
-                                })
-            except Exception:
-                pass
+                # Check if OCR table rows were reconstructed
+                table_rows = ocr_result.get("table_rows", [])
+                if len(table_rows) > 1:
+                    page_tables.append({
+                        "page": pno + 1,
+                        "headers": table_rows[0],
+                        "rows": table_rows[1:]
+                    })
+                    all_tables.append(table_rows)
+                    self._extract_items_from_table(table_rows, pno + 1, extracted_items)
 
             pages_data.append({
                 "page_number": pno + 1,
                 "text_length": len(page_text),
                 "has_tables": len(page_tables) > 0,
-                "table_count": len(page_tables)
+                "table_count": len(page_tables),
+                "extraction_mode": page_mode
             })
 
-        full_text = "\n\n".join(raw_full_text)
+        full_text = "\n\n".join([t for t in raw_full_text if t.strip()])
 
         # 3. Extract itemized paragraphs/clauses from text if tables did not yield items
         if not extracted_items:
@@ -327,7 +310,7 @@ class TenderPDFProcessor:
 
         # 4. Fallback: If no structured items detected, partition text into meaningful thematic sections
         if not extracted_items:
-            paras = [p.strip() for p in full_text.split("\n\n") if len(p.strip().split()) >= 4 and not self._is_admin_boilerplate(p)]
+            paras = [p.strip() for p in full_text.split("\n\n") if len(p.strip().split()) >= 5 and not self._is_admin_boilerplate(p)]
             for idx, p in enumerate(paras[:15], start=1):
                 extracted_items.append({
                     "item_number": str(idx),
@@ -336,15 +319,17 @@ class TenderPDFProcessor:
                     "page": 1
                 })
 
-        avg_ocr_conf = round(sum(ocr_confidences) / len(ocr_confidences), 4) if ocr_confidences else 0.0
+        ocr_count = sum(1 for p in pages_data if p["extraction_mode"] == "OCR")
+        digital_count = sum(1 for p in pages_data if p["extraction_mode"] == "DIGITAL")
 
         doc_meta = {
             "total_pages": total_pages,
             "table_count": len(all_tables),
             "extracted_items_count": len(extracted_items),
-            "ocr_engine": "PaddleOCR",
-            "avg_ocr_confidence": avg_ocr_conf,
-            "is_scanned": all(p["text_length"] < 20 for p in pages_data)
+            "is_scanned": ocr_count > 0,
+            "extraction_mode": "DIGITAL" if ocr_count == 0 else ("OCR" if digital_count == 0 else "HYBRID"),
+            "ocr_pages_count": ocr_count,
+            "digital_pages_count": digital_count
         }
 
         doc.close()
@@ -355,3 +340,123 @@ class TenderPDFProcessor:
             "pages": pages_data,
             "extracted_items": extracted_items
         }
+
+    def extract_image(self, image_input: Union[str, bytes], filename: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Parses an uploaded image file (PNG, JPG, JPEG, WEBP, BMP, TIFF) using RapidOCR.
+        Extracts structured text lines, table cells, and discrete technical specifications.
+        """
+        ocr_result = self.ocr_engine.extract_text_from_image(image_input)
+        full_text = ocr_result.get("text", "").strip()
+        table_rows = ocr_result.get("table_rows", [])
+        lines = ocr_result.get("lines", [])
+
+        extracted_items = []
+        all_tables = []
+
+        # 1. Check if structured table rows were reconstructed from OCR bounding boxes
+        if len(table_rows) > 1:
+            all_tables.append(table_rows)
+            self._extract_items_from_table(table_rows, 1, extracted_items)
+
+        # 2. Extract itemized paragraphs/clauses from text if tables did not yield items
+        if not extracted_items and full_text:
+            item_regex = r'(?:(?:Item|Sl\.?\s*No\.?|Clause)\s*\d+[:\.\)]|\b\d+[\.\)]\s+)([A-Z0-9][^\n]+(?:\n(?!\d+[\.\)])[^\n]+){1,3})'
+            matches = re.finditer(item_regex, full_text, re.MULTILINE)
+            for m in matches:
+                item_str = m.group(0).strip()
+                if len(item_str.split()) >= 3 and not self._is_admin_boilerplate(item_str):
+                    extracted_items.append({
+                        "item_number": None,
+                        "source": "Image OCR Item",
+                        "raw_text": " ".join(item_str.split()),
+                        "page": 1
+                    })
+
+        # 3. Fallback: Parse distinct line groups or paragraphs from OCR output
+        if not extracted_items and full_text:
+            # Group lines or split by paragraphs
+            paras = [p.strip() for p in full_text.split("\n\n") if len(p.strip().split()) >= 3 and not self._is_admin_boilerplate(p)]
+            if not paras:
+                paras = [l.strip() for l in full_text.splitlines() if len(l.strip().split()) >= 3 and not self._is_admin_boilerplate(l)]
+
+            for idx, p in enumerate(paras[:15], start=1):
+                extracted_items.append({
+                    "item_number": str(idx),
+                    "source": f"Image Clause {idx}",
+                    "raw_text": " ".join(p.split()),
+                    "page": 1
+                })
+
+        doc_meta = {
+            "file_type": "IMAGE_DOCUMENT",
+            "total_pages": 1,
+            "table_count": len(all_tables),
+            "extracted_items_count": len(extracted_items),
+            "is_scanned": True,
+            "extraction_mode": "OCR",
+            "ocr_confidence": ocr_result.get("confidence", 0.0),
+            "ocr_pages_count": 1,
+            "digital_pages_count": 0
+        }
+
+        pages_data = [{
+            "page_number": 1,
+            "text_length": len(full_text),
+            "has_tables": len(all_tables) > 0,
+            "table_count": len(all_tables),
+            "extraction_mode": "OCR"
+        }]
+
+        return {
+            "metadata": doc_meta,
+            "full_text": full_text[:50000],
+            "pages": pages_data,
+            "extracted_items": extracted_items
+        }
+
+    def _extract_items_from_table(self, tab_df: List[List[Any]], page_no: int, extracted_items: List[Dict[str, Any]]):
+        """Extracts procurement specifications from tabular rows."""
+        for row in tab_df:
+            if not row:
+                continue
+            item_no = None
+            desc = None
+
+            for cell in row:
+                if cell is None:
+                    continue
+                cs = str(cell).strip()
+                if cs.isdigit() and int(cs) < 500 and item_no is None:
+                    item_no = cs
+                elif len(cs) > 15 and not self._is_admin_boilerplate(cs) and desc is None:
+                    if not any(h in cs.lower() for h in ["description of item", "name of work", "sub head"]):
+                        desc = cs
+
+            if not desc and len(row) >= 2:
+                r_label = str(row[0]).strip().lower()
+                if any(lbl in r_label for lbl in ["title", "work description", "item description"]):
+                    val = str(row[1]).strip() if len(row) > 1 and row[1] else ""
+                    if len(val) > 12:
+                        desc = val
+
+            if desc:
+                clean_desc = " ".join(desc.split())
+                # Check if this row is a continuation of the previous item from a split table cell across pages
+                if item_no is None and extracted_items:
+                    last_item = extracted_items[-1]
+                    if last_item.get("item_number") is not None and (
+                        clean_desc[0].islower() or 
+                        last_item["raw_text"].rstrip().endswith(("from", "conforming to", "with", "as per", ":", "IS :", "IS : 1", "derived from", ",", "and", "or")) or
+                        any(clean_desc.startswith(pfx) for pfx in ["natural sources", "Ivory", "matching", "including", "over", "and", "jointing", "in skirting"])
+                    ):
+                        last_item["raw_text"] += " " + clean_desc
+                        continue
+
+                source_lbl = f"BoQ Item {item_no}" if item_no else f"BoQ Item (Page {page_no})"
+                extracted_items.append({
+                    "item_number": item_no,
+                    "source": source_lbl,
+                    "raw_text": clean_desc,
+                    "page": page_no
+                })

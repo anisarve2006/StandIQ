@@ -1,4 +1,5 @@
 
+import { X } from 'lucide-react';
 import { Mono } from './Typography';
 
 export const Toast = ({ variant = 'info', message, onClose, className = '' }: any) => {
@@ -13,7 +14,9 @@ export const Toast = ({ variant = 'info', message, onClose, className = '' }: an
     <div className={`flex items-center justify-between p-4 border rounded-sm shadow-lg max-w-sm w-full ${variants[variant as keyof typeof variants]} ${className}`}>
       <Mono className="text-xs font-medium">{message}</Mono>
       {onClose && (
-        <button onClick={onClose} className="ml-4 opacity-70 hover:opacity-100 focus:outline-none">✕</button>
+        <button onClick={onClose} className="ml-4 opacity-70 hover:opacity-100 focus:outline-none cursor-pointer">
+          <X className="w-3.5 h-3.5" />
+        </button>
       )}
     </div>
   );

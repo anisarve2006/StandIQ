@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # FastAPI AI Retrieval & Verification Engine
+  # -------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: maanakai_backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - APPLICATION_ENV=${APPLICATION_ENV:-PRODUCTION}
+      # Groq Cloud LLM Configuration
+      - USE_GROQ=${USE_GROQ:-false}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
+      # Modal Serverless GPU Configuration
+      - BHARATGPT_MODAL_URL=${BHARATGPT_MODAL_URL:-}
+      # Local Sovereign GGUF Model (if running on high-RAM host)
+      - USE_BHARATGPT=${USE_BHARATGPT:-true}
+      - BHARATGPT_MODEL_PATH=${BHARATGPT_MODEL_PATH:-BharatGPT-3B-Indic.Q8_0.gguf}
+      # Database Configuration
+      - DB_PATH=/app/data/standards.db
+      - DATABASE_URL=${DATABASE_URL:-}
+    volumes:
+      # Mount data folder containing standards.db and QCO master
+      - ./backend/data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # -------------------------------------------------------------
+  # React 19 + Vite Frontend (Served via Nginx)
+  # -------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Empty string defaults to relative '/api' reverse proxy handled by Nginx
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
+    container_name: maanakai_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # -------------------------------------------------------------
+  # Optional: Production PostgreSQL 16 (Activate with: --profile db)
+  # -------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: maanakai_postgres
+    restart: unless-stopped
+    profiles:
+      - db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-maanakai}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/data_pipeline/postgres_schema.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:

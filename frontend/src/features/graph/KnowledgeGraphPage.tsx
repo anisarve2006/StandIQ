@@ -12,7 +12,8 @@ import {
   Shield,
   BookOpen,
   FileCode2,
-  Share2
+  Share2,
+  ShoppingBag
 } from 'lucide-react';
 import { useStandIQ } from '../../stores/standiq.store';
 
@@ -165,7 +166,7 @@ const ALL_NODES: GraphNode[] = [CENTER_NODE, ...SATELLITE_NODES];
 
 export default function KnowledgeGraphPage() {
   const navigate = useNavigate();
-  const { addToBasket, removeFromBasket, isInBasket } = useStandIQ();
+  const { addToBasket, removeFromBasket, isInBasket, activeDocument, basket } = useStandIQ();
   const svgRef = useRef<SVGSVGElement>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -245,11 +246,24 @@ export default function KnowledgeGraphPage() {
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-5">
       {/* 01. Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Standards Relationship Graph</h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Visualize relationships between standards, references and allied documents.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Standards Relationship Graph</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Visualize relationships between standards, references and allied documents.
+          </p>
+        </div>
+
+        {activeDocument && (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-1.5 flex items-center gap-2 text-xs self-start sm:self-auto shrink-0">
+            <span className="font-semibold text-slate-500 whitespace-nowrap">Active Tender:</span>
+            <span className="font-mono font-bold text-slate-800 truncate max-w-xs">{activeDocument.title}</span>
+            <span className="font-mono bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-700 text-[11px] whitespace-nowrap inline-flex items-center gap-1">
+              <ShoppingBag className="w-3 h-3 text-slate-500 shrink-0" />
+              <span>{basket.length}</span>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 02. Top Control Filter Bar */}
@@ -706,18 +720,18 @@ export default function KnowledgeGraphPage() {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 onClick={() => navigate(`/standards/${selectedNode.code}`)}
-                className="py-2 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="py-2 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
               >
-                <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-                <span>Open Standard</span>
+                <BookOpen className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="whitespace-nowrap">Open Standard</span>
               </button>
 
               <button
                 onClick={() => navigate('/specification-builder')}
-                className="py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
               >
-                <FileCode2 className="w-3.5 h-3.5 text-slate-400" />
-                <span>Use in Spec</span>
+                <FileCode2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="whitespace-nowrap">Use in Spec</span>
               </button>
             </div>
           </div>

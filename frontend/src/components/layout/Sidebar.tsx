@@ -88,11 +88,11 @@ export function Sidebar() {
                       {item.num}
                     </span>
                     <Icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
-                    <span className="truncate">{t(item.key) || item.defaultLabel}</span>
+                    <span className="truncate whitespace-nowrap">{t(item.key) || item.defaultLabel}</span>
                   </div>
 
                   {badgeCount > 0 && (
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full min-w-4 text-center ${
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full min-w-4 text-center shrink-0 whitespace-nowrap ${
                       isActive 
                         ? 'bg-blue-600 text-white' 
                         : item.badgeKey === 'alerts' 

@@ -4,9 +4,12 @@ import {
   Send, 
   CheckCircle2, 
   Clock, 
-  Check
+  Check,
+  Download,
+  ShieldCheck
 } from 'lucide-react';
 import { useStandIQ } from '../../stores/standiq.store';
+import { exportDocumentToPdf } from '../../services/pdfExport';
 
 interface AuditItem {
   id: string;
@@ -26,7 +29,7 @@ const AUDIT_STEPS: AuditItem[] = [
     action: 'Created procurement draft & linked IS 12615:2018',
     status: 'Completed',
     date: '24 Sep 2026, 10:30 AM',
-    comment: 'All 5 recommended BIS standards incorporated with IE3 performance requirements.'
+    comment: 'All recommended BIS standards incorporated with IE3 performance requirements.'
   },
   {
     id: '2',
@@ -42,8 +45,9 @@ const AUDIT_STEPS: AuditItem[] = [
     author: 'Compliance Team',
     role: 'Quality & Regulatory Inspector',
     action: 'Reviewing for BIS CRS certification requirements',
-    status: 'Pending',
-    date: 'Under Review'
+    status: 'Completed',
+    date: '26 Sep 2026, 11:20 AM',
+    comment: 'BIS license validity verified against online directory.'
   },
   {
     id: '4',
@@ -51,17 +55,24 @@ const AUDIT_STEPS: AuditItem[] = [
     role: 'Sanctioning Authority',
     action: 'Final tender approval & publication sanction',
     status: 'Pending',
-    date: 'Awaiting Compliance'
+    date: 'Awaiting Final Sign-Off'
   }
 ];
 
 export default function ApprovalPage() {
   const navigate = useNavigate();
-  const { user } = useStandIQ();
+  const { user, activeDocument, basket } = useStandIQ();
 
   const [commentText, setCommentText] = useState('');
   const [auditFeed, setAuditFeed] = useState<AuditItem[]>(AUDIT_STEPS);
   const [submitted, setSubmitted] = useState(false);
+  const [approvedByAuthority, setApprovedByAuthority] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const handlePostComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +82,7 @@ export default function ApprovalPage() {
       id: Date.now().toString(),
       author: `${user.name} Sarve`,
       role: user.role,
-      action: 'Added comment',
+      action: 'Added review note',
       status: 'Completed',
       date: 'Just now',
       comment: commentText.trim()
@@ -79,34 +90,106 @@ export default function ApprovalPage() {
 
     setAuditFeed([...auditFeed, newEntry]);
     setCommentText('');
+    showToast('Compliance audit note posted.');
   };
 
   const handleSendApproval = () => {
     setSubmitted(true);
+    showToast('Tender package dispatched to Sanctioning Authority.');
     setTimeout(() => {
       navigate('/export');
     }, 1200);
   };
 
+  const handleDirectSignOff = () => {
+    setApprovedByAuthority(true);
+    const signEntry: AuditItem = {
+      id: Date.now().toString(),
+      author: `${user.name} (Acting Sanction Authority)`,
+      role: 'Sanctioning Officer',
+      action: 'Granted Final Publication Sanction',
+      status: 'Completed',
+      date: 'Just now',
+      comment: 'Official approval granted. Technical requirements and BIS compliance verified.'
+    };
+    setAuditFeed(prev => [...prev.slice(0, 3), signEntry]);
+    showToast('Tender formally sanctioned! Ready for publication.');
+  };
+
+  const handleExportPdf = () => {
+    if (activeDocument) {
+      exportDocumentToPdf(activeDocument, basket);
+      showToast('Exporting tender approval report PDF...');
+    } else {
+      showToast('Please select a tender document to export.');
+    }
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2.5 text-xs font-semibold animate-in slide-in-from-bottom-2">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* 01. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Approval Workflow</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Approval Workflow & Sign-Off</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Track approval status and manage reviews.
+            Track multi-tier procurement approvals, record compliance notes, and finalize tender sanctions.
           </p>
         </div>
 
-        <button
-          onClick={handleSendApproval}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm self-start sm:self-auto"
-        >
-          {submitted ? <Check className="w-4 h-4 stroke-[2.5]" /> : <Send className="w-4 h-4" />}
-          <span>{submitted ? 'Sent for Approval!' : 'Send for Approval'}</span>
-        </button>
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <button
+            onClick={handleExportPdf}
+            className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-2xs text-xs cursor-pointer transition-colors"
+          >
+            <Download className="w-4 h-4 text-slate-500" />
+            <span>Export Report</span>
+          </button>
+
+          {!approvedByAuthority ? (
+            <button
+              onClick={handleDirectSignOff}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs cursor-pointer"
+            >
+              <ShieldCheck className="w-4 h-4 stroke-[2.2]" />
+              <span>Sanction Approval</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleSendApproval}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs cursor-pointer"
+            >
+              {submitted ? <Check className="w-4 h-4 stroke-[2.5]" /> : <Send className="w-4 h-4" />}
+              <span>{submitted ? 'Sent to Export!' : 'Proceed to Export'}</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Tender Header Card */}
+      {activeDocument && (
+        <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div>
+            <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Target Procurement</span>
+            <span className="font-bold text-slate-900 text-sm">{activeDocument.title}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="font-mono bg-white px-2.5 py-1 rounded border border-amber-200 text-amber-900 font-semibold">
+              Compliance Score: {activeDocument.auditSummary?.complianceScore ?? 94}%
+            </span>
+            <span className="font-mono bg-white px-2.5 py-1 rounded border border-amber-200 text-amber-900 font-semibold">
+              Standards: {basket.length}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* 02. Status Pipeline Stepper */}
       <div className="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs">

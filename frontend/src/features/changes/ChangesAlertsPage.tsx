@@ -152,11 +152,18 @@ export default function ChangesAlertsPage() {
                 </span>
                 <span className="font-mono text-[11px] text-slate-400">{formatDate(item.date)}</span>
                 {item.unread && (
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+                  <span className="w-2 h-2 rounded-full bg-blue-600" title="Unread alert" />
                 )}
               </div>
 
-              <h2 className="text-sm font-bold text-slate-900 hover:text-blue-600 transition-colors">
+              <h2 
+                onClick={() => {
+                  if (item.standardCode) {
+                    navigate(`/standards/${encodeURIComponent(item.standardCode)}`);
+                  }
+                }}
+                className={`text-sm font-bold text-slate-900 transition-colors ${item.standardCode ? 'hover:text-blue-600 cursor-pointer' : ''}`}
+              >
                 {item.title}
               </h2>
 
@@ -166,19 +173,28 @@ export default function ChangesAlertsPage() {
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+              <button
+                onClick={() => {
+                  setAlerts(prev => prev.map(a => a.id === item.id ? { ...a, unread: !a.unread } : a));
+                }}
+                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                title="Toggle Read/Unread"
+              >
+                {item.unread ? 'Mark read' : 'Unread'}
+              </button>
               {item.standardCode && (
                 <button
-                  onClick={() => navigate('/standards')}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 transition-colors"
+                  onClick={() => navigate(`/standards/${encodeURIComponent(item.standardCode || '')}`)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Inspect</span>
+                  <span>Inspect Standard</span>
                 </button>
               )}
               <button
                 onClick={() => navigate('/tender-health')}
-                className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-50 transition-colors"
-                title="View Impact"
+                className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                title="View Impact in Tender Health"
               >
                 <ExternalLink className="w-4 h-4" />
               </button>

@@ -35,6 +35,9 @@ from retrieval.evidence_pack import EvidencePackBuilder
 from retrieval.verification_kernel import VerificationKernel
 from retrieval.pdf_processor import TenderPDFProcessor
 from retrieval.excel_processor import tender_excel_processor
+from services.cache_service import query_cache
+from services.circuit_breaker import bharatgpt_circuit_breaker
+from services.metrics_service import metrics_collector
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 SQLITE_DB = os.path.join(DATA_DIR, "standards.db")
@@ -182,27 +185,25 @@ class StandardsRecommenderEngine:
             logger.warning(f"BharatGPT clause drafting failed, falling back to deterministic: {e}")
             return self.generate_tender_clause_deterministic(evidence_pack)
 
-    def recommend(self, query_text: str, top_candidates: int = 5) -> Dict[str, Any]:
+    def recommend(self, query_text: str, top_candidates: int = 5, use_cache: bool = True) -> Dict[str, Any]:
         """
         End-to-End Orchestration Pipeline.
         Returns complete verified recommendation object with sub-millisecond audit metrics.
+        Integrated with multi-tier LRU caching and observability metrics.
         """
         t0 = time.time()
         timings = {}
 
-        cache_key = (self.db_path, query_text.strip(), top_candidates)
-        with self._recommend_cache_lock:
-            if cache_key in self._recommend_cache:
-                cached = copy.deepcopy(self._recommend_cache[cache_key])
-                cached["total_time_ms"] = round((time.time() - t0) * 1000, 2)
-                return cached
-
-        def _return_cached(res: Dict[str, Any]) -> Dict[str, Any]:
-            with self._recommend_cache_lock:
-                if len(self._recommend_cache) >= self._max_cache_size:
-                    self._recommend_cache.pop(next(iter(self._recommend_cache)))
-                self._recommend_cache[cache_key] = copy.deepcopy(res)
-            return res
+        # 0. Check Multi-Tier LRU Query Cache (Sub-millisecond retrieval)
+        if use_cache:
+            cached_result = query_cache.get(query_text, {"top_candidates": top_candidates})
+            if cached_result is not None:
+                cached_copy = dict(cached_result)
+                cached_copy["is_cached"] = True
+                total_ms = round((time.time() - t0) * 1000, 2)
+                cached_copy["total_time_ms"] = total_ms
+                metrics_collector.record_request(total_ms, is_cached=True)
+                return cached_copy
 
         # Multi-Clause Specification / Schedule of Requirements Handling
         clause_pattern = r'(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+(?:\n(?!\s*\d+[\.\)]\s+)[^\n]+)*)'
@@ -588,8 +589,12 @@ class StandardsRecommenderEngine:
                 "confidence_label": alt["constraint_result"]["confidence_vector"]["confidence_label"]
             })
 
-        return _return_cached({
+        total_time_ms = round((time.time() - t0) * 1000, 2)
+        timings["total_pipeline_ms"] = total_time_ms
+
+        response_payload = {
             "status": "SUCCESS",
+            "is_cached": False,
             "query": query_text,
             "evidence_pack": evidence_pack,
             "primary_recommendation": {
@@ -618,9 +623,15 @@ class StandardsRecommenderEngine:
                 "violations": verification_report["violations"]
             },
             "alternative_candidates": alternatives,
-            "arbitration_audit": arbitration_audit,
+            "total_time_ms": total_time_ms,
             "latency_breakdown_ms": timings
         })
+
+        if use_cache:
+            query_cache.put(query_text, response_payload, {"top_candidates": top_candidates})
+        metrics_collector.record_request(total_time_ms, is_cached=False)
+
+        return response_payload
 
     def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3, filename: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -636,13 +647,15 @@ class StandardsRecommenderEngine:
         is_text = False
         is_image = False
         
+        image_extensions = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff', '.tif')
+
         if filename:
             fn_lower = filename.lower()
             if fn_lower.endswith(('.xls', '.xlsx', '.csv')):
                 is_excel = True
             elif fn_lower.endswith(('.txt', '.log', '.json')):
                 is_text = True
-            elif fn_lower.endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.webp')):
+            elif fn_lower.endswith(image_extensions):
                 is_image = True
         
         if isinstance(pdf_input, str):
@@ -650,17 +663,19 @@ class StandardsRecommenderEngine:
                 is_excel = True
             elif pdf_input.lower().endswith(('.txt', '.log', '.json')):
                 is_text = True
-            elif pdf_input.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.webp')):
+            elif pdf_input.lower().endswith(image_extensions):
                 is_image = True
         elif isinstance(pdf_input, bytes):
             if pdf_input.startswith(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1') or pdf_input.startswith(b'PK\x03\x04'):
                 is_excel = True
-            elif (pdf_input.startswith(b'\x89PNG\r\n\x1a\n') or 
-                  pdf_input.startswith(b'\xff\xd8\xff') or 
-                  pdf_input.startswith(b'RIFF') or 
-                  pdf_input.startswith(b'II*\x00') or 
-                  pdf_input.startswith(b'MM\x00*') or
-                  pdf_input.startswith(b'BM')):
+            elif (
+                pdf_input.startswith(b'\x89PNG\r\n\x1a\n') or
+                pdf_input.startswith(b'\xff\xd8\xff') or
+                pdf_input.startswith(b'RIFF') and b'WEBP' in pdf_input[:14] or
+                pdf_input.startswith(b'BM') or
+                pdf_input.startswith(b'II*\x00') or
+                pdf_input.startswith(b'MM\x00*')
+            ):
                 is_image = True
             elif not pdf_input.startswith(b'%PDF'):
                 # Try decoding as text
@@ -674,6 +689,8 @@ class StandardsRecommenderEngine:
             doc_parsed = self.pdf_processor.extract_image_document(pdf_input)
         elif is_excel:
             doc_parsed = self.excel_processor.extract_document(pdf_input, filename=filename)
+        elif is_image:
+            doc_parsed = self.pdf_processor.extract_image(pdf_input, filename=filename)
         elif is_text:
             text = pdf_input.decode('utf-8', errors='ignore') if isinstance(pdf_input, bytes) else pdf_input
             lines = [l.strip() for l in text.split('\n') if len(l.strip()) > 5]
@@ -688,7 +705,7 @@ class StandardsRecommenderEngine:
                     "category": "Specification Clause"
                 })
             doc_parsed = {
-                "metadata": {"file_type": "TEXT_DOCUMENT", "total_rows": len(lines), "extracted_items_count": len(extracted)},
+                "metadata": {"file_type": "TEXT_DOCUMENT", "total_rows": len(lines), "extracted_items_count": len(extracted), "extraction_mode": "DIGITAL", "is_scanned": False},
                 "extracted_items": extracted
             }
         else:

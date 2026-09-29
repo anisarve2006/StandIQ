@@ -22,7 +22,13 @@ from services.tender_diff_service import TenderDiffService
 from services.specification_service import SpecificationService
 from services.procurement_session_service import ProcurementSessionService
 from services.export_service import ExportService
+
+from services.feedback_service import feedback_service, FeedbackSubmission
+from services.metrics_service import metrics_collector
+from services.cache_service import query_cache
+
 from services.completeness_service import CompletenessService
+
 from repositories.standard_repository import SQLiteStandardRepository
 
 from repositories.regulatory_repository import SQLiteRegulatoryRepository
@@ -345,22 +351,29 @@ def get_standard_details(family_id: str):
 @app.post("/api/v1/recommend/document", tags=["Retrieval & Standards Intelligence"])
 async def recommend_pdf_endpoint(
     file: UploadFile = File(..., description="Government Tender / BoQ document (PDF, Excel, CSV, TXT)"),
-    max_items: Optional[int] = 15,
+    max_items: Optional[int] = 60,
     top_candidates: Optional[int] = 3
 ):
     """
-    Tender Document Upload & Analysis Endpoint:
-    Upload an entire tender document (BoQ, Schedule of Requirements, Technical Specs).
-    Supports PDF (.pdf), Images (.png, .jpg, .jpeg, .tiff, .bmp, .webp), Excel (.xls, .xlsx), CSV (.csv), and Plain Text (.txt).
-    Extracts tables and itemized specifications via native PyMuPDF and Sovereign PaddleOCR,
-    maps applicable Indian Standards, audits compulsory QCO compliance, and generates a consolidated compliance matrix.
+
+    Tender Document & Image Upload & Analysis Endpoint:
+    Upload an entire tender document (BoQ, Schedule of Requirements, Technical Specs) or specification image.
+    Supports PDF (.pdf, with auto-detection for digital vs scanned OCR), Images (.png, .jpg, .jpeg, .webp, .bmp, .tiff),
+    Excel (.xls, .xlsx), CSV (.csv), Plain Text (.txt), and Word (.docx).
+    Extracts tables and itemized specifications, maps applicable Indian Standards,
+    audits compulsory QCO compliance, and generates a consolidated compliance matrix.
     """
-    allowed_exts = (".pdf", ".xls", ".xlsx", ".csv", ".txt", ".docx", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp")
+    allowed_exts = (
+        ".pdf", ".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".tif",
+        ".xls", ".xlsx", ".csv", ".txt", ".docx"
+    )
+
+  
     fname_lower = (file.filename or "").lower()
     if not any(fname_lower.endswith(ext) for ext in allowed_exts):
         raise HTTPException(
             status_code=400, 
-            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Images (.png, .jpg, .jpeg, .tiff, .bmp, .webp), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
+            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Images (.png, .jpg, .jpeg, .webp), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
         )
 
     file_bytes = await file.read()
@@ -582,6 +595,52 @@ def remove_standard_from_basket(session_id: str, family_id: str):
     session.selected_standards = [s for s in session.selected_standards if s.get("family_id") != family_id and s.get("raw_id") != family_id]
     session_repo.update(session)
     return session
+
+# ==========================================
+# SYSTEM DESIGN & OBSERVABILITY ENDPOINTS
+# ==========================================
+
+@app.post("/api/v1/feedback")
+def submit_procurement_feedback(submission: FeedbackSubmission):
+    """
+    Active Learning Feedback Endpoint.
+    Records procurement officer acceptance/corrections and dynamically adapts SQLite alias catalog.
+    """
+    res = feedback_service.record_feedback(submission)
+    if res.get("status") == "ERROR":
+        raise HTTPException(status_code=500, detail=res.get("message"))
+    return res
+
+@app.get("/api/v1/system/metrics")
+def get_system_telemetry_metrics():
+    """
+    SRE Telemetry & System Design Observability Endpoint.
+    Returns P50/P90/P99 latencies, cache hit ratio, circuit breaker status, and DB health.
+    """
+    return metrics_collector.get_summary()
+
+@app.post("/api/v1/system/cache/clear")
+def clear_query_cache():
+    """
+    Invalidates the entire LRU query cache.
+    """
+    query_cache.invalidate()
+    return {"status": "SUCCESS", "message": "Query LRU cache successfully invalidated."}
+
+@app.get("/api/v1/system/health")
+def get_system_health():
+    """
+    Comprehensive System Health Check with Circuit Breaker and Resource Status.
+    """
+    metrics = metrics_collector.get_summary()
+    return {
+        "status": "HEALTHY",
+        "engine": "StandardsRecommenderEngine v3.0",
+        "sovereign_llm_state": metrics["circuit_breaker"]["state"],
+        "cache_size": metrics["cache"]["size"],
+        "uptime_seconds": metrics["uptime_seconds"],
+        "database": metrics["database_health"]
+    }
 
 # Python direct callables for internal scripts / teammates
 def recommend_standards(query_text: str, top_candidates: int = 5) -> Dict[str, Any]:

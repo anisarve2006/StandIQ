@@ -183,7 +183,7 @@ export default function StandardDetailPage() {
         <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 shrink-0">
           <button
             onClick={handleToggleBasket}
-            className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer ${
+            className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0 ${
               inBasket
                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
@@ -191,37 +191,37 @@ export default function StandardDetailPage() {
           >
             {inBasket ? (
               <>
-                <Check className="w-4 h-4 stroke-[2.5]" />
-                <span>In Standards Basket</span>
+                <Check className="w-4 h-4 stroke-[2.5] shrink-0" />
+                <span className="whitespace-nowrap">In Standards Basket</span>
               </>
             ) : (
               <>
-                <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span>Add to Basket</span>
+                <Plus className="w-4 h-4 stroke-[2.5] shrink-0" />
+                <span className="whitespace-nowrap">Add to Basket</span>
               </>
             )}
           </button>
 
           <button
             onClick={() => navigate('/graph')}
-            className="px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
-            <Share2 className="w-4 h-4 text-slate-400" />
-            <span>View Knowledge Graph</span>
+            <Share2 className="w-4 h-4 text-slate-400 shrink-0" />
+            <span className="whitespace-nowrap">View Knowledge Graph</span>
           </button>
 
           <button
             onClick={() => navigate('/specification-builder')}
-            className="px-5 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
-            <FileText className="w-4 h-4 text-slate-400" />
-            <span>Use in Specification</span>
+            <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+            <span className="whitespace-nowrap">Use in Specification</span>
           </button>
         </div>
       </div>
 
       {/* 03. Navigation Tabs */}
-      <div className="flex items-center gap-1 border-b border-slate-200 text-xs font-semibold">
+      <div className="flex items-center gap-1 border-b border-slate-200 text-xs font-semibold overflow-x-auto pb-0.5 scrollbar-none">
         {[
           { key: 'overview', label: 'Overview & Scope' },
           { key: 'clauses', label: 'Key Clauses', count: details.keyClauses.length },
@@ -231,15 +231,15 @@ export default function StandardDetailPage() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as any)}
-            className={`pb-3 pt-1 px-4 border-b-2 transition-colors flex items-center gap-1.5 cursor-pointer ${
+            className={`pb-3 pt-1 px-4 border-b-2 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === tab.key
                 ? 'border-blue-600 text-blue-600 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            <span>{tab.label}</span>
+            <span className="whitespace-nowrap">{tab.label}</span>
             {tab.count !== undefined && (
-              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full whitespace-nowrap shrink-0 ${
                 activeTab === tab.key ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
               }`}>
                 {tab.count}

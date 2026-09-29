@@ -22,9 +22,7 @@ class Settings:
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     use_bharatgpt: bool = os.getenv("USE_BHARATGPT", "true").lower() == "true"
     bharatgpt_model_path: str = os.getenv("BHARATGPT_MODEL_PATH", "BharatGPT-3B-Indic.Q8_0.gguf")
-    
-    # Engine & SQLite Tuning
-    sqlite_busy_timeout_ms: int = int(os.getenv("SQLITE_BUSY_TIMEOUT_MS", "10000"))
-    cache_max_size: int = int(os.getenv("CACHE_MAX_SIZE", "512"))
+    bharatgpt_modal_url: str = os.getenv("BHARATGPT_MODAL_URL", "")
 
 settings = Settings()
+

@@ -1,0 +1,189 @@
+{
+  "version": "1.0.0",
+  "description": "StandIQ Declarative Domain Rulebook - Governs Late-Interaction Reranking & Disambiguation",
+  "last_updated": "2026-09-27",
+  "rules": [
+    {
+      "id": "ROLE_TEST_METHOD_SIEVE",
+      "category": "DOCUMENT_ROLE",
+      "rationale": "Prevents role inversion: queries requesting material testing must prioritize test method standards over pure product specifications",
+      "query_triggers": ["testing of", "method of test", "laboratory test", "field test", "compressive strength", "test report"],
+      "promoted_patterns": ["method of test", "methods of testing", "methods of physical tests", "sampling and test"],
+      "demoted_patterns": ["specification for", "specification"],
+      "boost": 0.40,
+      "penalty": -0.40
+    },
+    {
+      "id": "ROLE_EXECUTION_MEASUREMENT",
+      "category": "DOCUMENT_ROLE",
+      "rationale": "Queries requesting civil work execution or filling must prioritize measurement/execution codes over pure soil testing or safety codes",
+      "query_triggers": ["excavation", "plinth filling", "earthwork", "trench"],
+      "primary_standards": ["1200"],
+      "secondary_safety_standards": ["3764"],
+      "secondary_test_standards": ["2720"],
+      "primary_boost": 0.35,
+      "safety_penalty": -0.20,
+      "test_penalty": -0.35
+    },
+    {
+      "id": "CONSTITUENT_CONCRETE_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For structural concrete mixes and elements (column, beam, slab, footing, retaining wall), IS 456 is the governing primary code of practice; rebar (IS 16651/IS 18256) and aggregates (IS 383) are allied constituents",
+      "query_triggers": ["m-10", "m-15", "m-20", "m-25", "m-30", "rcc", "plain concrete", "cement concrete", "column", "beam", "slab", "footing", "retaining wall", "staircase", "pcc"],
+      "primary_standards": ["456"],
+      "allied_standards": ["383"],
+      "disqualified_unrequested_standards": ["16651", "18256"],
+      "primary_boost": 0.45,
+      "allied_penalty": -0.25,
+      "disqualification_penalty": -0.85
+    },
+    {
+      "id": "PRESTRESSED_CONCRETE_RULE",
+      "category": "STRUCTURAL_CODE",
+      "rationale": "For prestressed concrete works, IS 1343 is the governing code of practice",
+      "query_triggers": ["prestressed concrete", "prestress"],
+      "primary_standards": ["1343"],
+      "primary_boost": 0.60
+    },
+    {
+      "id": "SHOTCRETE_RULE",
+      "category": "STRUCTURAL_CODE",
+      "rationale": "For shotcrete and sprayed concrete works, IS 9012 is the governing code of practice",
+      "query_triggers": ["shotcrete", "gunite", "sprayed concrete"],
+      "primary_standards": ["9012"],
+      "primary_boost": 0.65
+    },
+    {
+      "id": "ROAD_BITUMINOUS_PAVEMENT_RULE",
+      "category": "HIGHWAY_INFRASTRUCTURE",
+      "rationale": "For bituminous macadam and asphalt road layers, paving bitumen conforms to IS 73 (QCO Mandatory) under MoRTH/IRC specifications",
+      "query_triggers": ["bituminous macadam", "dense bituminous macadam", "bituminous concrete", "dbm"],
+      "primary_standards": ["73"],
+      "primary_boost": 0.50
+    },
+    {
+      "id": "ROAD_EMULSION_RULE",
+      "category": "HIGHWAY_INFRASTRUCTURE",
+      "rationale": "For prime coat and tack coat, cationic bitumen emulsion conforms to IS 8887 under MoRTH specifications",
+      "query_triggers": ["prime coat", "tack coat"],
+      "primary_standards": ["8887"],
+      "primary_boost": 0.55
+    },
+    {
+      "id": "CONSTITUENT_PLASTER_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For plastering and rendering, IS 1661/IS 2402 are governing work codes; mortar (IS 2250) is an allied constituent",
+      "query_triggers": ["plastering", "rendering", "cement plaster", "external plaster"],
+      "primary_standards": ["1661", "2402"],
+      "allied_standards": ["2250"],
+      "primary_boost": 0.40,
+      "allied_penalty": -0.25
+    },
+    {
+      "id": "CONSTITUENT_BRICKWORK_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For brick masonry construction, IS 2212 is the governing code of practice; mortar (IS 2250) is an allied constituent",
+      "query_triggers": ["brickwork", "brick masonry", "laying bricks"],
+      "primary_standards": ["2212"],
+      "allied_standards": ["2250"],
+      "primary_boost": 0.40,
+      "allied_penalty": -0.25
+    },
+    {
+      "id": "CONSTITUENT_TILE_HIERARCHY",
+      "category": "MATERIAL_HIERARCHY",
+      "rationale": "For floor and wall tiles, IS 15622 is the primary product standard; fixing mortar (IS 2250) is an allied constituent",
+      "query_triggers": ["vitrified", "ceramic tile", "flooring tile", "glazed tile"],
+      "primary_standards": ["15622"],
+      "allied_standards": ["2250"],
+      "primary_boost": 0.35,
+      "allied_penalty": -0.45
+    },
+    {
+      "id": "CONTRADICTION_PVC_VS_XLPE",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Hard material contradiction: PVC cable specifications must strictly disqualify XLPE (IS 7098) insulation",
+      "query_triggers": ["pvc cable", "pvc insulated"],
+      "conflicting_terms": ["thermosetting", "cross-linked", "crosslinked", "xlpe"],
+      "disqualification_penalty": -0.85
+    },
+    {
+      "id": "CONTRADICTION_PIPE_VS_FITTINGS",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Component mismatch: CPVC pipe specifications must favor pipes (IS 15778) and demote fittings (IS 17546)",
+      "query_triggers": ["cpvc pipe", "cpvc pipes"],
+      "promoted_standards": ["15778"],
+      "demoted_standards": ["17546"],
+      "boost": 0.40,
+      "penalty": -0.65
+    },
+    {
+      "id": "CONTRADICTION_GI_PLUMBING_VS_MAINS",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Scope mismatch: Domestic GI plumbing must favor IS 1239:P1 over large cross-country transmission mains (IS 3589)",
+      "query_triggers": ["gi pipe", "galvanized iron pipe", "gi water supply"],
+      "promoted_standards": ["1239"],
+      "demoted_standards": ["3589"],
+      "boost": 0.45,
+      "penalty": -0.35
+    },
+    {
+      "id": "CONTRADICTION_DRY_VS_WET_DISTEMPER",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Product mismatch: Dry distemper (IS 427) must not be confused with washable distemper (IS 428)",
+      "query_triggers": ["dry distemper"],
+      "promoted_standards": ["427"],
+      "demoted_standards": ["428"],
+      "boost": 0.45,
+      "penalty": -0.50
+    },
+    {
+      "id": "CONTRADICTION_DIGITAL_VS_MERCURY_THERMOMETER",
+      "category": "HARD_CONTRADICTION",
+      "rationale": "Technology mismatch: Digital clinical thermometers (IS 15113) must not be confused with mercury-in-glass (IS 3055)",
+      "query_triggers": ["digital thermometer", "clinical digital thermometer"],
+      "promoted_standards": ["15113"],
+      "demoted_standards": ["3055"],
+      "boost": 0.45,
+      "penalty": -0.50
+    },
+    {
+      "id": "FIRE_PROTECTION_EQUIPMENT_RULES",
+      "category": "FIRE_SAFETY_HIERARCHY",
+      "rationale": "Fire protection specifications must strictly differentiate between delivery hoses (IS 636 - QCO), first-aid hose reels (IS 884 - QCO), pumps (IS 12469), landing valves (IS 5290), and wet/dry risers (IS 3844)",
+      "query_triggers": ["fire pump", "fire hose", "landing valve", "wet riser", "dry riser"],
+      "primary_standards": ["12469", "636", "5290", "3844"],
+      "primary_boost": 0.55
+    },
+    {
+      "id": "HVAC_VENTILATION_FAN_RULES",
+      "category": "HVAC_MEP_HIERARCHY",
+      "rationale": "Ventilation fans must resolve to IS 4894 (centrifugal) or IS 3588 (axial) and disqualify adhesives (IS 17917) and regulators (IS 11037)",
+      "query_triggers": ["ventilation fan", "centrifugal fan", "axial flow", "smoke extraction"],
+      "primary_standards": ["4894", "3588"],
+      "demoted_standards": ["17917", "11037"],
+      "primary_boost": 0.55,
+      "penalty": -0.75
+    },
+    {
+      "id": "HVAC_CHILLER_AHU_RULES",
+      "category": "HVAC_MEP_HIERARCHY",
+      "rationale": "Chillers must resolve to IS 16590 (liquid chilling units), and AHU / VRF systems must resolve to IS 8148 / IS 1391 without confusing air cargo ground equipment (IS 11436)",
+      "query_triggers": ["chiller", "chilled water", "air handling unit", "ahu", "vrf"],
+      "primary_standards": ["16590", "8148", "1391"],
+      "demoted_standards": ["10470", "11436"],
+      "primary_boost": 0.55,
+      "penalty": -0.80
+    },
+    {
+      "id": "ELECTROTECHNICAL_EQUIPMENT_RULES",
+      "category": "ELECTROTECHNICAL_HIERARCHY",
+      "rationale": "Electrical wiring, cables, switchgear, conduits, earthing, and distribution boards must resolve to primary Electrotechnical standards and strictly disqualify civil rebar steel (IS 16651/IS 1786) and wooden doors (IS 2202)",
+      "query_triggers": ["wire", "cable", "conduit", "switch", "socket", "breaker", "fuse", "earthing", "busbar", "tray", "mccb", "rccb", "rcbo", "mcb"],
+      "primary_standards": ["694", "7098", "1554", "9537", "3854", "1293", "60947", "12640", "13703", "8623", "13032", "3043", "2309"],
+      "demoted_standards": ["16651", "1786", "18256", "2202", "11654", "16098"],
+      "primary_boost": 0.65,
+      "penalty": -0.85
+    }
+  ]
+}
