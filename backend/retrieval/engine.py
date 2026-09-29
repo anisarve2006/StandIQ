@@ -523,8 +523,8 @@ class StandardsRecommenderEngine:
             else:
                 rejected_candidates.append(cand_copy)
 
-        # Only pass compatible candidates to reranking; fallback only if empty
-        candidates_for_rerank = compatible_candidates if compatible_candidates else initial_candidates
+        # Only pass compatible candidates to reranking; fallback to rejected (annotated) only if empty
+        candidates_for_rerank = compatible_candidates if compatible_candidates else (rejected_candidates if rejected_candidates else initial_candidates)
         timings["constraint_verification_ms"] = round((time.time() - t_const) * 1000, 2)
 
         # 4. Late-Interaction ColBERT-style Reranking
@@ -539,15 +539,18 @@ class StandardsRecommenderEngine:
         if len(candidates_to_use) >= 2 and self.bharatgpt and self.bharatgpt.is_available():
             score_1 = candidates_to_use[0].get("late_interaction_score", 1.0)
             score_2 = candidates_to_use[1].get("late_interaction_score", 0.0)
-            # If candidates are in close contention (within 8% score delta) and not an exact match
-            if abs(score_1 - score_2) <= 0.08 and candidates_to_use[0].get("source_channel") != "EXACT_ID":
+            # If candidates are in close contention (within 8% score delta) and not an exact/trade match
+            src_ch = candidates_to_use[0].get("source_channel")
+            if abs(score_1 - score_2) <= 0.08 and src_ch not in ["EXACT_ID", "TRADE_LEXICON"]:
                 t_judge = time.time()
                 arb_result = self.bharatgpt.arbitrate_candidates(query_text, candidates_to_use[:3])
                 if arb_result:
                     arbitration_audit = arb_result
                     chosen = arb_result["chosen_candidate"]
-                    if chosen["family_id"] != candidates_to_use[0]["family_id"]:
-                        candidates_to_use = [chosen] + [c for c in candidates_to_use if c["family_id"] != chosen["family_id"]]
+                    chosen_fid = chosen.get("family_id")
+                    matched_cand = next((c for c in candidates_to_use if c["family_id"] == chosen_fid), chosen)
+                    if matched_cand["family_id"] != candidates_to_use[0]["family_id"]:
+                        candidates_to_use = [matched_cand] + [c for c in candidates_to_use if c["family_id"] != matched_cand["family_id"]]
                 timings["bharatgpt_judge_ms"] = round((time.time() - t_judge) * 1000, 2)
 
         # Primary Standard selection
@@ -577,7 +580,7 @@ class StandardsRecommenderEngine:
             primary_standard=primary_candidate,
             allied_standards=completeness_res["allied_standards"],
             certification_info=graph_data["certification"],
-            constraint_results=primary_candidate["constraint_result"],
+            constraint_results=primary_candidate.get("constraint_result", {}),
             coverage_info=completeness_res["final_coverage"]
         )
         timings["evidence_pack_ms"] = round((time.time() - t_pack) * 1000, 2)

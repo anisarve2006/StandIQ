@@ -345,6 +345,8 @@ def healthcheck():
     conn.close()
 
     from services.bharatgpt_service import bharatgpt_engine
+    from repositories.qdrant_vector_store import qdrant_store
+    from repositories.neo4j_graph_repository import neo4j_repository
 
     return {
         "status": "HEALTHY",
@@ -354,13 +356,15 @@ def healthcheck():
             "compulsory_qco_rules": cert_cnt,
             "allied_graph_edges": edge_cnt
         },
+        "vector_store": qdrant_store.get_status(),
+        "graph_store": neo4j_repository.get_status(),
         "sqlite_concurrency": {
             "journal_mode": wal_status,
             "busy_timeout_ms": 10000,
             "cache_size_kb": 64000
         },
         "zero_hallucination_kernel": "ACTIVE",
-        "embedding_runtime": "ONNX FastEmbed CPU",
+        "embedding_runtime": "ONNX FastEmbed CPU (Qdrant Indexed)",
         "sovereign_llm": bharatgpt_engine.get_status()
     }
 

@@ -138,9 +138,13 @@ class LateInteractionReranker:
         query_tokens = self._tokenize(query_text)
         query_lower = query_text.lower().strip()
 
-        # Compute ColBERT neural MaxSim for top candidates if available
-        cand_texts = [f"{c.get('title_en', '')} {c.get('scope_text', '')}".strip() for c in candidates[:15]]
-        neural_scores = self.compute_neural_maxsim(query_text, cand_texts)
+        # Compute ColBERT neural MaxSim only when not an exact/trade match, bounded to top 4 for low latency
+        has_exact_channel = any(c.get("source_channel") in ["EXACT_ID", "TRADE_LEXICON"] for c in candidates[:2])
+        if not has_exact_channel:
+            cand_texts = [f"{c.get('title_en', '')} {c.get('scope_text', '')}".strip() for c in candidates[:4]]
+            neural_scores = self.compute_neural_maxsim(query_text, cand_texts)
+        else:
+            neural_scores = None
 
         reranked = []
         for cand_idx, cand in enumerate(candidates):
@@ -379,6 +383,13 @@ class LateInteractionReranker:
                     role_adjustment += 0.40
                 elif "1554" in cand.get("family_id", ""):
                     role_adjustment -= 0.20
+
+            # Steel Rebar / Fe 500D (IS 1786) vs Prestressed Wire (IS 1785)
+            if any(r in query_lower for r in ["fe 500", "fe-500", "fe500", "fe 415", "fe 550", "fe 600", "tmt", "deformed steel", "rebar", "sariya", "sarad"]):
+                if "1786" in cand.get("family_id", ""):
+                    role_adjustment += 0.85
+                elif "1785" in cand.get("family_id", "") or "prestressed" in title:
+                    role_adjustment -= 0.70
 
             # CPVC Pipes vs Fittings
             if "cpvc" in query_lower and "pipe" in query_lower:
