@@ -21,50 +21,74 @@ interface AuditItem {
   comment?: string;
 }
 
-const AUDIT_STEPS: AuditItem[] = [
-  {
-    id: '1',
-    author: 'Anirudh Sarve',
-    role: 'Senior Procurement Officer',
-    action: 'Created procurement draft & linked IS 12615:2018',
-    status: 'Completed',
-    date: '24 Sep 2026, 10:30 AM',
-    comment: 'All recommended BIS standards incorporated with IE3 performance requirements.'
-  },
-  {
-    id: '2',
-    author: 'Technical Team',
-    role: 'Engineering Reviewer',
-    action: 'Reviewed standards selection and efficiency parameters',
-    status: 'Completed',
-    date: '25 Sep 2026, 03:15 PM',
-    comment: 'Technical specifications approved. Aligns with tender energy efficiency mandate.'
-  },
-  {
-    id: '3',
-    author: 'Compliance Team',
-    role: 'Quality & Regulatory Inspector',
-    action: 'Reviewing for BIS CRS certification requirements',
-    status: 'Completed',
-    date: '26 Sep 2026, 11:20 AM',
-    comment: 'BIS license validity verified against online directory.'
-  },
-  {
-    id: '4',
-    author: 'Head of Procurement',
-    role: 'Sanctioning Authority',
-    action: 'Final tender approval & publication sanction',
-    status: 'Pending',
-    date: 'Awaiting Final Sign-Off'
+const getWorkflowSteps = (doc: any, userName: string, userRole: string): AuditItem[] => {
+  if (!doc) {
+    return [
+      {
+        id: '1',
+        author: userName || 'Procurement Officer',
+        role: userRole || 'Tender Lead',
+        action: 'Draft tender document creation',
+        status: 'Pending',
+        date: 'Awaiting Document Upload'
+      },
+      {
+        id: '2',
+        author: 'Technical Cell',
+        role: 'Engineering Reviewer',
+        action: 'Standards clause verification & QCO alignment',
+        status: 'Pending',
+        date: 'Awaiting Technical Review'
+      },
+      {
+        id: '3',
+        author: 'Competent Authority',
+        role: 'Sanctioning Officer',
+        action: 'Final statutory sanction & GeM publication',
+        status: 'Pending',
+        date: 'Awaiting Final Approval'
+      }
+    ];
   }
-];
+
+  return [
+    {
+      id: '1',
+      author: userName || 'Procurement Officer',
+      role: userRole || 'Procurement Lead',
+      action: `Created tender draft "${doc.fileName}"`,
+      status: 'Completed',
+      date: doc.uploadedAt || 'Uploaded',
+      comment: `Tender registered under ${doc.department || 'Procurement Cell'}. Extracted ${doc.requirements?.length || 0} clauses.`
+    },
+    {
+      id: '2',
+      author: 'Technical Evaluation Cell',
+      role: 'Standards Reviewer',
+      action: 'Verified BIS standards alignment',
+      status: doc.status === 'Ready' || doc.status === 'Completed' ? 'Completed' : 'Pending',
+      date: doc.status === 'Ready' || doc.status === 'Completed' ? 'Approved' : 'In Review',
+      comment: doc.status === 'Ready' || doc.status === 'Completed'
+        ? `Validated against national standards. Total ${doc.recommendedStandards?.length || 0} standards linked.`
+        : 'Technical scrutiny in progress.'
+    },
+    {
+      id: '3',
+      author: 'Sanctioning Authority',
+      role: 'Head of Procurement',
+      action: 'Final tender approval & publication sanction',
+      status: doc.status === 'Completed' ? 'Completed' : 'Pending',
+      date: doc.status === 'Completed' ? 'Sanctioned' : 'Awaiting Final Sign-Off'
+    }
+  ];
+};
 
 export default function ApprovalPage() {
   const navigate = useNavigate();
   const { user, activeDocument, basket } = useStandIQ();
 
   const [commentText, setCommentText] = useState('');
-  const [auditFeed, setAuditFeed] = useState<AuditItem[]>(AUDIT_STEPS);
+  const [auditFeed, setAuditFeed] = useState<AuditItem[]>(() => getWorkflowSteps(activeDocument, user.name, user.role));
   const [submitted, setSubmitted] = useState(false);
   const [approvedByAuthority, setApprovedByAuthority] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -80,7 +104,7 @@ export default function ApprovalPage() {
 
     const newEntry: AuditItem = {
       id: Date.now().toString(),
-      author: `${user.name} Sarve`,
+      author: user.name,
       role: user.role,
       action: 'Added review note',
       status: 'Completed',
@@ -182,7 +206,7 @@ export default function ApprovalPage() {
           </div>
           <div className="flex items-center gap-3">
             <span className="font-mono bg-white px-2.5 py-1 rounded border border-amber-200 text-amber-900 font-semibold">
-              Compliance Score: {activeDocument.auditSummary?.complianceScore ?? 94}%
+              Compliance Score: {activeDocument.auditSummary?.complianceScore ?? 100}%
             </span>
             <span className="font-mono bg-white px-2.5 py-1 rounded border border-amber-200 text-amber-900 font-semibold">
               Standards: {basket.length}

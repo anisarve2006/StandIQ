@@ -52,7 +52,7 @@ export function Sidebar() {
         </div>
         <div>
           <div className="flex items-center gap-1.5">
-            <span className="font-extrabold text-lg tracking-tight text-slate-900">StandIQ</span>
+            <span className="font-extrabold text-lg tracking-tight text-slate-900">BISense</span>
             <span className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-1.5 py-0.5 rounded border border-blue-200/60">BIS</span>
           </div>
           <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase block -mt-0.5">STANDARDS INTELLIGENCE</span>

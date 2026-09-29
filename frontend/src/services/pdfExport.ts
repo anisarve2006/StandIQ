@@ -19,7 +19,7 @@ export function exportDocumentToPdf(doc: AnalyzedDocument, basket?: BasketStanda
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(13);
   pdf.setTextColor(255, 255, 255);
-  pdf.text('STANDIQ • TENDER SPECIFICATION & STANDARDS COMPLIANCE REPORT', 14, 11);
+  pdf.text('BISENSE • TENDER SPECIFICATION & STANDARDS COMPLIANCE REPORT', 14, 11);
 
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
@@ -245,10 +245,10 @@ export function exportDocumentToPdf(doc: AnalyzedDocument, basket?: BasketStanda
   pdf.text('Authorized GeM / CPPP Technical Evaluation Signature', 125, currentY);
 
   // Save the PDF
-  const cleanFileName = (doc.title || doc.fileName || 'StandIQ_Report')
+  const cleanFileName = (doc.title || doc.fileName || 'BISense_Report')
     .replace(/[^a-zA-Z0-9_-]/g, '_')
     .slice(0, 40);
-  pdf.save(`${cleanFileName}_StandIQ_Compliance_Report.pdf`);
+  pdf.save(`${cleanFileName}_BISense_Compliance_Report.pdf`);
 }
 
 /**
@@ -321,7 +321,7 @@ export async function copyDocumentOutput(
     content += `in disqualification at the technical scrutiny stage.\n`;
   } else {
     // Executive Summary
-    content = `=== STANDIQ PROCUREMENT INTELLIGENCE REPORT ===\n`;
+    content = `=== BISENSE PROCUREMENT INTELLIGENCE REPORT ===\n`;
     content += `Tender: ${doc.title}\n`;
     content += `Reference: ${doc.tenderNumber || doc.fileName}\n`;
     content += `Department: ${doc.department}\n`;

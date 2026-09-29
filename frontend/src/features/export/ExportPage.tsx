@@ -17,7 +17,7 @@ export default function ExportPage() {
 
   const [format, setFormat] = useState<'pdf' | 'docx' | 'xlsx' | 'json'>('pdf');
   const [fileName, setFileName] = useState(() => 
-    (activeDocument?.title || 'Electrical_Motor_Specification_2026')
+    (activeDocument?.title || 'Tender_Specification_Package')
       .replace(/[^a-zA-Z0-9_-]/g, '_')
       .slice(0, 45)
   );
@@ -59,7 +59,7 @@ export default function ExportPage() {
     doc.setTextColor(30, 41, 59);
     doc.text(`File: ${effectiveFileName}.pdf`, 18, 38);
     doc.text(`Total Standards: ${basket.length}`, 110, 38);
-    doc.text(`Verification Engine: StandIQ Neuro-Symbolic 3.1`, 18, 44);
+    doc.text(`Verification Engine: BISense Neuro-Symbolic 3.1`, 18, 44);
     doc.text(`QCO Rules Grounding: 2,248 Mandatory Orders Verified`, 110, 44);
 
     let currentY = 54;
@@ -167,7 +167,7 @@ export default function ExportPage() {
         startY: currentY,
         head: [['Role', 'Designation', 'Status', 'Verification Digital Stamp']],
         body: [
-          ['Prepared By', 'Procurement Technical Officer', 'COMPLETED', `STANDIQ-VERIFIED-${Date.now().toString().slice(-8)}`],
+          ['Prepared By', 'Procurement Technical Officer', 'COMPLETED', `BISENSE-VERIFIED-${Date.now().toString().slice(-8)}`],
           ['Standards Reviewer', 'Chief Quality Advisor', 'APPROVED', 'BIS-QCO-COMPLIANT-HASH-OK'],
           ['Tender Authority', 'Head of Procuring Entity', 'FINALIZED', 'GeM-CATALOG-LINKED']
         ],
@@ -184,7 +184,7 @@ export default function ExportPage() {
       doc.setPage(i);
       doc.setFontSize(7.5);
       doc.setTextColor(148, 163, 184);
-      doc.text(`StandIQ Standards Intelligence • Confidential GeM/CPPP Tender Package • Page ${i} of ${totalPages}`, 14, 287);
+      doc.text(`BISense Standards Intelligence • Confidential GeM/CPPP Tender Package • Page ${i} of ${totalPages}`, 14, 287);
     }
 
     doc.save(`${effectiveFileName}.pdf`);
