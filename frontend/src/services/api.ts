@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
 
 export class ApiError extends Error {
   status: number;
@@ -16,7 +16,8 @@ export class ApiError extends Error {
 
 export async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   try {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${API_BASE_URL}${cleanEndpoint}`;
     const response = await fetch(url, {
       ...options,
       headers: {

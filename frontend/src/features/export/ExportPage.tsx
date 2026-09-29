@@ -10,6 +10,7 @@ import { useStandIQ } from '../../stores/standiq.store';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { API_BASE_URL } from '../../services/api';
 
 export default function ExportPage() {
   const { basket, activeDocument } = useStandIQ();
@@ -198,7 +199,7 @@ export default function ExportPage() {
 
     try {
       // 1. Try high-resolution server-side export with ReportLab / python-docx / openpyxl
-      const response = await fetch('/api/v1/export/package', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/export/package`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
