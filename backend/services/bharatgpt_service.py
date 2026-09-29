@@ -144,7 +144,7 @@ class BharatGPTService:
                 resp = requests.post(
                     f"{self._modal_url}/translate",
                     json={"masked_text": masked_text, "script_name": script_name},
-                    timeout=15
+                    timeout=45
                 )
                 if resp.status_code == 200:
                     text = resp.json().get("translated_text", "").strip()
@@ -198,7 +198,7 @@ class BharatGPTService:
                 resp = requests.post(
                     f"{self._modal_url}/canonicalize",
                     json={"text": text},
-                    timeout=15
+                    timeout=45
                 )
                 if resp.status_code == 200:
                     canonical = resp.json().get("canonical_title", "").strip()
@@ -271,11 +271,11 @@ class BharatGPTService:
                         "parameters": param_str,
                         "certification_info": cert_str
                     },
-                    timeout=20
+                    timeout=60
                 )
                 if resp.status_code == 200:
                     clause = resp.json().get("clause", "").strip()
-                    if clause and "1." in clause:
+                    if clause and len(clause) > 10:
                         return clause
             except Exception as me:
                 logger.warning(f"[BharatGPT-Modal] Clause drafting failed ({me}), falling back to deterministic template.")
@@ -343,6 +343,29 @@ class BharatGPTService:
             f"Engineering Rationale: [One sentence rationale]\n\n"
             f"Selected Option:"
         )
+
+        if getattr(self, "_modal_url", None):
+            try:
+                import requests
+                resp = requests.post(
+                    f"{self._modal_url}/generate",
+                    json={"prompt": prompt, "max_tokens": 90, "stop": ["###", "\n\n\n"], "temperature": 0.1},
+                    timeout=45
+                )
+                if resp.status_code == 200:
+                    output = resp.json().get("text", "").strip()
+                    match = re.search(r'\[?([A-C])\]?', output)
+                    if match:
+                        chosen_idx = ord(match.group(1).upper()) - 65
+                        if 0 <= chosen_idx < len(candidates[:3]):
+                            return {
+                                "chosen_candidate": candidates[chosen_idx],
+                                "rationale": output,
+                                "model": "BharatGPT-3B-Indic Sovereign Judge (Modal)"
+                            }
+            except Exception as me:
+                logger.warning(f"[BharatGPT-Modal] Arbitration failed ({me})")
+                return None
 
         try:
             with _INFERENCE_LOCK:
