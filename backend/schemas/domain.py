@@ -74,6 +74,28 @@ class VersionInfo(BaseModel):
     supersedes: Optional[List[str]] = None
     superseded_by: Optional[List[str]] = None
 
+class AmendmentRecord(BaseModel):
+    amendment_no: int
+    notification_date: Optional[str] = None
+    effective_date: Optional[str] = None
+    gazette_ref: Optional[str] = None
+    clause_affected: Optional[str] = None
+    parameter_name: Optional[str] = None
+    previous_value: Optional[str] = None
+    revised_value: Optional[str] = None
+    change_summary: str
+    impact_level: Optional[str] = "MAJOR"
+
+class VersionDiffInfo(BaseModel):
+    standard_id: Optional[str] = None
+    title: Optional[str] = None
+    base_year: Optional[int] = None
+    current_status: str = "CURRENT"
+    num_amendments: int = 0
+    chronological_amendments: List[AmendmentRecord] = []
+    diff_summary: List[str] = []
+
+
 class CertificationType(str, Enum):
     BIS_PRODUCT_CERTIFICATION = "BIS_PRODUCT_CERTIFICATION"
     CRS = "CRS"

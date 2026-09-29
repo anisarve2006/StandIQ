@@ -1,7 +1,11 @@
-from typing import List
-from schemas.api import TenderHealthFinding, TenderClauseDetail
+from typing import List, Optional
+from schemas.api import TenderHealthFinding, TenderClauseDetail, TenderHealthResponse
+from services.audit_risk_service import AuditRiskService
 
 class TenderHealthService:
+    def __init__(self):
+        self.audit_risk_service = AuditRiskService()
+
     def analyze_health(self, clauses: List[TenderClauseDetail]) -> List[TenderHealthFinding]:
         findings = []
         requirements_map = {}
@@ -35,3 +39,19 @@ class TenderHealthService:
                 requirements_map[clause.requirement] = clause
 
         return findings
+
+    def get_full_report(
+        self,
+        clauses: List[TenderClauseDetail],
+        raw_text: Optional[str] = None
+    ) -> TenderHealthResponse:
+        findings = self.analyze_health(clauses)
+        clause_texts = [c.text for c in clauses if c.text]
+        risk_report = self.audit_risk_service.audit_tender(
+            tender_text=raw_text,
+            clauses=clause_texts
+        )
+        return TenderHealthResponse(
+            findings=findings,
+            dispute_risk_report=risk_report
+        )

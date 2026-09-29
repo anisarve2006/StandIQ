@@ -96,7 +96,13 @@ CROSS_LINGUAL_LEXICON: Dict[str, Dict[str, Any]] = {
     "రడ్": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
     "রড": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
     "সળિયા": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
+    "સળિયા": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
     "കമ്പി": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
+    "ടിഎംടി": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
+    "ಸರಳು": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
+    "ಕಬ್ಬಿಣದ ಸರಳು": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
+    "ਸਰਿਆ": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
+    "ਰਡ୍": {"product": "high strength deformed steel bars and wires", "family_id": "IS:1786", "division": "Civil Engineering"},
 
     # --- Cement (IS 8112 / IS 12269) ---
     "सीमेंट": {"product": "ordinary portland cement 43 grade", "family_id": "IS:8112", "division": "Civil Engineering"},
@@ -107,6 +113,8 @@ CROSS_LINGUAL_LEXICON: Dict[str, Dict[str, Any]] = {
     "সিমেন্ট": {"product": "ordinary portland cement 43 grade", "family_id": "IS:8112", "division": "Civil Engineering"},
     "સિમેન્ટ": {"product": "ordinary portland cement 43 grade", "family_id": "IS:8112", "division": "Civil Engineering"},
     "സിമന്റ്": {"product": "ordinary portland cement 43 grade", "family_id": "IS:8112", "division": "Civil Engineering"},
+    "ਸੀਮਿੰਟ": {"product": "ordinary portland cement 43 grade", "family_id": "IS:8112", "division": "Civil Engineering"},
+    "ସିମେଣ୍ଟ": {"product": "ordinary portland cement 43 grade", "family_id": "IS:8112", "division": "Civil Engineering"},
 
     # --- Submersible Pump (IS 8034) ---
     "पानी की मोटर": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
@@ -118,9 +126,15 @@ CROSS_LINGUAL_LEXICON: Dict[str, Dict[str, Any]] = {
     "నీటి మోటారు": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
     "సబ్‌మెర్సిబుల్ పంప్": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
     "ನೀರಿನ ಮೋಟರ್": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
+    "ಸಬ್‌ಮರ್ಸಿಬಲ್ ಪಂಪ್": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
+    "ಸಬ್‌ಮರ್ಸಿಬಲ್": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
     "জলের মোটর": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
     "પાણીની મોટર": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
     "വാട്ടർ പമ്പ്": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
+    "സബ്മേഴ്സിബിൾ പമ്പ്": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
+    "ਪਾਣੀ ਦੀ ਮੋਟਰ": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
+    "ਸਬਮਰਸੀਬਲ ਪੰਪ": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
+    "ସବମର୍ସିବଲ ପମ୍ପ": {"product": "submersible pumpsets for clear cold water", "family_id": "IS:8034", "division": "Mechanical Engineering"},
 
     # --- Gold & Hallmarking (IS 1417) ---
     "सोना": {"product": "gold and gold alloys jewellery artefacts fineness marking", "family_id": "IS:1417", "division": "Metallurgical Engineering"},
@@ -154,7 +168,7 @@ CROSS_LINGUAL_LEXICON: Dict[str, Dict[str, Any]] = {
     "பாதுகாப்பு காலணிகள்": {"product": "personal protective equipment safety footwear", "family_id": "IS:15298:P2", "division": "Chemical"},
     "பாதுகாப்பு தலைக்கவசம்": {"product": "industrial safety helmets", "family_id": "IS:2925", "division": "Civil Engineering"},
     "రక్షణ పాదరక్షలు": {"product": "personal protective equipment safety footwear", "family_id": "IS:15298:P2", "division": "Chemical"},
-    "రక్షణ హెల్మెట్": {"product": "industrial safety helmets", "family_id": "IS:2925", "division": "Civil Engineering"},
+    "రక్షణ హెल्మెట్": {"product": "industrial safety helmets", "family_id": "IS:2925", "division": "Civil Engineering"},
 
     # --- Fire Extinguishers (IS 15683) ---
     "अग्निशामक": {"product": "portable fire extinguishers", "family_id": "IS:15683", "division": "Civil Engineering"},
@@ -166,9 +180,23 @@ CROSS_LINGUAL_LEXICON: Dict[str, Dict[str, Any]] = {
 
     # --- Pipes (IS 4985 & IS 1239) ---
     "पीवीसी पाइप": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "पीव्हीसी पाईप": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
     "नळ पाईप": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
     "குழாய்": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
-    "పైపు": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"}
+    "పైపు": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "ಪೈಪ್": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "ಪಿವಿಸಿ ಪೈಪ್": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "പൈപ്പ്": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "પીવીસી પાઇપ": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "পিভিসি পাইপ": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "ਪਾਈਪ": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+    "ପାଇପ": {"product": "unplasticized pvc pipes for potable water supplies", "family_id": "IS:4985", "division": "Civil Engineering"},
+
+    # --- LED Lighting (IS 10322 Part 5 Sec 3) ---
+    "एलईडी ल्युमिनेअर": {"product": "luminaires road and street lighting", "family_id": "IS:10322:P5:S3", "division": "Electrotechnical"},
+    "தெரு விளக்கு": {"product": "luminaires road and street lighting", "family_id": "IS:10322:P5:S3", "division": "Electrotechnical"},
+    "వీధి దీపం": {"product": "luminaires road and street lighting", "family_id": "IS:10322:P5:S3", "division": "Electrotechnical"}
+
 }
 
 # Common Indic Procurement Intent Keywords (Translates auxiliary intent)
