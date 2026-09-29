@@ -148,7 +148,7 @@ export const ALL_STANDARDS: StandardItem[] = [
 
 export default function StandardsDiscoveryPage() {
   const navigate = useNavigate();
-  const { addToBasket, removeFromBasket, isInBasket } = useStandIQ();
+  const { addToBasket, removeFromBasket, isInBasket, activeDocument } = useStandIQ();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTypeTab, setActiveTypeTab] = useState<'All' | 'Product' | 'Testing' | 'Safety' | 'Terminology' | 'Code of Practice'>('All');
@@ -240,9 +240,17 @@ export default function StandardsDiscoveryPage() {
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
       {/* 01. Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Indian Standards Explorer</h1>
-        <p className="text-xs text-slate-500 mt-0.5">Search and explore official BIS standards with interactive facet filters.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Indian Standards Explorer</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Search and explore official BIS standards with interactive facet filters.</p>
+        </div>
+        {activeDocument && (
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-600/20 text-xs text-amber-900 font-medium whitespace-nowrap shrink-0">
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+            <span>Active Tender Basket: <strong className="font-semibold">{activeDocument.title || activeDocument.fileName}</strong></span>
+          </div>
+        )}
       </div>
 
       {/* 02. Prominent Search Bar */}
@@ -259,7 +267,7 @@ export default function StandardsDiscoveryPage() {
         </div>
         <button 
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-xs transition-colors shrink-0 cursor-pointer"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap"
         >
           Search
         </button>
@@ -455,7 +463,7 @@ export default function StandardsDiscoveryPage() {
                           {std.tags.map((tag, i) => (
                             <span
                               key={i}
-                              className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-50/70 text-blue-700 border border-blue-100"
+                              className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-50/70 text-blue-700 border border-blue-100 whitespace-nowrap shrink-0"
                             >
                               {tag}
                             </span>
@@ -467,7 +475,7 @@ export default function StandardsDiscoveryPage() {
                       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 shrink-0">
                         <button
                           onClick={() => handleBasketToggle(std)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer ${
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0 ${
                             inBasket
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : 'bg-blue-600 hover:bg-blue-700 text-white shadow-2xs'
@@ -488,7 +496,7 @@ export default function StandardsDiscoveryPage() {
 
                         <button
                           onClick={() => navigate('/graph')}
-                          className="text-[11px] text-slate-500 hover:text-blue-600 flex items-center gap-1 transition-colors cursor-pointer"
+                          className="text-[11px] text-slate-500 hover:text-blue-600 flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap shrink-0"
                         >
                           <Share2 className="w-3 h-3" />
                           <span>View Graph</span>

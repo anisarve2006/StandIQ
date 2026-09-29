@@ -1,0 +1,134 @@
+{
+  "total_cases": 1000,
+  "total_time_seconds": 3228.6265218257904,
+  "throughput_qps": 0.3097292279673461,
+  "top1_accuracy": 56.00000000000001,
+  "top3_recall": 71.6,
+  "top5_recall": 78.3,
+  "mrr": 0.6454,
+  "qco_accuracy": 93.8,
+  "supersession_accuracy": 100.0,
+  "latency_ms": {
+    "mean": 3228.562712430954,
+    "p50": 2900.388240814209,
+    "p90": 6165.16592502594,
+    "p95": 8388.041341304777,
+    "p99": 15751.371102333063
+  },
+  "domain_breakdown": {
+    "Metallurgical Engineering": {
+      "total": 106,
+      "top1_acc": 69.81132075471697,
+      "top5_acc": 86.79245283018868,
+      "median_latency_ms": 2775.4989862442017
+    },
+    "Transport Engineering": {
+      "total": 50,
+      "top1_acc": 50.0,
+      "top5_acc": 64.0,
+      "median_latency_ms": 2719.430446624756
+    },
+    "Food and Agriculture": {
+      "total": 81,
+      "top1_acc": 43.20987654320987,
+      "top5_acc": 75.30864197530865,
+      "median_latency_ms": 3151.8619060516357
+    },
+    "Electronics and Information Technology": {
+      "total": 70,
+      "top1_acc": 61.42857142857143,
+      "top5_acc": 78.57142857142857,
+      "median_latency_ms": 920.6420183181763
+    },
+    "Mechanical Engineering": {
+      "total": 53,
+      "top1_acc": 56.60377358490566,
+      "top5_acc": 67.9245283018868,
+      "median_latency_ms": 2721.9743728637695
+    },
+    "Civil Engineering": {
+      "total": 72,
+      "top1_acc": 62.5,
+      "top5_acc": 81.94444444444444,
+      "median_latency_ms": 2588.3909463882446
+    },
+    "Electrotechnical": {
+      "total": 76,
+      "top1_acc": 65.78947368421053,
+      "top5_acc": 82.89473684210526,
+      "median_latency_ms": 2244.0333366394043
+    },
+    "General Engineering": {
+      "total": 91,
+      "top1_acc": 70.32967032967034,
+      "top5_acc": 83.51648351648352,
+      "median_latency_ms": 3828.157901763916
+    },
+    "Textiles": {
+      "total": 45,
+      "top1_acc": 26.666666666666668,
+      "top5_acc": 42.22222222222222,
+      "median_latency_ms": 1648.8559246063232
+    },
+    "Production and General Engineering": {
+      "total": 112,
+      "top1_acc": 43.75,
+      "top5_acc": 73.21428571428571,
+      "median_latency_ms": 2962.760806083679
+    },
+    "Chemical": {
+      "total": 72,
+      "top1_acc": 55.55555555555556,
+      "top5_acc": 93.05555555555556,
+      "median_latency_ms": 3653.456449508667
+    },
+    "Water Resources": {
+      "total": 21,
+      "top1_acc": 71.42857142857143,
+      "top5_acc": 85.71428571428571,
+      "median_latency_ms": 841.3050174713135
+    },
+    "Petroleum, Coal, and Related Products": {
+      "total": 74,
+      "top1_acc": 50.0,
+      "top5_acc": 86.48648648648648,
+      "median_latency_ms": 3010.988235473633
+    },
+    "Management and Systems": {
+      "total": 13,
+      "top1_acc": 76.92307692307693,
+      "top5_acc": 84.61538461538461,
+      "median_latency_ms": 2666.921615600586
+    },
+    "Medical Equipment and Hospital Planning": {
+      "total": 59,
+      "top1_acc": 45.76271186440678,
+      "top5_acc": 74.57627118644068,
+      "median_latency_ms": 3665.080785751343
+    },
+    "Production and General Engineering Division (PGD)": {
+      "total": 1,
+      "top1_acc": 100.0,
+      "top5_acc": 100.0,
+      "median_latency_ms": 5623.088598251343
+    },
+    "Medical Equipment and Hospital Planning Division (MHD)": {
+      "total": 2,
+      "top1_acc": 100.0,
+      "top5_acc": 100.0,
+      "median_latency_ms": 7013.346314430237
+    },
+    "Civil Engineering Division": {
+      "total": 1,
+      "top1_acc": 100.0,
+      "top5_acc": 100.0,
+      "median_latency_ms": 2477.9365062713623
+    },
+    "Transport Engineering Division (TED)": {
+      "total": 1,
+      "top1_acc": 0.0,
+      "top5_acc": 0.0,
+      "median_latency_ms": 2803.7803173065186
+    }
+  }
+}

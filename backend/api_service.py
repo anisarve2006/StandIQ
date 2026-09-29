@@ -299,22 +299,26 @@ def get_standard_details(family_id: str):
 @app.post("/api/v1/recommend/document")
 async def recommend_pdf_endpoint(
     file: UploadFile = File(..., description="Government Tender / BoQ document (PDF, Excel, CSV, TXT)"),
-    max_items: Optional[int] = 15,
+    max_items: Optional[int] = 60,
     top_candidates: Optional[int] = 3
 ):
     """
-    Tender Document Upload & Analysis Endpoint:
-    Upload an entire tender document (BoQ, Schedule of Requirements, Technical Specs).
-    Supports PDF (.pdf), Excel (.xls, .xlsx), CSV (.csv), and Plain Text (.txt).
+    Tender Document & Image Upload & Analysis Endpoint:
+    Upload an entire tender document (BoQ, Schedule of Requirements, Technical Specs) or specification image.
+    Supports PDF (.pdf, with auto-detection for digital vs scanned OCR), Images (.png, .jpg, .jpeg, .webp, .bmp, .tiff),
+    Excel (.xls, .xlsx), CSV (.csv), Plain Text (.txt), and Word (.docx).
     Extracts tables and itemized specifications, maps applicable Indian Standards,
     audits compulsory QCO compliance, and generates a consolidated compliance matrix.
     """
-    allowed_exts = (".pdf", ".xls", ".xlsx", ".csv", ".txt", ".docx")
+    allowed_exts = (
+        ".pdf", ".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".tif",
+        ".xls", ".xlsx", ".csv", ".txt", ".docx"
+    )
     fname_lower = (file.filename or "").lower()
     if not any(fname_lower.endswith(ext) for ext in allowed_exts):
         raise HTTPException(
             status_code=400, 
-            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
+            detail=f"Unsupported file format '{file.filename}'. Allowed formats: PDF (.pdf), Images (.png, .jpg, .jpeg, .webp), Excel (.xlsx, .xls), CSV (.csv), and Text (.txt)."
         )
 
     file_bytes = await file.read()

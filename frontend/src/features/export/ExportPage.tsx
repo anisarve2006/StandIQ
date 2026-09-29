@@ -12,10 +12,14 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export default function ExportPage() {
-  const { basket } = useStandIQ();
+  const { basket, activeDocument } = useStandIQ();
 
   const [format, setFormat] = useState<'pdf' | 'docx' | 'xlsx' | 'json'>('pdf');
-  const [fileName, setFileName] = useState('Electrical_Motor_Specification_2026');
+  const [fileName, setFileName] = useState(() => 
+    (activeDocument?.title || 'Electrical_Motor_Specification_2026')
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .slice(0, 45)
+  );
   const [downloading, setDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -268,11 +272,19 @@ export default function ExportPage() {
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
       {/* 01. Header */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Export Specification Package</h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Generate and export complete tender specification documents.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Export Specification Package</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Generate and export complete tender specification documents.
+          </p>
+        </div>
+        {activeDocument && (
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-600/20 text-xs text-emerald-900 font-medium whitespace-nowrap shrink-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+            <span>Target Tender: <strong className="font-semibold">{activeDocument.title || activeDocument.fileName}</strong> ({basket.length} standards)</span>
+          </div>
+        )}
       </div>
 
       {/* 02. Two Column Selector Interface */}
@@ -367,7 +379,7 @@ export default function ExportPage() {
                   />
                   <span className="text-xs font-semibold text-slate-800">{item.label}</span>
                 </div>
-                <span className="text-[11px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/50">
+                <span className="text-[11px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/50 whitespace-nowrap shrink-0">
                   Ready
                 </span>
               </label>
@@ -389,7 +401,7 @@ export default function ExportPage() {
               onChange={(e) => setFileName(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-l-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
             />
-            <span className="px-3 py-2 bg-slate-100 border border-l-0 border-slate-200 rounded-r-lg text-xs font-mono text-slate-500 font-bold">
+            <span className="px-3 py-2 bg-slate-100 border border-l-0 border-slate-200 rounded-r-lg text-xs font-mono text-slate-500 font-bold whitespace-nowrap shrink-0">
               .{format}
             </span>
           </div>
@@ -398,7 +410,7 @@ export default function ExportPage() {
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm self-end sm:self-auto"
+          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm self-end sm:self-auto whitespace-nowrap shrink-0 cursor-pointer"
         >
           {downloadSuccess ? (
             <>

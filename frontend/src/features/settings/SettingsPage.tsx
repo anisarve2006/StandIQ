@@ -111,7 +111,7 @@ export default function SettingsPage() {
 
         <button
           onClick={() => handleSave()}
-          className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all active:scale-[0.98] text-xs sm:text-sm self-start sm:self-auto cursor-pointer"
+          className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all active:scale-[0.98] text-xs sm:text-sm self-start sm:self-auto cursor-pointer whitespace-nowrap shrink-0"
         >
           {saved ? <Check className="w-4 h-4 stroke-[2.5]" /> : <Save className="w-4 h-4" />}
           <span>{saved ? t('savedChanges') : t('saveChanges')}</span>
@@ -119,12 +119,12 @@ export default function SettingsPage() {
       </div>
 
       {/* 02. Tabs Bar */}
-      <div className="flex items-center gap-1 border-b border-slate-200 overflow-x-auto text-xs font-semibold">
+      <div className="flex items-center gap-1 border-b border-slate-200 overflow-x-auto text-xs font-semibold pb-0.5">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 pt-1 px-3.5 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+            className={`pb-3 pt-1 px-3.5 border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               activeTab === tab
                 ? 'border-blue-600 text-blue-600 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -503,7 +503,7 @@ export default function SettingsPage() {
                     <p className="text-[11px] text-slate-500">Directly syncs official Indian Standards catalogue and amendments.</p>
                   </div>
                 </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Connected</span>
                 </span>
@@ -511,7 +511,7 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200/90 bg-slate-50/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs whitespace-nowrap shrink-0">
                     GeM
                   </div>
                   <div>
@@ -543,7 +543,7 @@ export default function SettingsPage() {
                       setApiKeyCopied(true);
                       setTimeout(() => setApiKeyCopied(false), 2000);
                     }}
-                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
                     {apiKeyCopied ? 'Copied!' : 'Copy'}
                   </button>

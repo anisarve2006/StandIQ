@@ -18,5 +18,7 @@ class Settings:
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     use_bharatgpt: bool = os.getenv("USE_BHARATGPT", "true").lower() == "true"
     bharatgpt_model_path: str = os.getenv("BHARATGPT_MODEL_PATH", "BharatGPT-3B-Indic.Q8_0.gguf")
+    bharatgpt_modal_url: str = os.getenv("BHARATGPT_MODAL_URL", "")
 
 settings = Settings()
+

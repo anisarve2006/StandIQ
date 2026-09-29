@@ -97,9 +97,16 @@ class LateInteractionReranker:
 
             # 4. Document Role & Scope Prior (Product Specification vs Test Method vs Safety Code)
             role_adjustment = 0.0
-            is_testing_query = any(w in query_lower for w in [
-                "testing of", "testing", "test method", "methods of test", 
-                "methods of testing", "methods of physical tests", "compressive strength at specified ages"
+            is_procurement_supply = any(p in query_lower for p in [
+                "providing and fixing", "providing & fixing", "providing and laying", 
+                "providing & laying", "supplying and fixing", "supplying & fixing",
+                "supply and fixing", "supply & fixing", "supply of", "supplying of",
+                "including testing", "including jointing"
+            ])
+            is_testing_query = (not is_procurement_supply) and any(w in query_lower for w in [
+                "test method", "methods of test", "methods of testing", 
+                "methods of physical tests", "compressive strength at specified ages",
+                "testing of", "procedure for testing", "sampling and test"
             ])
             is_test_doc = any(phrase in title for phrase in [
                 "method of test", "methods of test", "methods of testing", 
@@ -275,8 +282,10 @@ class LateInteractionReranker:
             if "cpvc" in query_lower and "pipe" in query_lower:
                 if "17546" in cand.get("family_id", "") or "fittings" in title:
                     role_adjustment -= 0.65
-                elif "15778" in cand.get("family_id", "") or "pipes" in title:
-                    role_adjustment += 0.40
+                elif "15778" in cand.get("family_id", ""):
+                    role_adjustment += 0.50
+                elif any(other_pipe in cand.get("family_id", "") for other_pipe in ["13592", "4985", "4984"]):
+                    role_adjustment -= 0.40
 
             # GI Plumbing Pipes vs Large transmission mains
             if ("gi pipe" in query_lower or "gi steel pipe" in query_lower or "galvanized iron pipe" in query_lower) or ("gi" in query_lower and "water supply" in query_lower):
@@ -567,7 +576,25 @@ class LateInteractionReranker:
                     role_adjustment += 0.75
 
             # Plumbing Pipes, Fittings & Valves (Batch 221-260)
-            if "fitting" in query_lower or "fittings" in query_lower:
+            has_pipe_term = "pipe" in query_lower or "pipes" in query_lower
+            has_fitting_term = "fitting" in query_lower or "fittings" in query_lower
+
+            is_pipe_primary = False
+            is_fitting_primary = False
+
+            if has_pipe_term and has_fitting_term:
+                pos_pipe = min(query_lower.find("pipe") if "pipe" in query_lower else 9999, query_lower.find("pipes") if "pipes" in query_lower else 9999)
+                pos_fitting = min(query_lower.find("fitting") if "fitting" in query_lower else 9999, query_lower.find("fittings") if "fittings" in query_lower else 9999)
+                if pos_pipe < pos_fitting:
+                    is_pipe_primary = True
+                else:
+                    is_fitting_primary = True
+            elif has_pipe_term:
+                is_pipe_primary = True
+            elif has_fitting_term:
+                is_fitting_primary = True
+
+            if is_fitting_primary:
                 if "cpvc" in query_lower and "17546" in cand.get("family_id", ""):
                     role_adjustment += 0.85
                 elif "upvc" in query_lower and "7834" in cand.get("family_id", ""):
@@ -583,11 +610,16 @@ class LateInteractionReranker:
                 # Penalize pipe-only standards when query is for fittings
                 if any(pipe_only in cand.get("family_id", "") for pipe_only in ["4984", "4985", "8329", "15778", "14333"]):
                     role_adjustment -= 0.85
-            elif "pipe" in query_lower or "pipes" in query_lower:
+            elif is_pipe_primary:
                 # Penalize fittings standards when query is specifically for pipes
                 if any(fitting_std in cand.get("family_id", "") for fitting_std in ["8360", "9523", "7834", "17546"]):
                     role_adjustment -= 0.60
-                if "hdpe" in query_lower:
+                if "cpvc" in query_lower:
+                    if "15778" in cand.get("family_id", ""):
+                        role_adjustment += 0.85
+                    elif any(other_p in cand.get("family_id", "") for other_p in ["13592", "4985", "4984", "17546"]):
+                        role_adjustment -= 0.50
+                elif "hdpe" in query_lower:
                     if any(w in query_lower for w in ["drainage", "sewerage", "sewer"]):
                         if "14333" in cand.get("family_id", ""):
                             role_adjustment += 0.85

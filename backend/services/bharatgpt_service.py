@@ -62,7 +62,20 @@ class BharatGPTService:
         return target
 
     def _init_model(self):
-        """Loads BharatGPT-3B GGUF into RAM at startup."""
+        """Loads BharatGPT-3B GGUF into RAM or configures Modal Serverless GPU endpoint."""
+        if os.getenv("USE_BHARATGPT", "true").lower() == "false":
+            self._load_error = "BharatGPT disabled via USE_BHARATGPT=false"
+            logger.info("[BharatGPT] USE_BHARATGPT=false. Running in fast deterministic mode.")
+            return
+
+        modal_url = os.getenv("BHARATGPT_MODAL_URL", "").strip().rstrip("/")
+        if modal_url:
+            self._modal_url = modal_url
+            self._backend_type = "Modal Serverless GPU"
+            logger.info(f"[BharatGPT] Configured for Modal Serverless GPU at {self._modal_url}")
+            return
+
+        self._modal_url = None
         if not self.model_path or not os.path.exists(self.model_path):
             self._load_error = f"GGUF model file not found at: {self.model_path}"
             logger.warning(f"[BharatGPT] {self._load_error}. Running in FALLBACK mode.")
@@ -101,6 +114,10 @@ class BharatGPTService:
             logger.error(f"[BharatGPT] Failed to load GGUF model: {e}. Running in FALLBACK mode.")
 
     def is_available(self) -> bool:
+        if os.getenv("USE_BHARATGPT", "true").lower() == "false":
+            return False
+        if getattr(self, "_modal_url", None):
+            return True
         return self.llm is not None
 
     def get_status(self) -> Dict[str, Any]:
@@ -108,6 +125,7 @@ class BharatGPTService:
             "available": self.is_available(),
             "model_path": self.model_path,
             "backend": getattr(self, "_backend_type", "Local GGUF (CPU AVX2)") if self.is_available() else "UNAVAILABLE",
+            "modal_url": getattr(self, "_modal_url", None),
             "error": self._load_error
         }
 
@@ -118,6 +136,23 @@ class BharatGPTService:
         """
         if not self.is_available():
             return None
+
+        # 1. Remote Modal Serverless GPU Execution
+        if getattr(self, "_modal_url", None):
+            try:
+                import requests
+                resp = requests.post(
+                    f"{self._modal_url}/translate",
+                    json={"masked_text": masked_text, "script_name": script_name},
+                    timeout=15
+                )
+                if resp.status_code == 200:
+                    text = resp.json().get("translated_text", "").strip()
+                    if text and len(text) > 3:
+                        return text
+            except Exception as me:
+                logger.warning(f"[BharatGPT-Modal] Translation failed ({me}), falling back to deterministic lexicon.")
+                return None
 
         prompt = (
             f"### Instruction:\n"
@@ -155,6 +190,23 @@ class BharatGPTService:
         """
         if not self.is_available():
             return None
+
+        # 1. Remote Modal Serverless GPU Execution
+        if getattr(self, "_modal_url", None):
+            try:
+                import requests
+                resp = requests.post(
+                    f"{self._modal_url}/canonicalize",
+                    json={"text": text},
+                    timeout=15
+                )
+                if resp.status_code == 200:
+                    canonical = resp.json().get("canonical_title", "").strip()
+                    if canonical and len(canonical) > 3:
+                        return canonical
+            except Exception as me:
+                logger.warning(f"[BharatGPT-Modal] Canonicalization failed ({me})")
+                return None
 
         prompt = (
             "### Instruction:\n"
@@ -205,6 +257,29 @@ class BharatGPTService:
 
         param_str = ", ".join([f"{k}: {v}" for k, v in (parameters or {}).items()]) if parameters else "Standard commercial grades"
         cert_str = certification_info or "Standard quality compliance"
+
+        # 1. Remote Modal Serverless GPU Execution
+        if getattr(self, "_modal_url", None):
+            try:
+                import requests
+                resp = requests.post(
+                    f"{self._modal_url}/draft_clause",
+                    json={
+                        "product_name": product_name,
+                        "standard_id": standard_id,
+                        "standard_title": standard_title,
+                        "parameters": param_str,
+                        "certification_info": cert_str
+                    },
+                    timeout=20
+                )
+                if resp.status_code == 200:
+                    clause = resp.json().get("clause", "").strip()
+                    if clause and "1." in clause:
+                        return clause
+            except Exception as me:
+                logger.warning(f"[BharatGPT-Modal] Clause drafting failed ({me}), falling back to deterministic template.")
+                return None
 
         prompt = (
             f"### Instruction:\n"

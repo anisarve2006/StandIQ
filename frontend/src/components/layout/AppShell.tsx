@@ -7,7 +7,8 @@ import {
   HelpCircle, 
   ChevronDown, 
   Menu, 
-  X
+  X,
+  Sun
 } from 'lucide-react';
 import { useStandIQ } from '../../stores/standiq.store';
 import { GlobalSearch } from '../search/GlobalSearch';
@@ -15,7 +16,7 @@ import { GlobalSearch } from '../search/GlobalSearch';
 export function AppShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const { user, unreadAlertsCount, t } = useStandIQ();
+  const { user, unreadAlertsCount, t, theme, setTheme } = useStandIQ();
   const navigate = useNavigate();
 
   return (
@@ -68,11 +69,26 @@ export function AppShell() {
           </div>
 
           {/* Right Action Icons & User Profile */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2.5 ml-auto shrink-0">
+            {/* Eye-Comfort Warmth Toggle */}
+            <button
+              onClick={() => {
+                const nextTheme = theme === 'Soothing' ? 'Dark' : theme === 'Dark' ? 'Light' : 'Soothing';
+                setTheme(nextTheme as any);
+              }}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all bg-amber-50/90 hover:bg-amber-100 text-amber-800 border border-amber-200/90 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
+              title={`Active Mode: ${theme === 'Soothing' ? 'Warm Eye-Comfort Paper (Anti-Strain)' : theme === 'Dark' ? 'Midnight Slate' : 'Clean Studio Light'}. Click to toggle.`}
+            >
+              <Sun className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span className="hidden sm:inline text-[11px] font-medium whitespace-nowrap">
+                {theme === 'Soothing' ? 'Eye-Comfort Warmth' : theme === 'Dark' ? 'Dark Mode' : 'Light Mode'}
+              </span>
+            </button>
+
             {/* Notifications Alert Bell */}
             <Link
               to="/changes"
-              className="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              className="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors shrink-0"
               title="Notifications & Amendments"
             >
               <Bell className="w-4 h-4" />
@@ -84,23 +100,23 @@ export function AppShell() {
             {/* Help & Documentation */}
             <button
               onClick={() => navigate('/settings')}
-              className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors hidden sm:block"
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors hidden sm:block shrink-0"
               title="Help & System Info"
             >
               <HelpCircle className="w-4 h-4" />
             </button>
 
             {/* User Profile Pill */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
-                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
                   {user.initials}
                 </div>
-                <span className="text-xs font-semibold text-slate-800 hidden sm:inline-block">{user.name}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-xs font-semibold text-slate-800 hidden sm:inline-block whitespace-nowrap">{user.name}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               </button>
 
               {/* Profile Dropdown */}

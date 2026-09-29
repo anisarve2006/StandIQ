@@ -165,24 +165,29 @@ class ProcurementArchetypeClassifier:
                 }
 
         # Rule 2c: Check for Demolition & Dismantling Works
-        for term in self.demolition_terms:
-            if term in clean:
-                return {
-                    "archetype": "SERVICE_OR_LABOUR",
-                    "is_physical_product": False,
-                    "category": "Civil Demolition & Dismantling Work",
-                    "standard_applicable": True,
-                    "service_standard": {
-                        "family_id": "IS:4130",
-                        "raw_id": "IS 4130",
-                        "title_en": "Safety code for demolition of buildings",
-                        "status": "CURRENT",
-                        "is_mandatory": False,
-                        "type": "SAFETY_CODE"
-                    },
-                    "recommended_action": "APPLY_DEMOLITION_SAFETY_CODE",
-                    "explanation": f"Clause '{raw}' specifies civil demolition or dismantling work. Rather than a manufactured product standard, this execution is governed by IS 4130 (Safety code for demolition of buildings) and statutory site safety protocols."
-                }
+        # Guard: If clause starts with "providing and fixing/laying" a physical product, dismantling is incidental
+        has_supply_fixing = any(clean.startswith(pfx) for pfx in ["providing and fixing", "providing & fixing", "supply and fixing", "providing and laying", "providing & laying"])
+        has_physical_noun = any(re.search(rf'\b{re.escape(noun)}\b', clean) for noun in self.physical_product_nouns)
+
+        if not (has_supply_fixing and has_physical_noun):
+            for term in self.demolition_terms:
+                if term in clean:
+                    return {
+                        "archetype": "SERVICE_OR_LABOUR",
+                        "is_physical_product": False,
+                        "category": "Civil Demolition & Dismantling Work",
+                        "standard_applicable": True,
+                        "service_standard": {
+                            "family_id": "IS:4130",
+                            "raw_id": "IS 4130",
+                            "title_en": "Safety code for demolition of buildings",
+                            "status": "CURRENT",
+                            "is_mandatory": False,
+                            "type": "SAFETY_CODE"
+                        },
+                        "recommended_action": "APPLY_DEMOLITION_SAFETY_CODE",
+                        "explanation": f"Clause '{raw}' specifies civil demolition or dismantling work. Rather than a manufactured product standard, this execution is governed by IS 4130 (Safety code for demolition of buildings) and statutory site safety protocols."
+                    }
 
         # Rule 3: Check for Operational Services & Labour Contracts
         # If text explicitly describes service operations without supplying a manufactured product

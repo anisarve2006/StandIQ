@@ -1,6 +1,7 @@
 import argparse
 
 try:
+    # pyrefly: ignore [missing-import]
     from neo4j import GraphDatabase
 except ImportError:
     GraphDatabase = None

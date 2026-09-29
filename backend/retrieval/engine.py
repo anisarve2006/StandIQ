@@ -559,22 +559,38 @@ class StandardsRecommenderEngine:
         # Detect if input is Excel (.xls / .xlsx / .csv) or PDF or Text
         is_excel = False
         is_text = False
+        is_image = False
         
+        image_extensions = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff', '.tif')
+
         if filename:
             fn_lower = filename.lower()
             if fn_lower.endswith(('.xls', '.xlsx', '.csv')):
                 is_excel = True
             elif fn_lower.endswith(('.txt', '.log', '.json')):
                 is_text = True
+            elif fn_lower.endswith(image_extensions):
+                is_image = True
         
         if isinstance(pdf_input, str):
             if pdf_input.lower().endswith(('.xls', '.xlsx', '.csv')):
                 is_excel = True
             elif pdf_input.lower().endswith(('.txt', '.log', '.json')):
                 is_text = True
+            elif pdf_input.lower().endswith(image_extensions):
+                is_image = True
         elif isinstance(pdf_input, bytes):
             if pdf_input.startswith(b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1') or pdf_input.startswith(b'PK\x03\x04'):
                 is_excel = True
+            elif (
+                pdf_input.startswith(b'\x89PNG\r\n\x1a\n') or
+                pdf_input.startswith(b'\xff\xd8\xff') or
+                pdf_input.startswith(b'RIFF') and b'WEBP' in pdf_input[:14] or
+                pdf_input.startswith(b'BM') or
+                pdf_input.startswith(b'II*\x00') or
+                pdf_input.startswith(b'MM\x00*')
+            ):
+                is_image = True
             elif not pdf_input.startswith(b'%PDF'):
                 # Try decoding as text
                 try:
@@ -585,6 +601,8 @@ class StandardsRecommenderEngine:
 
         if is_excel:
             doc_parsed = self.excel_processor.extract_document(pdf_input, filename=filename)
+        elif is_image:
+            doc_parsed = self.pdf_processor.extract_image(pdf_input, filename=filename)
         elif is_text:
             text = pdf_input.decode('utf-8', errors='ignore') if isinstance(pdf_input, bytes) else pdf_input
             lines = [l.strip() for l in text.split('\n') if len(l.strip()) > 5]
@@ -599,7 +617,7 @@ class StandardsRecommenderEngine:
                     "category": "Specification Clause"
                 })
             doc_parsed = {
-                "metadata": {"file_type": "TEXT_DOCUMENT", "total_rows": len(lines), "extracted_items_count": len(extracted)},
+                "metadata": {"file_type": "TEXT_DOCUMENT", "total_rows": len(lines), "extracted_items_count": len(extracted), "extraction_mode": "DIGITAL", "is_scanned": False},
                 "extracted_items": extracted
             }
         else:

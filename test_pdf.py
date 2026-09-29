@@ -25,7 +25,7 @@ if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
 try:
-    from api_service import recommend_tender_pdf
+    from api_service import recommend_tender_pdf 
 except ImportError:
     from backend.api_service import recommend_tender_pdf
 

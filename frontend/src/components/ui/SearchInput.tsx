@@ -1,5 +1,6 @@
 import React from 'react';
 import { type InputHTMLAttributes } from 'react';
+import { Search } from 'lucide-react';
 
 export interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
   onClear?: () => void;
@@ -10,7 +11,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className = '', onClear, isLoading, value, ...props }, ref) => {
     return (
       <div className={`relative flex items-center w-full ${className}`}>
-        <span className="absolute left-3 text-text-muted">⚲</span>
+        <Search className="absolute left-3 w-4 h-4 text-text-muted" />
         <input
           ref={ref}
           value={value}
