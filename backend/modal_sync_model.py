@@ -62,13 +62,16 @@ def download_model(mode: str, source: str, filename: str = "BharatGPT-3B-Indic.Q
                         bar.update(len(chunk))
 
     elif mode == "gdrive":
+        import re
         import gdown
         print(f"📥 Fetching from Google Drive: {source}...")
-        # fuzzy=True handles both raw file IDs and full Google Drive sharing links
-        if source.startswith("http"):
-            gdown.download(url=source, output=dest_path, quiet=False, fuzzy=True)
-        else:
-            gdown.download(id=source, output=dest_path, quiet=False, fuzzy=True)
+        file_id = source.strip()
+        if "drive.google.com" in source:
+            match = re.search(r"/d/([a-zA-Z0-9_-]+)", source) or re.search(r"id=([a-zA-Z0-9_-]+)", source)
+            if match:
+                file_id = match.group(1)
+        download_url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url=download_url, output=dest_path, quiet=False)
 
     elif mode == "hf":
         import shutil
