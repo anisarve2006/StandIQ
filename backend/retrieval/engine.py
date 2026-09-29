@@ -72,6 +72,7 @@ class StandardsRecommenderEngine:
         """Clear recommendation cache and underlying component caches."""
         with self._recommend_cache_lock:
             self._recommend_cache.clear()
+        query_cache.invalidate()
         if hasattr(self.graph_expander, "clear_cache"):
             self.graph_expander.clear_cache()
 
@@ -195,15 +196,37 @@ class StandardsRecommenderEngine:
         timings = {}
 
         # 0. Check Multi-Tier LRU Query Cache (Sub-millisecond retrieval)
+        cache_key = (self.db_path, query_text.strip(), top_candidates)
         if use_cache:
+            with self._recommend_cache_lock:
+                if cache_key in self._recommend_cache:
+                    cached = copy.deepcopy(self._recommend_cache[cache_key])
+                    total_ms = round((time.time() - t0) * 1000, 2)
+                    cached["total_time_ms"] = total_ms
+                    cached["is_cached"] = True
+                    metrics_collector.record_request(total_ms, is_cached=True)
+                    return cached
+
             cached_result = query_cache.get(query_text, {"top_candidates": top_candidates})
             if cached_result is not None:
-                cached_copy = dict(cached_result)
+                cached_copy = copy.deepcopy(cached_result) if isinstance(cached_result, dict) else cached_result
                 cached_copy["is_cached"] = True
                 total_ms = round((time.time() - t0) * 1000, 2)
                 cached_copy["total_time_ms"] = total_ms
                 metrics_collector.record_request(total_ms, is_cached=True)
                 return cached_copy
+
+        def _return_cached(payload: Dict[str, Any]) -> Dict[str, Any]:
+            total_time_ms = payload.get("total_time_ms", round((time.time() - t0) * 1000, 2))
+            payload["total_time_ms"] = total_time_ms
+            if use_cache:
+                with self._recommend_cache_lock:
+                    if len(self._recommend_cache) >= self._max_cache_size:
+                        self._recommend_cache.pop(next(iter(self._recommend_cache)))
+                    self._recommend_cache[cache_key] = copy.deepcopy(payload)
+                query_cache.put(query_text, payload, {"top_candidates": top_candidates})
+            metrics_collector.record_request(total_time_ms, is_cached=False)
+            return payload
 
         # Multi-Clause Specification / Schedule of Requirements Handling
         clause_pattern = r'(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+(?:\n(?!\s*\d+[\.\)]\s+)[^\n]+)*)'
@@ -500,8 +523,8 @@ class StandardsRecommenderEngine:
             else:
                 rejected_candidates.append(cand_copy)
 
-        # Only pass compatible candidates to reranking; fallback only if empty
-        candidates_for_rerank = compatible_candidates if compatible_candidates else initial_candidates
+        # Only pass compatible candidates to reranking; fallback to rejected (annotated) only if empty
+        candidates_for_rerank = compatible_candidates if compatible_candidates else (rejected_candidates if rejected_candidates else initial_candidates)
         timings["constraint_verification_ms"] = round((time.time() - t_const) * 1000, 2)
 
         # 4. Late-Interaction ColBERT-style Reranking
@@ -516,15 +539,18 @@ class StandardsRecommenderEngine:
         if len(candidates_to_use) >= 2 and self.bharatgpt and self.bharatgpt.is_available():
             score_1 = candidates_to_use[0].get("late_interaction_score", 1.0)
             score_2 = candidates_to_use[1].get("late_interaction_score", 0.0)
-            # If candidates are in close contention (within 8% score delta) and not an exact match
-            if abs(score_1 - score_2) <= 0.08 and candidates_to_use[0].get("source_channel") != "EXACT_ID":
+            # If candidates are in close contention (within 8% score delta) and not an exact/trade match
+            src_ch = candidates_to_use[0].get("source_channel")
+            if abs(score_1 - score_2) <= 0.08 and src_ch not in ["EXACT_ID", "TRADE_LEXICON"]:
                 t_judge = time.time()
                 arb_result = self.bharatgpt.arbitrate_candidates(query_text, candidates_to_use[:3])
                 if arb_result:
                     arbitration_audit = arb_result
                     chosen = arb_result["chosen_candidate"]
-                    if chosen["family_id"] != candidates_to_use[0]["family_id"]:
-                        candidates_to_use = [chosen] + [c for c in candidates_to_use if c["family_id"] != chosen["family_id"]]
+                    chosen_fid = chosen.get("family_id")
+                    matched_cand = next((c for c in candidates_to_use if c["family_id"] == chosen_fid), chosen)
+                    if matched_cand["family_id"] != candidates_to_use[0]["family_id"]:
+                        candidates_to_use = [matched_cand] + [c for c in candidates_to_use if c["family_id"] != matched_cand["family_id"]]
                 timings["bharatgpt_judge_ms"] = round((time.time() - t_judge) * 1000, 2)
 
         # Primary Standard selection
@@ -554,7 +580,7 @@ class StandardsRecommenderEngine:
             primary_standard=primary_candidate,
             allied_standards=completeness_res["allied_standards"],
             certification_info=graph_data["certification"],
-            constraint_results=primary_candidate["constraint_result"],
+            constraint_results=primary_candidate.get("constraint_result", {}),
             coverage_info=completeness_res["final_coverage"]
         )
         timings["evidence_pack_ms"] = round((time.time() - t_pack) * 1000, 2)
@@ -625,13 +651,9 @@ class StandardsRecommenderEngine:
             "alternative_candidates": alternatives,
             "total_time_ms": total_time_ms,
             "latency_breakdown_ms": timings
-        })
+        }
 
-        if use_cache:
-            query_cache.put(query_text, response_payload, {"top_candidates": top_candidates})
-        metrics_collector.record_request(total_time_ms, is_cached=False)
-
-        return response_payload
+        return _return_cached(response_payload)
 
     def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3, filename: Optional[str] = None) -> Dict[str, Any]:
         """

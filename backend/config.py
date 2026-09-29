@@ -1,4 +1,16 @@
 import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    _curr_dir = os.path.dirname(os.path.abspath(__file__))
+    _backend_env = os.path.join(_curr_dir, ".env")
+    if os.path.exists(_backend_env):
+        load_dotenv(_backend_env)
+    _root_env = os.path.join(os.path.dirname(_curr_dir), ".env")
+    if os.path.exists(_root_env):
+        load_dotenv(_root_env)
+except Exception:
+    pass
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")

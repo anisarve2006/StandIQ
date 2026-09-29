@@ -28,6 +28,7 @@ data/
 backend/data/*
 !backend/data/qco_master.json
 !backend/data/sample_gem_tender.pdf
+!backend/data/standards.db
 
 # --- Node / Frontend Artifacts ---
 node_modules/

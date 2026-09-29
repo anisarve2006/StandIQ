@@ -236,20 +236,28 @@ class HybridRetriever:
         if not candidate_pool:
             return []
 
-        # Evaluate top 25 candidates on CPU for robust recall
-        pool_to_score = candidate_pool[:25]
+        self._load_vector_index()
+        pool_to_score = candidate_pool[:12]
         query_vec = self._get_embedding(query_text)
+
+        fid_to_vec = {}
+        if getattr(self, "_vector_index_loaded", False) and hasattr(self, "_vector_fids"):
+            fid_to_vec = {fid: self._vector_matrix[i] for i, fid in enumerate(self._vector_fids)}
 
         scored_candidates = []
         for cand in pool_to_score:
-            title = cand.get('title_en', '')
-            scope = cand.get('scope_text') or ''
-            div = cand.get('division') or ''
-            scope_str = f" Scope: {scope}" if scope and len(scope) > 5 else ""
-            div_str = f" Division: {div}" if div else ""
-            doc_repr = f"{title}.{scope_str}{div_str}".strip()
+            fid = cand.get('family_id')
+            if fid in fid_to_vec:
+                cvec = fid_to_vec[fid]
+            else:
+                title = cand.get('title_en', '')
+                scope = cand.get('scope_text') or ''
+                div = cand.get('division') or ''
+                scope_str = f" Scope: {scope}" if scope and len(scope) > 5 else ""
+                div_str = f" Division: {div}" if div else ""
+                doc_repr = f"{title}.{scope_str}{div_str}".strip()
+                cvec = self._get_embedding(doc_repr)
 
-            cvec = self._get_embedding(doc_repr)
             sim = float(np.dot(query_vec, cvec))
             item = dict(cand)
             item["semantic_score"] = round(sim, 4)

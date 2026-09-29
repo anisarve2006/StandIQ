@@ -1,11 +1,11 @@
-# 🚀 MaanakAI (मानक AI) — How to Run Guide
+# MaanakAI (मानक AI) — How to Run Guide
 **Indian Standards Recommendation & Compliance Engine (SIH 26108)**
 
 This document provides a step-by-step guide to setting up and running the complete **MaanakAI** full-stack application (FastAPI backend + Vite/React frontend), as well as running test tools and CLI auditors.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 1. [System Prerequisites](#1-system-prerequisites)
 2. [Quick Start (TL;DR)](#2-quick-start-tldr)
 3. [Frontend Setup (React + Vite)](#3-frontend-setup-react--vite)
@@ -81,7 +81,7 @@ cd frontend
 ```
 
 ### Step 2: Install dependencies
-> ⚠️ **Why did `npm run dev` fail with `'vite' is not recognized`?**  
+> ️ **Why did `npm run dev` fail with `'vite' is not recognized`?**  
 > `node_modules` is not committed to git. You must run `npm install` first so Vite and all libraries are downloaded!
 
 ```powershell
@@ -106,8 +106,8 @@ Output will show:
 ```
   VITE v8.3.0  ready in 320 ms
 
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
+    Local:   http://localhost:5173/
+    Network: use --host to expose
 ```
 
 ### Frontend Commands Summary
@@ -138,7 +138,7 @@ python -m venv venv
 ```
 *(If on Windows Command Prompt `cmd.exe`: run `venv\Scripts\activate.bat`)*
 
-> 💡 **Tip:** If PowerShell gives a policy error (`File cannot be loaded because running scripts is disabled`):
+>  **Tip:** If PowerShell gives a policy error (`File cannot be loaded because running scripts is disabled`):
 > ```powershell
 > Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 > .\venv\Scripts\Activate.ps1

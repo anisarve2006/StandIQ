@@ -330,14 +330,14 @@ Conducted across 100 heterogeneous procurement specifications covering Civil, El
 
 | Benchmark Dimension | Naive Baseline | StandIQ (Post-Guard Engine) | Verification Status |
 |---|:---:|:---:|:---:|
-| **Curated Benchmark Accuracy (100 Items)** | 69.0% (31 Domain Errors) | **100/100 Identified** | ✅ RESOLVED VIA GUARDS |
-| **Mandatory QCO Detection Rate** | 64.7% (Missed Harmonized Codes) | **34/34 Detected (100%)** | ✅ VERIFIED AGAINST GAZETTE |
-| **Data Fabrication / Hallucinated Codes** | Fabricated 4 Codes | **0 Fabricated (100% Grounded)** | ✅ ENFORCED BY AST KERNEL |
-| **Average Pipeline Latency (CPU)** | 1,420 ms | **516.3 ms** | ✅ SUB-SECOND OPTIMIZED |
-| **Role Inversions (Test vs Spec)** | 6/6 Inverted | **0 Inversions (Correct Test Methods)** | ✅ DOCUMENT ROLE SIEVE |
-| **Constituent Material Inversions** | 5/5 Inverted | **0 Inversions (Primary Codes Retained)** | ✅ MATERIAL HIERARCHY GUARD |
-| **Harmonization of Superseded Standards** | 2/2 Failed (IS 8112/12269) | **2/2 Routed to IS 269:2015** | ✅ HARMONIZATION ENGINE |
-| **Calibrated Ambiguity Downgrades** | 0 Flagged (Overconfident) | **6/6 Flagged as NEEDS_REVIEW** | ✅ CONFIDENCE CALIBRATOR |
+| **Curated Benchmark Accuracy (100 Items)** | 69.0% (31 Domain Errors) | **100/100 Identified** |  RESOLVED VIA GUARDS |
+| **Mandatory QCO Detection Rate** | 64.7% (Missed Harmonized Codes) | **34/34 Detected (100%)** |  VERIFIED AGAINST GAZETTE |
+| **Data Fabrication / Hallucinated Codes** | Fabricated 4 Codes | **0 Fabricated (100% Grounded)** |  ENFORCED BY AST KERNEL |
+| **Average Pipeline Latency (CPU)** | 1,420 ms | **516.3 ms** |  SUB-SECOND OPTIMIZED |
+| **Role Inversions (Test vs Spec)** | 6/6 Inverted | **0 Inversions (Correct Test Methods)** |  DOCUMENT ROLE SIEVE |
+| **Constituent Material Inversions** | 5/5 Inverted | **0 Inversions (Primary Codes Retained)** |  MATERIAL HIERARCHY GUARD |
+| **Harmonization of Superseded Standards** | 2/2 Failed (IS 8112/12269) | **2/2 Routed to IS 269:2015** |  HARMONIZATION ENGINE |
+| **Calibrated Ambiguity Downgrades** | 0 Flagged (Overconfident) | **6/6 Flagged as NEEDS_REVIEW** |  CONFIDENCE CALIBRATOR |
 
 ---
 

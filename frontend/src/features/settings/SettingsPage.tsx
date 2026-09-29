@@ -528,7 +528,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-2">
-                <label className="block text-xs font-bold text-slate-900">StandIQ Organization API Key</label>
+                <label className="block text-xs font-bold text-slate-900">BISense Organization API Key</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="password"

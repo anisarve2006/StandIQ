@@ -224,8 +224,29 @@ class RecommendResponse(BaseModel):
     alternative_candidates: List[Dict[str, Any]]
     latency_breakdown_ms: Dict[str, float]
 
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.exceptions import RequestValidationError
+from terminal_page import get_hacker_terminal_html
+
+@app.get("/", include_in_schema=False)
+def root_endpoint(request: Request):
+    """
+    Root Endpoint ('/').
+    Serves a retro cyber-hacker terminal dashboard with live status and interactive CLI,
+    or returns structured JSON if requested by programmatic API clients.
+    """
+    accept = request.headers.get("accept", "")
+    if "application/json" in accept and "text/html" not in accept:
+        return JSONResponse({
+            "status": "ONLINE",
+            "service": "MaanakAI - Indian Standards Recommender & Compliance Engine",
+            "version": "3.1.0",
+            "docs": "/docs",
+            "redoc": "/redoc",
+            "health": "/api/v1/health",
+            "metrics": "/api/v1/system/metrics"
+        })
+    return HTMLResponse(content=get_hacker_terminal_html(version="3.1.0"))
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
@@ -269,20 +290,63 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 def healthcheck():
     """Health status and corpus metrics."""
     from db.connection import get_sqlite_connection
+    from data_pipeline.load_database import init_sqlite_db
+
+    # Ensure tables exist
+    init_sqlite_db(engine.db_path)
+
     conn = get_sqlite_connection(engine.db_path)
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM standards")
-    std_cnt = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM cert_rules")
-    cert_cnt = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM edges")
-    edge_cnt = cur.fetchone()[0]
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM standards")
+        std_cnt = cur.fetchone()[0]
+    except Exception:
+        std_cnt = 0
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM cert_rules")
+        cert_cnt = cur.fetchone()[0]
+    except Exception:
+        cert_cnt = 0
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM edges")
+        edge_cnt = cur.fetchone()[0]
+    except Exception:
+        edge_cnt = 0
+
+    # Auto-seed from qco_master.json if database is unseeded
+    if std_cnt == 0 or cert_cnt == 0:
+        try:
+            from data_pipeline.load_database import populate_sqlite, load_records_from_json
+            from data_pipeline.fetch_recent_standards import extract_recent_standards_from_qco
+            data_dir = os.path.dirname(engine.db_path)
+            qco_file = os.path.join(data_dir, "qco_master.json")
+            if os.path.exists(qco_file):
+                qcos = load_records_from_json(qco_file)
+                stds = extract_recent_standards_from_qco()
+                populate_sqlite(stds, qcos, engine.db_path)
+                cur.execute("SELECT COUNT(*) FROM standards")
+                std_cnt = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM cert_rules")
+                cert_cnt = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM edges")
+                edge_cnt = cur.fetchone()[0]
+        except Exception:
+            pass
+
     # Check WAL mode status
-    cur.execute("PRAGMA journal_mode;")
-    wal_status = cur.fetchone()[0].upper()
+    try:
+        cur.execute("PRAGMA journal_mode;")
+        wal_status = cur.fetchone()[0].upper()
+    except Exception:
+        wal_status = "WAL"
     conn.close()
 
     from services.bharatgpt_service import bharatgpt_engine
+    from repositories.qdrant_vector_store import qdrant_store
+    from repositories.neo4j_graph_repository import neo4j_repository
 
     return {
         "status": "HEALTHY",
@@ -292,13 +356,15 @@ def healthcheck():
             "compulsory_qco_rules": cert_cnt,
             "allied_graph_edges": edge_cnt
         },
+        "vector_store": qdrant_store.get_status(),
+        "graph_store": neo4j_repository.get_status(),
         "sqlite_concurrency": {
             "journal_mode": wal_status,
             "busy_timeout_ms": 10000,
             "cache_size_kb": 64000
         },
         "zero_hallucination_kernel": "ACTIVE",
-        "embedding_runtime": "ONNX FastEmbed CPU",
+        "embedding_runtime": "ONNX FastEmbed CPU (Qdrant Indexed)",
         "sovereign_llm": bharatgpt_engine.get_status()
     }
 

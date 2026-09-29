@@ -26,13 +26,13 @@ interface SpecSection {
 
 const DEFAULT_SECTIONS: SpecSection[] = [
   { id: 1, title: 'General Requirements', description: 'Procurement scope, environmental operating limits, site conditions', enabled: true },
-  { id: 2, title: 'Technical Specifications', description: 'Motor rating, frame sizes, insulation class, torque characteristics', enabled: true },
-  { id: 3, title: 'Efficiency Requirements', description: 'IE3 premium efficiency band conforming to IS 12615', enabled: true },
-  { id: 4, title: 'Safety Requirements', description: 'Enclosure IP55 rating, grounding standards, dielectric clearance', enabled: true },
-  { id: 5, title: 'Testing & Inspection', description: 'Loss summation, temperature rise, routine and type test certificates', enabled: true },
-  { id: 6, title: 'Installation Requirements', description: 'Foundation bolting, vibration limits, alignment tolerances', enabled: true },
-  { id: 7, title: 'Certification Requirements', description: 'Mandatory BIS ISI mark license, CRS registration schedule', enabled: true },
-  { id: 8, title: 'Documentation', description: 'Operation manuals, test reports, spare parts schedule, warranty', enabled: true },
+  { id: 2, title: 'Technical Specifications', description: 'Rating, capacity, design parameters, and performance characteristics', enabled: true },
+  { id: 3, title: 'Quality & Standards Alignment', description: 'Mandatory Indian Standards (IS), ISO specifications, and QCO compliance', enabled: true },
+  { id: 4, title: 'Safety & Environmental Safeguards', description: 'Ingress protection, hazardous material limits, grounding, and fail-safes', enabled: true },
+  { id: 5, title: 'Testing & Quality Assurance', description: 'NABL-accredited test reports, routine inspection, and type testing protocols', enabled: true },
+  { id: 6, title: 'Packaging & Delivery', description: 'Preservation packaging, transit insurance, and delivery schedules', enabled: true },
+  { id: 7, title: 'Statutory Certification Requirements', description: 'Mandatory BIS ISI Mark / CRS license and manufacturer test certificates', enabled: true },
+  { id: 8, title: 'Documentation & Warranty', description: 'Operating manuals, spare parts catalog, and comprehensive warranty terms', enabled: true },
 ];
 
 export default function SpecificationBuilderPage() {

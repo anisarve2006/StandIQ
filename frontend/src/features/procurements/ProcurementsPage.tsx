@@ -20,89 +20,20 @@ interface ProcurementItem {
   updated: string;
 }
 
-const INITIAL_PROCUREMENTS: ProcurementItem[] = [
-  {
-    id: 'pr-1',
-    title: 'Electrical Distribution Panel',
-    category: 'Electrical Equipment',
-    status: 'In Review',
-    standardsCount: 7,
-    updated: '24 Sep 2026'
-  },
-  {
-    id: 'pr-2',
-    title: 'Cement Supply',
-    category: 'Construction Materials',
-    status: 'Ready',
-    standardsCount: 8,
-    updated: '22 Sep 2026'
-  },
-  {
-    id: 'pr-3',
-    title: 'Solar PV Modules',
-    category: 'Renewable Energy',
-    status: 'Completed',
-    standardsCount: 6,
-    updated: '20 Sep 2026'
-  },
-  {
-    id: 'pr-4',
-    title: 'Fire Safety Equipment',
-    category: 'Safety Equipment',
-    status: 'Draft',
-    standardsCount: 4,
-    updated: '18 Sep 2026'
-  },
-  {
-    id: 'pr-5',
-    title: 'Water Pumps',
-    category: 'Industrial Equipment',
-    status: 'In Review',
-    standardsCount: 6,
-    updated: '16 Sep 2026'
-  },
-  {
-    id: 'pr-6',
-    title: 'IT Laptops',
-    category: 'IT Equipment',
-    status: 'Ready',
-    standardsCount: 5,
-    updated: '15 Sep 2026'
-  },
-  {
-    id: 'pr-7',
-    title: 'Road Construction Material',
-    category: 'Construction Materials',
-    status: 'Draft',
-    standardsCount: 3,
-    updated: '12 Sep 2026'
-  },
-  {
-    id: 'pr-8',
-    title: 'Medical Equipment',
-    category: 'Medical Devices',
-    status: 'Completed',
-    standardsCount: 9,
-    updated: '10 Sep 2026'
-  }
-];
-
 export default function ProcurementsPage() {
   const navigate = useNavigate();
   const { setCurrentProcurement } = useProcurement();
   const { formatDate, documents, setActiveDocId, getDocumentBasket, addOrUpdateDocument } = useStandIQ();
 
-  // Map persistent documents to procurement items (with INITIAL_PROCUREMENTS fallback)
-  const mappedStoreItems: ProcurementItem[] = documents.length > 0
-    ? documents.map(d => ({
-        id: d.id,
-        title: d.title,
-        category: d.category || 'Electrical Equipment',
-        status: d.status,
-        standardsCount: getDocumentBasket(d.id).length,
-        updated: d.uploadedAt
-      }))
-    : INITIAL_PROCUREMENTS;
+  // Map persistent documents to procurement items
+  const mappedStoreItems: ProcurementItem[] = documents.map(d => ({
+    id: d.id,
+    title: d.title,
+    category: d.category || 'Electrical Equipment',
+    status: d.status,
+    standardsCount: getDocumentBasket(d.id).length,
+    updated: d.uploadedAt
+  }));
 
   const [activeTab, setActiveTab] = useState<'All' | 'Active' | 'Drafts' | 'In Review' | 'Completed'>('All');
   const [search, setSearch] = useState('');
@@ -276,22 +207,34 @@ export default function ProcurementsPage() {
       {/* 04. Procurements Table */}
       <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[900px]">
             <thead>
               <tr className="bg-slate-50/70 border-b border-slate-100 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                <th className="py-3 px-6 whitespace-nowrap">Title</th>
-                <th className="py-3 px-6 whitespace-nowrap">Category</th>
-                <th className="py-3 px-6 whitespace-nowrap">Status</th>
-                <th className="py-3 px-6 text-center whitespace-nowrap">Standards</th>
-                <th className="py-3 px-6 whitespace-nowrap">Updated</th>
-                <th className="py-3 px-6 text-right whitespace-nowrap">Actions</th>
+                <th className="py-3.5 px-6 whitespace-nowrap min-w-[300px]">Title</th>
+                <th className="py-3.5 px-6 whitespace-nowrap min-w-[160px]">Category</th>
+                <th className="py-3.5 px-6 whitespace-nowrap min-w-[120px]">Status</th>
+                <th className="py-3.5 px-6 text-center whitespace-nowrap min-w-[110px]">Standards</th>
+                <th className="py-3.5 px-6 whitespace-nowrap min-w-[120px]">Updated</th>
+                <th className="py-3.5 px-6 text-right whitespace-nowrap min-w-[90px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredProcurements.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 whitespace-nowrap">
-                    No procurements match your current search or filters.
+                  <td colSpan={6} className="py-16 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-2 max-w-sm mx-auto">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                        <FileText className="w-5 h-5 stroke-[1.5]" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-800">
+                        {documents.length === 0 ? 'No procurements created yet' : 'No matching procurements'}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {documents.length === 0 
+                          ? 'Upload a tender in Review & Verify or click New Procurement to start.' 
+                          : 'Try adjusting your search query or category filters.'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -301,18 +244,22 @@ export default function ProcurementsPage() {
                     onClick={() => handleOpenProcurement(p)}
                     className="hover:bg-slate-50/70 cursor-pointer transition-colors group"
                   >
-                    <td className="py-3.5 px-6 font-semibold text-slate-900 group-hover:text-blue-600 whitespace-nowrap">
-                      <div className="flex items-center gap-2 whitespace-nowrap">
-                        <FileText className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-500 shrink-0" />
-                        <span className="whitespace-nowrap">{p.title}</span>
+                    <td className="py-4 px-6 font-semibold text-slate-900 group-hover:text-blue-600 min-w-[300px]">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-50/80 text-blue-600 shrink-0 group-hover:bg-blue-100/80 transition-colors">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <span className="truncate max-w-[280px] font-semibold text-slate-900 group-hover:text-blue-600 leading-snug">
+                          {p.title}
+                        </span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-6 text-slate-600 whitespace-nowrap">
+                    <td className="py-4 px-6 text-slate-600 whitespace-nowrap min-w-[160px]">
                       {p.category}
                     </td>
-                    <td className="py-3.5 px-6 whitespace-nowrap">
+                    <td className="py-4 px-6 whitespace-nowrap min-w-[120px]">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border whitespace-nowrap ${
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap ${
                           p.status === 'Completed'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : p.status === 'In Review'
@@ -325,18 +272,18 @@ export default function ProcurementsPage() {
                         {p.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-6 text-center whitespace-nowrap">
-                      <span className="font-mono font-semibold text-slate-800 bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60 whitespace-nowrap">
+                    <td className="py-4 px-6 text-center whitespace-nowrap min-w-[110px]">
+                      <span className="font-mono font-semibold text-slate-800 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/60 whitespace-nowrap">
                         {p.standardsCount}
                       </span>
                     </td>
-                    <td className="py-3.5 px-6 text-slate-500 font-mono text-[11px] whitespace-nowrap">
+                    <td className="py-4 px-6 text-slate-500 font-mono text-[11px] whitespace-nowrap min-w-[120px]">
                       {formatDate(p.updated)}
                     </td>
-                    <td className="py-3.5 px-6 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-4 px-6 text-right whitespace-nowrap min-w-[90px]" onClick={(e) => e.stopPropagation()}>
                       <button 
                         onClick={() => handleOpenProcurement(p)}
-                        className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap shrink-0"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap shrink-0"
                         title="Open Procurement Analysis"
                       >
                         <MoreHorizontal className="w-4 h-4" />

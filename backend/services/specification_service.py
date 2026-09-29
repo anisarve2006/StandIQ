@@ -9,7 +9,32 @@ class SpecificationService:
         # If there are no standards or evidence, we cannot generate a grounded specification.
         if not standards:
             return SpecificationGenerateResponse(specification_clause="UNKNOWN: No standards selected for specification generation.")
-            
+
+        # Attempt high-fidelity clause drafting using sovereign BharatGPT (Modal Serverless or Local)
+        try:
+            from services.bharatgpt_service import bharatgpt_engine
+            if bharatgpt_engine and bharatgpt_engine.is_available():
+                primary = standards[0]
+                std_id = primary.get("raw_id", primary.get("family_id", "IS Standard"))
+                std_title = primary.get("title_en", std_id)
+                param_dict = {}
+                for req in (requirements or []):
+                    if req.name and (req.expected_value or req.normalized_value):
+                        param_dict[req.name] = req.normalized_value or req.expected_value
+                cert_ev = [e.get("source", "QCO") for e in (evidence or []) if e.get("evidence_type") == "CERTIFICATION"]
+                cert_info = ", ".join(cert_ev) if cert_ev else "Standard Quality Compliance"
+                clause = bharatgpt_engine.draft_specification_clause(
+                    product_name=std_title,
+                    standard_id=std_id,
+                    standard_title=std_title,
+                    parameters=param_dict,
+                    certification_info=cert_info
+                )
+                if clause and len(clause) > 15:
+                    return SpecificationGenerateResponse(specification_clause=clause)
+        except Exception:
+            pass
+
         lines.append("### GENERATED TENDER SPECIFICATION CLAUSE")
         lines.append("")
         

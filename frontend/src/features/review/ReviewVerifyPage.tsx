@@ -97,820 +97,18 @@ interface TenderDocumentData {
   recommendedStandards: RecommendedStandardItem[];
 }
 
-// 1. Three-Phase Induction Motors Sample
-const SAMPLE_MOTORS: TenderDocumentData = {
-  id: 'motors',
-  fileName: 'Tender_Document.pdf',
-  fileSize: '2.4 MB',
-  totalPages: 45,
-  department: 'ENGINEERING & PROCUREMENT CELL, CENTRAL POWER UTILITY',
-  tenderNumber: 'TDR/2026/ELEC-IND/042-REV1',
-  title: 'TECHNICAL SPECIFICATION FOR THREE-PHASE INDUCTION MOTORS',
-  section: 'SECTION 4 — TECHNICAL REQUIREMENTS & PERFORMANCE',
-  clauses: [
-    {
-      id: 'c-4.1',
-      number: '4.1',
-      title: 'Scope of Supply & Ambient Conditions',
-      text: 'The contractor shall design, manufacture, test, and supply high-performance electrical drives suitable for continuous industrial duty under tropical ambient temperature conditions (-5°C to 50°C) with relative humidity up to 95%.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-4.2',
-      number: '4.2',
-      title: 'Electric Motors & Efficiency Class',
-      text: 'The motor shall be three-phase induction type rated for 415V ±10%, 50Hz ±5% with minimum efficiency of 90% (IE3 Premium Efficiency equivalent as per IS 12615:2018) and shall be suitable for continuous S1 duty in outdoor environments.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #1 & #2',
-      matchedRequirementId: 1,
-      matchedStandard: 'IS 12615:2018'
-    },
-    {
-      id: 'c-4.3',
-      number: '4.3',
-      title: 'Testing & Quality Verification Protocols',
-      text: 'All motors shall be type tested for efficiency, temperature rise, and insulation resistance conforming to IS 12615:2018 and IS 8789:1981 loss summation procedures. Routine test certificates must accompany every consignment.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #4',
-      matchedRequirementId: 4,
-      matchedStandard: 'IS 8789:1981'
-    },
-    {
-      id: 'c-4.4',
-      number: '4.4',
-      title: 'Enclosure Protection & Insulation Class',
-      text: 'Enclosure protection shall conform to minimum IP55 rating with Class F insulation and temperature rise restricted to Class B limits conforming to IS 325:1996 and IS 302:2008.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-4.5',
-      number: '4.5',
-      title: 'Terminal Box & Grounding System',
-      text: 'Terminal box shall have IP66 ingress protection with dual brass grounding terminals. Metric PG gland plates must be provided for armored copper cables conforming to IS 1231.',
-      isHighlighted: false
-    }
-  ],
-  requirements: [
-    {
-      id: 1,
-      title: 'Motor Type & Voltage',
-      severity: 'High',
-      requirementText: 'Three-phase induction motor, 415V ±10%, 50Hz for S1 duty',
-      recommendedStandard: 'IS 12615:2018',
-      status: 'pending',
-      clauseNumber: '4.2',
-      category: 'Product'
-    },
-    {
-      id: 2,
-      title: 'Efficiency Level (IE3)',
-      severity: 'High',
-      requirementText: 'Minimum efficiency of 90% (IE3 equivalent under BIS QCO)',
-      recommendedStandard: 'IS 12615:2018',
-      status: 'pending',
-      clauseNumber: '4.2',
-      category: 'Product'
-    },
-    {
-      id: 3,
-      title: 'Operating Ambient Limits',
-      severity: 'Medium',
-      requirementText: 'Continuous operation outdoor conditions (ambient -5°C to 50°C, 95% RH)',
-      recommendedStandard: 'IS 325:1996',
-      status: 'pending',
-      clauseNumber: '4.1',
-      category: 'Testing'
-    },
-    {
-      id: 4,
-      title: 'Type Testing Protocols',
-      severity: 'High',
-      requirementText: 'Type tested for efficiency, heating and insulation as per IS 12615:2018',
-      recommendedStandard: 'IS 8789:1981',
-      status: 'pending',
-      clauseNumber: '4.3',
-      category: 'Testing'
-    },
-    {
-      id: 5,
-      title: 'Enclosure Protection (IP55)',
-      severity: 'Medium',
-      requirementText: 'IP55 enclosure rating with Class F insulation and Class B temperature rise',
-      recommendedStandard: 'IS 302:2008',
-      status: 'pending',
-      clauseNumber: '4.4',
-      category: 'Safety'
-    }
-  ],
-  recommendedStandards: [
-    {
-      code: 'IS 12615:2018',
-      title: 'Energy Efficient Induction Motors (Three-phase)',
-      match: 94,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Mandatory standard for IE3 three-phase industrial motors under Compulsory QCO order.'
-    },
-    {
-      code: 'IS 325:1996',
-      title: 'Three-phase Induction Motors - General Specifications',
-      match: 88,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Governs frame sizes, mounting boundaries, and operational tolerances.'
-    },
-    {
-      code: 'IS 8789:1981',
-      title: 'Method of Test for Efficiency of Induction Motors',
-      match: 91,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Prescribed test protocols for losses summation and verification.'
-    },
-    {
-      code: 'IS 302:2008',
-      title: 'Safety of Electrical Equipment - General Requirements',
-      match: 85,
-      type: 'Safety',
-      status: 'Current',
-      rationale: 'Ensures dielectric clearance, creepage limits, and grounding safety.'
-    }
-  ]
-};
-
-// 2. Electrical Distribution Panel Sample
-const SAMPLE_PANELS: TenderDocumentData = {
-  id: 'panels',
-  fileName: 'Electrical_Distribution_Panel_Tender_2026.pdf',
-  fileSize: '2.4 MB',
-  totalPages: 38,
-  department: 'URBAN INFRASTRUCTURE DEVELOPMENT CORPORATION',
-  tenderNumber: 'UIDC/ELECT-DIST/LV-PANEL/2026-09',
-  title: 'SPECIFICATION FOR 415V LOW VOLTAGE SWITCHGEAR & DISTRIBUTION BOARDS',
-  section: 'SECTION 3 — SWITCHGEAR ASSEMBLY & BUSBAR REQUIREMENTS',
-  clauses: [
-    {
-      id: 'c-3.1',
-      number: '3.1',
-      title: 'Assembly Standards & Rated Insulation Voltage',
-      text: 'The switchgear assembly shall be low-voltage design conforming strictly to IS/IEC 61439-1 & 2. Rated insulation voltage shall be 1000V AC 3-phase 4-wire 50Hz with impulse withstand voltage of 8kV.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #1',
-      matchedRequirementId: 1,
-      matchedStandard: 'IS/IEC 61439-1:2011'
-    },
-    {
-      id: 'c-3.2',
-      number: '3.2',
-      title: 'Busbar Material & Short-Circuit Withstand',
-      text: 'Busbars shall be manufactured from 99.9% pure electrolytic grade high-conductivity copper. The main horizontal and vertical busbars shall withstand a prospective short-circuit fault current of 50kA RMS for 1.0 second.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #2',
-      matchedRequirementId: 2,
-      matchedStandard: 'IS 8623:1993'
-    },
-    {
-      id: 'c-3.3',
-      number: '3.3',
-      title: 'Circuit Breakers Breaking Capacity (ACB / MCCB)',
-      text: 'Incomer and tie breakers shall be microprocessor-based 4-pole Air Circuit Breakers (ACB) and feeder Moulded Case Circuit Breakers (MCCB) conforming to IS/IEC 60947-2 with service breaking capacity Ics = 100% Icu.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #3',
-      matchedRequirementId: 3,
-      matchedStandard: 'IS/IEC 60947-2:2016'
-    },
-    {
-      id: 'c-3.4',
-      number: '3.4',
-      title: 'Enclosure Protection & Sheet Thickness',
-      text: 'The enclosure shall be free-standing, floor-mounted, fully compartmentalized design made of minimum 2.0mm CRCA sheet steel with epoxy powder coating (70-80 microns). Minimum ingress protection shall be IP54 for indoor units as per IS 12063.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-3.5',
-      number: '3.5',
-      title: 'Factory Acceptance & Dielectric Testing',
-      text: 'Routine tests shall include high-voltage dielectric test at 2.5kV for 1 minute, insulation resistance check (> 100 MΩ), and temperature rise verification conforming to IS/IEC 61439-1.',
-      isHighlighted: false
-    }
-  ],
-  requirements: [
-    {
-      id: 1,
-      title: 'Panel Conformance & Voltage Rating',
-      severity: 'High',
-      requirementText: 'Assembly conformance to IS/IEC 61439-1/2, rated insulation 1000V AC',
-      recommendedStandard: 'IS/IEC 61439-1:2011',
-      status: 'pending',
-      clauseNumber: '3.1',
-      category: 'Product'
-    },
-    {
-      id: 2,
-      title: 'Busbar Short-Circuit Withstand',
-      severity: 'High',
-      requirementText: '50kA RMS for 1.0 second withstand, 99.9% electrolytic copper busbars',
-      recommendedStandard: 'IS 8623:1993',
-      status: 'pending',
-      clauseNumber: '3.2',
-      category: 'Product'
-    },
-    {
-      id: 3,
-      title: 'Breakers Breaking Capacity (Ics=100% Icu)',
-      severity: 'High',
-      requirementText: 'Air & Moulded Case Circuit Breakers with Ics = 100% Icu per IS/IEC 60947-2',
-      recommendedStandard: 'IS/IEC 60947-2:2016',
-      status: 'pending',
-      clauseNumber: '3.3',
-      category: 'Safety'
-    },
-    {
-      id: 4,
-      title: 'Enclosure Ingress Protection (IP54)',
-      severity: 'Medium',
-      requirementText: 'Compartmentalized 2.0mm CRCA steel enclosure with minimum IP54 protection',
-      recommendedStandard: 'IS 12063:1987',
-      status: 'pending',
-      clauseNumber: '3.4',
-      category: 'Testing'
-    },
-    {
-      id: 5,
-      title: 'Factory High-Voltage Testing',
-      severity: 'High',
-      requirementText: 'Dielectric test at 2.5kV for 1 min, IR verification > 100 MΩ',
-      recommendedStandard: 'IS/IEC 61439-1:2011',
-      status: 'pending',
-      clauseNumber: '3.5',
-      category: 'Testing'
-    }
-  ],
-  recommendedStandards: [
-    {
-      code: 'IS/IEC 61439-1:2011',
-      title: 'Low-Voltage Switchgear and Controlgear Assemblies - Part 1',
-      match: 96,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Mandatory BIS standard for low-voltage power distribution switchboards.'
-    },
-    {
-      code: 'IS/IEC 60947-2:2016',
-      title: 'Low-Voltage Switchgear and Controlgear - Part 2: Circuit-Breakers',
-      match: 93,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Specifies tripping characteristics, breaking capacities, and isolation criteria.'
-    },
-    {
-      code: 'IS 8623:1993',
-      title: 'Specification for Low-Voltage Switchgear and Controlgear Assemblies',
-      match: 90,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Essential for busbar electrodynamic short-circuit withstand verification.'
-    },
-    {
-      code: 'IS 12063:1987',
-      title: 'Classification of Degrees of Protection by Enclosures (IP Code)',
-      match: 87,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Standardized classification for IP54 dust and splash ingress testing.'
-    }
-  ]
-};
-
-// 3. Centrifugal Water Pumps Sample
-const SAMPLE_PUMPS: TenderDocumentData = {
-  id: 'pumps',
-  fileName: 'Centrifugal_Water_Pumps_Procurement_Spec.pdf',
-  fileSize: '1.8 MB',
-  totalPages: 32,
-  department: 'STATE WATER SUPPLY & SEWERAGE BOARD',
-  tenderNumber: 'WSSB/MECH/PUMP-CLEAR/2026-44',
-  title: 'TECHNICAL SPECIFICATIONS FOR END-SUCTION CENTRIFUGAL WATER PUMPS',
-  section: 'SECTION 2 — HYDRAULIC & MECHANICAL SPECIFICATIONS',
-  clauses: [
-    {
-      id: 'c-2.1',
-      number: '2.1',
-      title: 'Pump Type, Capacity & Efficiency Rating',
-      text: 'Pumps shall be horizontal end-suction, back pull-out centrifugal type designed for handling clear cold potable water. Rated discharge shall be 50 LPS at 45 meters total dynamic head with minimum pump hydraulic efficiency not less than 78% as per IS 1520:1980.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #1 & #2',
-      matchedRequirementId: 1,
-      matchedStandard: 'IS 1520:1980'
-    },
-    {
-      id: 'c-2.2',
-      number: '2.2',
-      title: 'Materials of Construction & Metallurgy',
-      text: 'Pump casing shall be close-grained cast iron conforming to Grade FG 260 of IS 210. Impeller shall be dynamically balanced phosphor bronze Grade II of IS 28 or stainless steel CF8M. Pump shaft shall be high tensile stainless steel AISI 410.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-2.3',
-      number: '2.3',
-      title: 'Shaft Sealing & Bearing Lubrication',
-      text: 'Shaft sealing shall be provided with cartridge type balanced mechanical seal with silicon carbide vs silicon carbide faces suitable for continuous 24-hour operation. Bearings shall be heavy-duty grease lubricated deep groove ball bearings.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-2.4',
-      number: '2.4',
-      title: 'Hydrostatic Pressure Testing of Casing',
-      text: 'All pump casings and suction/discharge heads shall be hydrostatically tested at the manufacturer works to 1.5 times the maximum working pressure or 2.0 times the shut-off head for minimum 30 minutes without leakage conforming to IS 5120:1977.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #4',
-      matchedRequirementId: 4,
-      matchedStandard: 'IS 5120:1977'
-    },
-    {
-      id: 'c-2.5',
-      number: '2.5',
-      title: 'Hydraulic Performance Acceptance Testing',
-      text: 'Every pump shall undergo hydraulic performance acceptance tests at full speed conforming to Grade 2B of IS 9137:2019 / IS/ISO 9906:2012 to establish head, capacity, power consumption, and NPSH required.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #5',
-      matchedRequirementId: 5,
-      matchedStandard: 'IS 9137:2019'
-    }
-  ],
-  requirements: [
-    {
-      id: 1,
-      title: 'Pump Type & Hydraulic Duty',
-      severity: 'High',
-      requirementText: 'Horizontal end-suction centrifugal pump, 50 LPS @ 45m head, min 78% efficiency',
-      recommendedStandard: 'IS 1520:1980',
-      status: 'pending',
-      clauseNumber: '2.1',
-      category: 'Product'
-    },
-    {
-      id: 2,
-      title: 'Mandatory ISI Certification',
-      severity: 'High',
-      requirementText: 'Pump sets shall carry valid BIS ISI Mark certification under Centrifugal Pumps QCO',
-      recommendedStandard: 'IS 1520:1980',
-      status: 'pending',
-      clauseNumber: '2.1',
-      category: 'Product'
-    },
-    {
-      id: 3,
-      title: 'Casing & Impeller Metallurgy',
-      severity: 'Medium',
-      requirementText: 'Cast Iron Grade FG 260 casing with Bronze / Stainless Steel CF8M impeller',
-      recommendedStandard: 'IS 5120:1977',
-      status: 'pending',
-      clauseNumber: '2.2',
-      category: 'Product'
-    },
-    {
-      id: 4,
-      title: 'Hydrostatic Casing Test (1.5x Pressure)',
-      severity: 'High',
-      requirementText: 'Hydrostatic pressure withstand test at 1.5x working pressure for 30 minutes',
-      recommendedStandard: 'IS 5120:1977',
-      status: 'pending',
-      clauseNumber: '2.4',
-      category: 'Testing'
-    },
-    {
-      id: 5,
-      title: 'Performance Acceptance Test (Grade 2B)',
-      severity: 'High',
-      requirementText: 'Full speed hydraulic performance and NPSHR verification per Grade 2B',
-      recommendedStandard: 'IS 9137:2019',
-      status: 'pending',
-      clauseNumber: '2.5',
-      category: 'Testing'
-    }
-  ],
-  recommendedStandards: [
-    {
-      code: 'IS 1520:1980',
-      title: 'Horizontal Centrifugal Pumps for Clear, Cold, Fresh Water',
-      match: 95,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Mandatory Indian Standard governing performance and BIS ISI marking for clean water pumps.'
-    },
-    {
-      code: 'IS 5120:1977',
-      title: 'Technical Requirements for Rotodynamic Special Purpose Pumps',
-      match: 91,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Defines mechanical construction, hydrostatic test pressures, and shaft deflection limits.'
-    },
-    {
-      code: 'IS 9137:2019',
-      title: 'Acceptance Tests for Centrifugal, Mixed Flow and Axial Pumps',
-      match: 93,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Establishes precise Grade 2B test tolerances, flow metering, and power measurements.'
-    },
-    {
-      code: 'IS/ISO 9906:2012',
-      title: 'Rotodynamic Pumps - Hydraulic Performance Acceptance Tests',
-      match: 88,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Harmonized international standard for pump efficiency curves and NPSH evaluation.'
-    }
-  ]
-};
-
-// 4. Solar PV Inverter Sample
-const SAMPLE_SOLAR: TenderDocumentData = {
-  id: 'solar',
-  fileName: 'Solar_PV_Inverter_Grid_Specification.pdf',
-  fileSize: '3.1 MB',
-  totalPages: 58,
-  department: 'STATE RENEWABLE ENERGY DEVELOPMENT AGENCY',
-  tenderNumber: 'REDA/SOLAR-MW/INV-SPEC/2026',
-  title: 'SPECIFICATION FOR GRID-TIED STRING INVERTERS & POWER CONDITIONING UNITS (PCU)',
-  section: 'SECTION 5 — INVERTER CONVERSION & GRID COMPLIANCE',
-  clauses: [
-    {
-      id: 'c-5.1',
-      number: '5.1',
-      title: 'Power Rating, Topology & Conversion Efficiency',
-      text: 'Inverters shall be 100kW 3-phase 415V 50Hz transformerless grid-interactive string type. Maximum conversion efficiency shall be greater than 98.8% with European weighted efficiency not less than 98.5%.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #1',
-      matchedRequirementId: 1,
-      matchedStandard: 'IS 16221:2016'
-    },
-    {
-      id: 'c-5.2',
-      number: '5.2',
-      title: 'Maximum Power Point Tracking (MPPT) Range',
-      text: 'The unit shall incorporate multiple independent MPPT trackers with operational MPPT voltage window of 200V to 1000V DC and dynamic MPPT tracking efficiency exceeding 99.5%.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-5.3',
-      number: '5.3',
-      title: 'Anti-Islanding Protection & Grid Disconnection',
-      text: 'In the event of utility grid outage or voltage/frequency excursions, the inverter shall disconnect automatically within 2.0 seconds in accordance with IS 16169:2014 and CEA Technical Standards for Grid Connectivity.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #2',
-      matchedRequirementId: 2,
-      matchedStandard: 'IS 16169:2014'
-    },
-    {
-      id: 'c-5.4',
-      number: '5.4',
-      title: 'Harmonic Distortion & Power Factor Control',
-      text: 'Total Harmonic Current Distortion (THD) injected into the distribution grid shall not exceed 3% at rated power output. Power factor shall be dynamically adjustable between 0.80 leading to 0.80 lagging.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-5.5',
-      number: '5.5',
-      title: 'Enclosure Protection & Environmental Safety',
-      text: 'The complete inverter enclosure shall conform to IP65 ingress protection for outdoor installation, with Type II AC/DC surge protection devices and compliance with IS 16221 (Part 2):2015 safety requirements.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #4',
-      matchedRequirementId: 4,
-      matchedStandard: 'IS 16221 (Part 2):2015'
-    }
-  ],
-  requirements: [
-    {
-      id: 1,
-      title: 'Inverter Efficiency (>98.8%)',
-      severity: 'High',
-      requirementText: 'Transformerless string inverter, max efficiency > 98.8%, Euro efficiency > 98.5%',
-      recommendedStandard: 'IS 16221:2016',
-      status: 'pending',
-      clauseNumber: '5.1',
-      category: 'Product'
-    },
-    {
-      id: 2,
-      title: 'Anti-Islanding Protection (<2.0s)',
-      severity: 'High',
-      requirementText: 'Automatic grid disconnect within 2.0 seconds on grid loss per IS 16169:2014',
-      recommendedStandard: 'IS 16169:2014',
-      status: 'pending',
-      clauseNumber: '5.3',
-      category: 'Safety'
-    },
-    {
-      id: 3,
-      title: 'Harmonic Current Distortion (THD < 3%)',
-      severity: 'High',
-      requirementText: 'Total Harmonic Current Distortion (THD) under 3% with 0.8 lead/lag power factor',
-      recommendedStandard: 'IS 16221:2016',
-      status: 'pending',
-      clauseNumber: '5.4',
-      category: 'Testing'
-    },
-    {
-      id: 4,
-      title: 'Safety of Power Converters (BIS QCO)',
-      severity: 'High',
-      requirementText: 'Photovoltaic power converters safety qualification conforming to IS 16221 (Part 2)',
-      recommendedStandard: 'IS 16221 (Part 2):2015',
-      status: 'pending',
-      clauseNumber: '5.5',
-      category: 'Safety'
-    },
-    {
-      id: 5,
-      title: 'Ingress Protection (IP65 Outdoor)',
-      severity: 'Medium',
-      requirementText: 'IP65 outdoor rated enclosure with integrated Type II AC/DC surge protectors',
-      recommendedStandard: 'IS 12063:1987',
-      status: 'pending',
-      clauseNumber: '5.5',
-      category: 'Testing'
-    }
-  ],
-  recommendedStandards: [
-    {
-      code: 'IS 16221 (Part 2):2015',
-      title: 'Safety of Power Converters for use in Photovoltaic Power Systems',
-      match: 97,
-      type: 'Safety',
-      status: 'Current',
-      rationale: 'Mandatory standard under MNRE Quality Control Order for solar grid inverters.'
-    },
-    {
-      code: 'IS 16169:2014',
-      title: 'Test Procedure of Islanding Prevention Measures for Utility-Interconnected PV Inverters',
-      match: 94,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Governs disconnection safety trip thresholds under utility distribution outages.'
-    },
-    {
-      code: 'IS 14286:2010',
-      title: 'Crystalline Silicon Terrestrial Photovoltaic (PV) Modules - Design Qualification',
-      match: 89,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Allied standard ensuring electrical insulation and DC string safety with inverter input.'
-    },
-    {
-      code: 'IS/IEC 60068-2-1:2007',
-      title: 'Environmental Testing: Cold, Dry Heat and Damp Heat',
-      match: 86,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Verifies thermal cycling and IP65 enclosure withstand under extreme tropical heat.'
-    }
-  ]
-};
-
-// 5. Structural Steel & TMT Rebar Sample
-const SAMPLE_STEEL: TenderDocumentData = {
-  id: 'steel',
-  fileName: 'Fe_500D_TMT_Steel_Rebar_Tender.pdf',
-  fileSize: '2.1 MB',
-  totalPages: 24,
-  department: 'NATIONAL HIGHWAYS INFRASTRUCTURE DEVELOPMENT CORPORATION',
-  tenderNumber: 'NHIDCL/CIVIL/REBAR-FE500D/2026-11',
-  title: 'SPECIFICATION FOR THERMO-MECHANICALLY TREATED (TMT) HIGH-STRENGTH STEEL REBARS',
-  section: 'SECTION 3 — METALLURGICAL & MECHANICAL REQUIREMENTS',
-  clauses: [
-    {
-      id: 'c-3.1',
-      number: '3.1',
-      title: 'Steel Grade & Production Process',
-      text: 'All reinforcing steel bars shall be Thermo-Mechanically Treated (TMT) Fe 500D Grade conforming strictly to IS 1786:2008 with guaranteed enhanced ductility and weldability.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #1',
-      matchedRequirementId: 1,
-      matchedStandard: 'IS 1786:2008'
-    },
-    {
-      id: 'c-3.2',
-      number: '3.2',
-      title: 'Tensile & Yield Strength Parameters',
-      text: 'Minimum 0.2 percent proof stress/yield stress shall be 500 N/mm². Tensile strength shall be minimum 565 N/mm² (minimum 1.10 times the actual yield stress) with minimum elongation of 16.0% conforming to IS 1608.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #2',
-      matchedRequirementId: 2,
-      matchedStandard: 'IS 1608 (Part 1):2018'
-    },
-    {
-      id: 'c-3.3',
-      number: '3.3',
-      title: 'Bend and Rebend Ductility Test',
-      text: 'Test pieces shall withstand bend through 180° and rebend testing without any rupture or visible cracking at the bend zone around specified mandrel diameters conforming to IS 1786:2008.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-3.4',
-      number: '3.4',
-      title: 'Mandatory BIS ISI Certification under QCO',
-      text: 'All steel rebars delivered on site shall carry distinct embossed BIS standard mark (ISI Mark) together with manufacturer identification mark conforming to Steel Products (Quality Control) Order.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #4',
-      matchedRequirementId: 4,
-      matchedStandard: 'IS 1786:2008'
-    }
-  ],
-  requirements: [
-    {
-      id: 1,
-      title: 'Steel Grade (Fe 500D)',
-      severity: 'High',
-      requirementText: 'TMT High strength deformed steel bars Grade Fe 500D per IS 1786',
-      recommendedStandard: 'IS 1786:2008',
-      status: 'pending',
-      clauseNumber: '3.1',
-      category: 'Product'
-    },
-    {
-      id: 2,
-      title: 'Proof Stress & Elongation (16%)',
-      severity: 'High',
-      requirementText: 'Yield stress min 500 N/mm², tensile ratio > 1.10, elongation min 16%',
-      recommendedStandard: 'IS 1608 (Part 1):2018',
-      status: 'pending',
-      clauseNumber: '3.2',
-      category: 'Testing'
-    },
-    {
-      id: 3,
-      title: 'Bend & Rebend Ductility',
-      severity: 'Medium',
-      requirementText: '180° mandrel bend and reverse rebend without fracture',
-      recommendedStandard: 'IS 1786:2008',
-      status: 'pending',
-      clauseNumber: '3.3',
-      category: 'Testing'
-    },
-    {
-      id: 4,
-      title: 'Mandatory QCO ISI Marking',
-      severity: 'High',
-      requirementText: 'Mandatory ISI mark embossed on every meter per BIS Steel QCO Order',
-      recommendedStandard: 'IS 1786:2008',
-      status: 'pending',
-      clauseNumber: '3.4',
-      category: 'Safety'
-    }
-  ],
-  recommendedStandards: [
-    {
-      code: 'IS 1786:2008',
-      title: 'High Strength Deformed Steel Bars and Wires for Concrete Reinforcement',
-      match: 98,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Mandatory benchmark standard for TMT reinforcement under Ministry of Steel QCO.'
-    },
-    {
-      code: 'IS 1608 (Part 1):2018',
-      title: 'Metallic Materials - Tensile Testing - Part 1: Method of Test at Room Temp',
-      match: 92,
-      type: 'Testing',
-      status: 'Current',
-      rationale: 'Standard method for yield stress, tensile ratio and total elongation measurement.'
-    },
-    {
-      code: 'IS 432 (Part 1):1982',
-      title: 'Specification for Mild Steel and Medium Tensile Steel Bars',
-      match: 86,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Governs plain round mild steel bars and structural dowel applications.'
-    },
-    {
-      code: 'IS 2062:2011',
-      title: 'Hot Rolled Medium and High Tensile Structural Steel',
-      match: 89,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Key standard for structural plates, angles and composite reinforcement.'
-    }
-  ]
-};
-
-// 6. Generic Procurement / BoQ Sample Fallback
-const SAMPLE_GENERIC: TenderDocumentData = {
-  id: 'generic',
-  fileName: 'Procurement_Specification_BoQ.xlsx',
-  fileSize: '1.2 MB',
-  totalPages: 16,
-  department: 'DIRECTORATE GENERAL OF SUPPLIES & DISPOSALS (GeM / CPPP)',
-  tenderNumber: 'GEM/BOQ/GEN-PROC/2026-88',
-  title: 'GENERAL PROCUREMENT SPECIFICATION & SCHEDULE OF TECHNICAL REQUIREMENTS',
-  section: 'SECTION 1 — COMPLIANCE WITH INDIAN NATIONAL STANDARDS',
-  clauses: [
-    {
-      id: 'c-1.1',
-      number: '1.1',
-      title: 'Statutory Standards & BIS Compliance',
-      text: 'All supplied goods, materials, and equipment shall conform to the latest published editions of relevant Indian Standards (IS) with all amendments up to date as notified by the Bureau of Indian Standards.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #1',
-      matchedRequirementId: 1,
-      matchedStandard: 'IS/ISO 9001:2015'
-    },
-    {
-      id: 'c-1.2',
-      number: '1.2',
-      title: 'Quality Assurance & Factory Inspection',
-      text: 'The vendor shall maintain an accredited Quality Management System conforming to IS/ISO 9001:2015. Third-party pre-dispatch inspection shall be arranged at manufacturer works prior to release.',
-      isHighlighted: true,
-      highlightNote: 'AI Extracted Requirement #2',
-      matchedRequirementId: 2,
-      matchedStandard: 'IS/ISO 9001:2015'
-    },
-    {
-      id: 'c-1.3',
-      number: '1.3',
-      title: 'Testing & Verification Certificates',
-      text: 'Test certificates from NABL accredited testing laboratories verifying conformance with all specified mechanical, chemical, and functional parameters must accompany supply documents.',
-      isHighlighted: false
-    },
-    {
-      id: 'c-1.4',
-      number: '1.4',
-      title: 'Packaging, Marking & Traceability',
-      text: 'Items shall be legibly stamped or labeled with manufacturer name, batch/lot number, date of manufacture, and applicable BIS standard license marks for complete audit trail traceability.',
-      isHighlighted: false
-    }
-  ],
-  requirements: [
-    {
-      id: 1,
-      title: 'BIS Standards Compliance',
-      severity: 'High',
-      requirementText: 'Mandatory conformance to the latest published Bureau of Indian Standards specifications',
-      recommendedStandard: 'IS/ISO 9001:2015',
-      status: 'pending',
-      clauseNumber: '1.1',
-      category: 'Product'
-    },
-    {
-      id: 2,
-      title: 'Quality Management (ISO 9001)',
-      severity: 'High',
-      requirementText: 'Manufacturer certified under IS/ISO 9001:2015 quality management system',
-      recommendedStandard: 'IS/ISO 9001:2015',
-      status: 'pending',
-      clauseNumber: '1.2',
-      category: 'Product'
-    },
-    {
-      id: 3,
-      title: 'NABL Accredited Test Reports',
-      severity: 'High',
-      requirementText: 'Routine and type test certificates issued by NABL accredited laboratories',
-      recommendedStandard: 'IS/ISO 9001:2015',
-      status: 'pending',
-      clauseNumber: '1.3',
-      category: 'Testing'
-    },
-    {
-      id: 4,
-      title: 'Batch Traceability & Marking',
-      severity: 'Medium',
-      requirementText: 'Unique batch numbering, date coding, and legible BIS mark on all consignments',
-      recommendedStandard: 'IS/ISO 9001:2015',
-      status: 'pending',
-      clauseNumber: '1.4',
-      category: 'Safety'
-    }
-  ],
-  recommendedStandards: [
-    {
-      code: 'IS/ISO 9001:2015',
-      title: 'Quality Management Systems - Requirements',
-      match: 95,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Foundational standard for procurement vendor quality assurance and audit compliance.'
-    },
-    {
-      code: 'IS 1200:1992',
-      title: 'Method of Measurement of Building and Civil Engineering Works',
-      match: 88,
-      type: 'Code of Practice',
-      status: 'Current',
-      rationale: 'Standard measurement methods for government BoQ line items and tender verification.'
-    },
-    {
-      code: 'IS/ISO 14001:2015',
-      title: 'Environmental Management Systems - Requirements with Guidance for Use',
-      match: 85,
-      type: 'Product',
-      status: 'Current',
-      rationale: 'Mandated for sustainable green public procurement and environmental safeguards.'
-    }
-  ]
+const EMPTY_TENDER_DOC: TenderDocumentData = {
+  id: '',
+  fileName: 'No Document Loaded',
+  fileSize: '0 KB',
+  totalPages: 0,
+  department: 'No Tender Selected',
+  tenderNumber: 'N/A',
+  title: 'Upload or Select a Tender Document to Begin Analysis',
+  section: 'N/A',
+  clauses: [],
+  requirements: [],
+  recommendedStandards: []
 };
 
 export default function ReviewVerifyPage() {
@@ -934,15 +132,16 @@ export default function ReviewVerifyPage() {
     try {
       const state = location.state as any;
       if (state?.autoUploadFile || state?.selectedDocId) return true;
+      if (activeDocId && activeDocument) return true;
       const stored = sessionStorage.getItem('standiq_review_active_doc');
-      return Boolean(stored && stored !== 'none');
+      return Boolean(stored && stored !== 'none' && stored !== 'motors' && stored !== 'pumps' && stored !== 'cables' && stored !== 'tmt-steel' && stored !== 'solar' && stored !== 'transformers');
     } catch {
       return false;
     }
   });
 
   // Active document data & state (only populated if isDocumentLoaded is true)
-  const initialDoc = activeDocument || SAMPLE_MOTORS;
+  const initialDoc = (activeDocument as any) || EMPTY_TENDER_DOC;
   const [currentDoc, setCurrentDoc] = useState<TenderDocumentData>(initialDoc as any);
   const [requirements, setRequirements] = useState<ExtractedRequirement[]>(
     isDocumentLoaded ? (initialDoc.requirements || []) : []
@@ -1139,56 +338,6 @@ export default function ReviewVerifyPage() {
     }
   };
 
-  // Switch between sample tenders
-  const handleSelectSample = (sample: TenderDocumentData) => {
-    setUploading(true);
-    setAnalysisStep(1);
-    
-    // Simulate AI pipeline progression
-    const stepTimer1 = setTimeout(() => setAnalysisStep(2), 350);
-    const stepTimer2 = setTimeout(() => setAnalysisStep(3), 700);
-
-    setTimeout(() => {
-      clearTimeout(stepTimer1);
-      clearTimeout(stepTimer2);
-
-      // Save into store and set as active
-      addOrUpdateDocument({
-        ...sample,
-        category: (sample as any).category || 'Industrial Equipment',
-        uploadedAt: 'Today',
-        status: 'In Review',
-        fileType: 'pdf',
-        basket: sample.recommendedStandards.map(s => ({
-          id: s.code,
-          code: s.code,
-          title: s.title,
-          type: s.type,
-          status: s.status,
-          mandatory: s.rationale?.includes('Mandatory')
-        }))
-      });
-
-      setCurrentDoc(sample);
-      setRequirements(sample.requirements);
-      setRecommendedStandards(sample.recommendedStandards);
-      setUploadedBlobUrl(null);
-      setUploadedFileType('pdf');
-      setRawTextContent(null);
-      setViewerMode('document');
-      setCurrentPage(1);
-      setSelectedClause(null);
-      setIsDocumentLoaded(true);
-      try {
-        sessionStorage.setItem('standiq_review_active_doc', sample.id);
-      } catch (e) {
-        console.warn('Could not store session doc:', e);
-      }
-      setUploading(false);
-      setIsUploadOpen(false);
-    }, 1100);
-  };
-
   // Handle ANY file format upload (PDF, DOCX, XLSX, CSV, Images, TXT, etc.)
   const processUploadedFile = async (file: File) => {
     setUploading(true);
@@ -1344,7 +493,7 @@ export default function ReviewVerifyPage() {
                 matchedStandard: req.recommendedStandard
               })),
               requirements: dynamicReqs,
-              recommendedStandards: uniqueStds.length > 0 ? uniqueStds : SAMPLE_MOTORS.recommendedStandards
+              recommendedStandards: uniqueStds
             };
 
             setCurrentDoc(customDocData);
@@ -1357,89 +506,61 @@ export default function ReviewVerifyPage() {
       }
     }
 
-    // Comprehensive Fallback & Multi-Format Intelligence
+    // Local extraction if backend was unreachable
     if (!backendSuccess) {
-      const combinedSearchText = (file.name + ' ' + textContent).toLowerCase();
-      let matchedDataset = SAMPLE_MOTORS;
+      const lines = textContent
+        ? textContent.split('\n').map(l => l.trim()).filter(l => l.length > 15)
+        : [];
 
-      if (combinedSearchText.includes('pump') || combinedSearchText.includes('water') || combinedSearchText.includes('hydraulic') || combinedSearchText.includes('fluid')) {
-        matchedDataset = SAMPLE_PUMPS;
-      } else if (combinedSearchText.includes('solar') || combinedSearchText.includes('inverter') || combinedSearchText.includes('photovoltaic') || combinedSearchText.includes('pv')) {
-        matchedDataset = SAMPLE_SOLAR;
-      } else if (combinedSearchText.includes('panel') || combinedSearchText.includes('switchgear') || combinedSearchText.includes('breaker') || combinedSearchText.includes('distribution')) {
-        matchedDataset = SAMPLE_PANELS;
-      } else if (combinedSearchText.includes('steel') || combinedSearchText.includes('tmt') || combinedSearchText.includes('rebar') || combinedSearchText.includes('fe500') || combinedSearchText.includes('iron')) {
-        matchedDataset = SAMPLE_STEEL;
-      } else {
-        matchedDataset = SAMPLE_GENERIC;
-      }
+      const customClauses: DocumentClause[] = lines.map((line, idx) => ({
+        id: `c-text-${idx + 1}`,
+        number: `1.${idx + 1}`,
+        title: `Clause 1.${idx + 1}`,
+        text: line,
+        isHighlighted: false,
+        matchedRequirementId: idx + 1
+      }));
 
-      // If user uploaded a text file with distinct paragraphs, build custom clauses from actual file!
-      let customClauses = matchedDataset.clauses;
-      let customReqs = matchedDataset.requirements;
+      const customReqs: ExtractedRequirement[] = lines.map((line, idx) => ({
+        id: idx + 1,
+        title: `Clause 1.${idx + 1}`,
+        severity: 'Medium',
+        requirementText: line,
+        status: 'pending' as const,
+        clauseNumber: `1.${idx + 1}`,
+        category: 'Product'
+      }));
 
-      if (fileCategory === 'text' && textContent.trim()) {
-        const lines = textContent.split('\n').map(l => l.trim()).filter(l => l.length > 20).slice(0, 5);
-        if (lines.length >= 2) {
-          customClauses = lines.map((line, idx) => ({
-            id: `c-text-${idx+1}`,
-            number: `1.${idx+1}`,
-            title: `Clause 1.${idx+1} Technical Provision`,
-            text: line,
-            isHighlighted: idx % 2 === 0,
-            highlightNote: `AI Extracted Requirement #${idx+1}`,
-            matchedRequirementId: idx + 1,
-            matchedStandard: matchedDataset.recommendedStandards[idx % matchedDataset.recommendedStandards.length]?.code
-          }));
-
-          customReqs = lines.map((line, idx) => ({
-            id: idx + 1,
-            title: `Extracted Clause #${idx + 1}`,
-            severity: (idx === 0 ? 'High' : idx === 1 ? 'High' : 'Medium') as 'High' | 'Medium',
-            requirementText: line,
-            recommendedStandard: matchedDataset.recommendedStandards[idx % matchedDataset.recommendedStandards.length]?.code,
-            status: 'pending' as const,
-            clauseNumber: `1.${idx+1}`,
-            category: 'Product'
-          }));
-        }
-      }
-
-      // Generate custom document wrapper
       const customDocData: TenderDocumentData = {
-        ...matchedDataset,
         id: 'uploaded-' + Date.now(),
         fileName: file.name,
         fileSize: file.size > 1024 * 1024 
           ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
           : `${Math.round(file.size / 1024)} KB`,
+        totalPages: 1,
+        department: 'General Technical Specifications',
+        tenderNumber: `TDR-${Date.now().toString().slice(-6)}`,
         title: `TENDER SPECIFICATION: ${file.name.replace(/\.[^/.]+$/, '').toUpperCase()}`,
+        section: 'Technical Requirements',
         clauses: customClauses,
-        requirements: customReqs
+        requirements: customReqs,
+        recommendedStandards: []
       };
 
-      // Save into persistent store with its dedicated basket!
       const persistentDoc: AnalyzedDocument = {
         ...customDocData,
-        category: (customDocData as any).category || 'Uploaded Tender',
+        category: 'Uploaded Tender',
         uploadedAt: 'Today',
         status: 'In Review',
         fileType: fileCategory,
         rawTextContent: textContent || null,
-        basket: matchedDataset.recommendedStandards.map(s => ({
-          id: s.code,
-          code: s.code,
-          title: s.title,
-          type: s.type,
-          status: s.status,
-          mandatory: s.rationale?.toLowerCase().includes('mandatory')
-        }))
+        basket: []
       };
       addOrUpdateDocument(persistentDoc);
 
       setCurrentDoc(customDocData);
       setRequirements(customReqs);
-      setRecommendedStandards(matchedDataset.recommendedStandards);
+      setRecommendedStandards([]);
       setIsDocumentLoaded(true);
       try {
         sessionStorage.setItem('standiq_review_active_doc', customDocData.id);
@@ -2656,69 +1777,7 @@ export default function ReviewVerifyPage() {
                     </div>
                   </div>
 
-                  {/* Sample Tenders */}
-                  <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                      Or Select Sample Tender Specifications
-                    </span>
-                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
-                      {[
-                        { 
-                          data: SAMPLE_MOTORS,
-                          label: 'Three-Phase Induction Motors',
-                          tags: 'IS 12615 | IE3 Motors'
-                        },
-                        { 
-                          data: SAMPLE_PANELS,
-                          label: 'Electrical Distribution Panels',
-                          tags: 'IS/IEC 61439 | 50kA Switchgear'
-                        },
-                        { 
-                          data: SAMPLE_PUMPS,
-                          label: 'Centrifugal Water Pumps',
-                          tags: 'IS 1520 | 50 LPS Clear Water'
-                        },
-                        { 
-                          data: SAMPLE_SOLAR,
-                          label: 'Solar PV Grid Inverter',
-                          tags: 'IS 16221 | 100kW Anti-Islanding'
-                        },
-                        {
-                          data: SAMPLE_STEEL,
-                          label: 'Fe 500D TMT Steel Rebars',
-                          tags: 'IS 1786 | High Ductility QCO'
-                        },
-                        {
-                          data: SAMPLE_GENERIC,
-                          label: 'BoQ Procurement Schedule',
-                          tags: 'IS/ISO 9001 | GeM General'
-                        }
-                      ].map((item) => (
-                        <div
-                          key={item.data.id}
-                          onClick={() => handleSelectSample(item.data)}
-                          className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-blue-300 cursor-pointer transition-all text-xs group"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <FileText className="w-4 h-4 text-blue-600 shrink-0" />
-                            <div>
-                              <span className="font-semibold text-slate-800 block group-hover:text-blue-700">
-                                {item.data.fileName}
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-mono">
-                                {item.tags}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
-                            <span>{item.data.fileSize}</span>
-                            <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
+                  </>
               )}
             </div>
           </div>

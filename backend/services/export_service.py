@@ -3,55 +3,69 @@ import json
 import datetime
 from typing import Tuple, List, Dict, Any, Optional
 
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether, HRFlowable
-)
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.pdfgen import canvas
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether, HRFlowable
+    )
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.pdfgen import canvas
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
+    A4 = None
+    colors = None
+    SimpleDocTemplate = Paragraph = Spacer = Table = TableStyle = KeepTogether = HRFlowable = None
+    getSampleStyleSheet = ParagraphStyle = None
+    canvas = None
 
 from schemas.api import ExportRequest, ExportResponse, ExportPackageRequest
 from services.procurement_session_service import ProcurementSessionService
 
 
-class NumberedCanvas(canvas.Canvas):
-    """
-    Two-pass canvas for precise 'Page X of Y' numbering and running header/footer.
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._saved_page_states = []
+if REPORTLAB_AVAILABLE and canvas is not None:
+    class NumberedCanvas(canvas.Canvas):
+        """
+        Two-pass canvas for precise 'Page X of Y' numbering and running header/footer.
+        """
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._saved_page_states = []
 
-    def showPage(self):
-        self._saved_page_states.append(dict(self.__dict__))
-        self._startPage()
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
 
-    def save(self):
-        num_pages = len(self._saved_page_states)
-        for state in self._saved_page_states:
-            self.__dict__.update(state)
-            self.draw_decorations(num_pages)
-            super().showPage()
-        super().save()
+        def save(self):
+            num_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_decorations(num_pages)
+                super().showPage()
+            super().save()
 
-    def draw_decorations(self, page_count: int):
-        self.saveState()
-        self.setFont("Helvetica", 8)
-        self.setFillColor(colors.HexColor("#64748b"))
-        self.setStrokeColor(colors.HexColor("#e2e8f0"))
-        self.setLineWidth(0.5)
+        def draw_decorations(self, page_count: int):
+            self.saveState()
+            self.setFont("Helvetica", 8)
+            self.setFillColor(colors.HexColor("#64748b"))
+            self.setStrokeColor(colors.HexColor("#e2e8f0"))
+            self.setLineWidth(0.5)
 
-        # Running Header
-        self.line(36, 806, 559, 806)
-        self.drawString(36, 812, "StandIQ — BIS Standards Intelligence & Specification Engine")
-        self.drawRightString(559, 812, "Govt. Procurement Compliance (GeM / CPPP)")
+            # Running Header
+            self.line(36, 806, 559, 806)
+            self.drawString(36, 812, "StandIQ — BIS Standards Intelligence & Specification Engine")
+            self.drawRightString(559, 812, "Govt. Procurement Compliance (GeM / CPPP)")
 
-        # Running Footer
-        self.line(36, 45, 559, 45)
-        self.drawString(36, 32, "Confidential | Prepared for Tender Specification Adherence & Verification")
-        self.drawRightString(559, 32, f"Page {self._pageNumber} of {page_count}")
-        self.restoreState()
+            # Running Footer
+            self.line(36, 45, 559, 45)
+            self.drawString(36, 32, "Confidential | Prepared for Tender Specification Adherence & Verification")
+            self.drawRightString(559, 32, f"Page {self._pageNumber} of {page_count}")
+            self.restoreState()
+else:
+    class NumberedCanvas:  # type: ignore
+        def __init__(self, *args, **kwargs):
+            pass
 
 
 class ExportService:
@@ -115,6 +129,8 @@ class ExportService:
     # PDF BUILDER (ReportLab)
     # ==========================================
     def _build_pdf(self, req: ExportPackageRequest) -> bytes:
+        if not REPORTLAB_AVAILABLE:
+            raise RuntimeError("PDF export requires 'reportlab'. Please ensure reportlab is installed (pip install reportlab>=4.1.0).")
         buf = io.BytesIO()
         doc = SimpleDocTemplate(
             buf,

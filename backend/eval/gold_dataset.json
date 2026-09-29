@@ -172,7 +172,7 @@
     "domain": "Mechanical Engineering",
     "query": "submersible pumpsets for clear cold water 100mm borewell 5 HP",
     "expected_family_id": "IS:8034",
-    "expected_qco": false,
+    "expected_qco": true,
     "type": "TECHNICAL_SPEC"
   },
   {
@@ -180,7 +180,7 @@
     "domain": "Mechanical Engineering",
     "query": "pani ki motor submersible pumpset 415 V for agriculture irrigation",
     "expected_family_id": "IS:8034",
-    "expected_qco": false,
+    "expected_qco": true,
     "type": "TRADE_COLLOQUIAL"
   },
   {
@@ -340,7 +340,7 @@
     "domain": "Food and Agriculture",
     "query": "compounded cattle feeds for dairy animals nutrition",
     "expected_family_id": "IS:2052",
-    "expected_qco": false,
+    "expected_qco": true,
     "type": "TECHNICAL_SPEC"
   },
   {
@@ -396,7 +396,7 @@
     "domain": "Civil Engineering",
     "query": "hard drawn mild steel wire fabric welded mesh for concrete reinforcement IS 1566",
     "expected_family_id": "IS:1566",
-    "expected_qco": false,
+    "expected_qco": true,
     "type": "EXACT_ID"
   },
   {

@@ -15,9 +15,9 @@ Unwanted test cases commented out in favor of the production-grade:
 # from retrieval.compiler import extract_units_and_numbers
 
 # def run_synthetic_pipeline():
-#     # Deprecated: Use backend/eval/benchmark.py instead
-#     pass
+# # Deprecated: Use backend/eval/benchmark.py instead
+# pass
 
 # if __name__ == "__main__":
-#     print("Notice: run_e2e_synthetic is deprecated. Please run backend/eval/benchmark.py or backend/eval/test_dda_tender.py")
+# print("Notice: run_e2e_synthetic is deprecated. Please run backend/eval/benchmark.py or backend/eval/test_dda_tender.py")
 

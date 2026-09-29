@@ -10,6 +10,7 @@ import {
   RefreshCw,
   ArrowRight
 } from 'lucide-react';
+import { useStandIQ } from '../../stores/standiq.store';
 
 interface DiffFinding {
   type: 'added' | 'removed' | 'modified';
@@ -19,68 +20,14 @@ interface DiffFinding {
   standardRef?: string;
 }
 
-const SAMPLE_A = `4.1 Scope of Supply:
-Supply of 75kW three-phase electrical motor suitable for continuous duty in factory premises.
-4.2 Efficiency Rating:
-The motor efficiency shall be standard commercial level (minimum 85%).
-4.3 Testing Standards:
-The supplier shall submit internal manufacturer test certificates prior to dispatch.
-4.4 Enclosure:
-Standard IP44 sheet metal casing.`;
-
-const SAMPLE_B = `4.1 Scope of Supply:
-Supply of 75kW three-phase electrical motor suitable for continuous duty under tropical conditions conforming to IS 325:1996.
-4.2 Efficiency Rating:
-The motor efficiency shall conform to Premium Efficiency IE3 class (minimum 94.5%) as per IS 12615:2018.
-4.3 Testing Standards:
-All motors shall undergo type testing and loss summation efficiency tests in accordance with IS 8789:1981 at a BIS-accredited testing laboratory.
-4.4 Enclosure:
-IP55 totally enclosed fan-cooled (TEFC) casing with Class F insulation as per IS 302:2008.
-4.5 Mandatory Certification:
-Valid BIS ISI mark license and CRS registration must be provided with the technical bid.`;
-
 export default function TenderDiffPage() {
   const navigate = useNavigate();
+  const { activeDocument } = useStandIQ();
 
-  const [versionA, setVersionA] = useState(SAMPLE_A);
-  const [versionB, setVersionB] = useState(SAMPLE_B);
+  const [versionA, setVersionA] = useState(activeDocument?.rawTextContent || '');
+  const [versionB, setVersionB] = useState('');
   const [isComparing, setIsComparing] = useState(false);
-  const [diffResults, setDiffResults] = useState<DiffFinding[] | null>([
-    {
-      type: 'modified',
-      clause: 'Clause 4.1 — Scope of Supply',
-      originalText: 'suitable for continuous duty in factory premises',
-      updatedText: 'suitable for continuous duty under tropical conditions conforming to IS 325:1996',
-      standardRef: 'IS 325:1996'
-    },
-    {
-      type: 'modified',
-      clause: 'Clause 4.2 — Efficiency Rating',
-      originalText: 'minimum 85% standard commercial level',
-      updatedText: 'Premium Efficiency IE3 class (minimum 94.5%) as per IS 12615:2018',
-      standardRef: 'IS 12615:2018'
-    },
-    {
-      type: 'modified',
-      clause: 'Clause 4.3 — Testing Standards',
-      originalText: 'internal manufacturer test certificates prior to dispatch',
-      updatedText: 'loss summation efficiency tests in accordance with IS 8789:1981 at BIS-accredited testing laboratory',
-      standardRef: 'IS 8789:1981'
-    },
-    {
-      type: 'modified',
-      clause: 'Clause 4.4 — Enclosure Protection',
-      originalText: 'Standard IP44 sheet metal casing',
-      updatedText: 'IP55 totally enclosed fan-cooled (TEFC) casing with Class F insulation as per IS 302:2008',
-      standardRef: 'IS 302:2008'
-    },
-    {
-      type: 'added',
-      clause: 'Clause 4.5 — Mandatory Certification',
-      updatedText: 'Valid BIS ISI mark license and CRS registration must be provided with the technical bid.',
-      standardRef: 'BIS CRS Quality Order'
-    }
-  ]);
+  const [diffResults, setDiffResults] = useState<DiffFinding[] | null>(null);
 
   const handleCompare = () => {
     setIsComparing(true);
@@ -157,14 +104,14 @@ export default function TenderDiffPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
-              setVersionA(SAMPLE_A);
-              setVersionB(SAMPLE_B);
-              handleCompare();
+              setVersionA('');
+              setVersionB('');
+              setDiffResults(null);
             }}
             className="px-3.5 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-2xs cursor-pointer flex items-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
-            <span>Reset Demo Spec</span>
+            <span>Clear</span>
           </button>
           <button
             onClick={() => navigate('/specification-builder')}
@@ -177,32 +124,34 @@ export default function TenderDiffPage() {
       </div>
 
       {/* 02. Metrics Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Changes</span>
-          <span className="text-2xl font-extrabold text-slate-900 font-mono mt-1 block">
-            {(addedCount + modifiedCount + removedCount).toString().padStart(2, '0')}
-          </span>
+      {diffResults && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Changes</span>
+            <span className="text-2xl font-extrabold text-slate-900 font-mono mt-1 block">
+              {(addedCount + modifiedCount + removedCount).toString().padStart(2, '0')}
+            </span>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">Added Clauses</span>
+            <span className="text-2xl font-extrabold text-emerald-600 font-mono mt-1 block">
+              +{addedCount.toString().padStart(2, '0')}
+            </span>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+            <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Standardized</span>
+            <span className="text-2xl font-extrabold text-blue-600 font-mono mt-1 block">
+              {modifiedCount.toString().padStart(2, '0')}
+            </span>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
+            <span className="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">Removed Clauses</span>
+            <span className="text-2xl font-extrabold text-rose-500 font-mono mt-1 block">
+              -{removedCount.toString().padStart(2, '0')}
+            </span>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">Added Clauses</span>
-          <span className="text-2xl font-extrabold text-emerald-600 font-mono mt-1 block">
-            +{addedCount.toString().padStart(2, '0')}
-          </span>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Standardized</span>
-          <span className="text-2xl font-extrabold text-blue-600 font-mono mt-1 block">
-            {modifiedCount.toString().padStart(2, '0')}
-          </span>
-        </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-bold text-rose-500 uppercase tracking-wider block">Removed Clauses</span>
-          <span className="text-2xl font-extrabold text-rose-500 font-mono mt-1 block">
-            -{removedCount.toString().padStart(2, '0')}
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* 03. Side-by-Side Textarea Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -307,6 +256,18 @@ export default function TenderDiffPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {!diffResults && !isComparing && (
+        <div className="bg-white border border-slate-200 rounded-xl p-10 text-center max-w-lg mx-auto space-y-3">
+          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+            <GitCompare className="w-6 h-6 stroke-[1.5]" />
+          </div>
+          <h3 className="text-base font-bold text-slate-800">No Comparison Run Yet</h3>
+          <p className="text-xs text-slate-500">
+            Paste original tender clauses into Version A and the revised specification into Version B, then click &quot;Compare Versions&quot; to review differences.
+          </p>
         </div>
       )}
     </div>
