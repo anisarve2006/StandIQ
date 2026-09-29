@@ -99,12 +99,55 @@ export interface TenderHealthFinding {
   suggested_action: string;
 }
 
+export interface AuditVulnerabilityFinding {
+  id: string;
+  dimension: string;
+  dimension_title: string;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  clause_text: string;
+  rule_reference: string;
+  issue: string;
+  consequence: string;
+  remediation: string;
+  risk_points?: number;
+}
+
+export interface DisputeRiskReport {
+  total_risk_score: number;
+  risk_tier: "SAFE" | "LOW" | "MODERATE" | "HIGH" | "CRITICAL";
+  summary: string;
+  dimension_scores: {
+    gfr: number;
+    cvc: number;
+    cag: number;
+    arbitration: number;
+  };
+  dimension_max_scores?: {
+    gfr: number;
+    cvc: number;
+    cag: number;
+    arbitration: number;
+  };
+  commodity_criticality?: string;
+  findings: AuditVulnerabilityFinding[];
+  remediated_specification?: string;
+  compliance_certificate_id?: string;
+}
+
+export interface DisputeRiskAuditRequest {
+  tender_text?: string;
+  clauses?: string[];
+  target_standard?: string;
+}
+
 export interface TenderHealthRequest {
-  session_id: string;
+  session_id?: string;
+  clauses?: TenderClauseDetail[];
 }
 
 export interface TenderHealthResponse {
   findings: TenderHealthFinding[];
+  dispute_risk_report?: DisputeRiskReport;
 }
 
 export interface TenderDiffRequest {

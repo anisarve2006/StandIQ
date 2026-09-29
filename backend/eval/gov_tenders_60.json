@@ -1,0 +1,602 @@
+[
+  {
+    "id": "TENDER-01",
+    "domain": "Civil & Structural",
+    "agency": "CPWD / MoHUA",
+    "tender_title": "Supply of High Strength TMT Steel Reinforcement Bars Fe 500D",
+    "query": "Supply and delivery of High Strength Deformed Steel Bars for concrete reinforcement Grade Fe 500D diameter 12mm conforming to IS 1786 manufactured through thermo-mechanical treatment with valid BIS certification.",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-02",
+    "domain": "Civil & Structural",
+    "agency": "State PWD Buildings Division",
+    "tender_title": "Ordinary Portland Cement 43 Grade for Reinforced Concrete Works",
+    "query": "Supply of Ordinary Portland Cement 43 Grade in 50 kg HDPE bags for reinforced cement concrete RCC slab and column works conforming to IS 269 / IS 8112 with manufacturer test certificate and ISI mark.",
+    "expected_family_id": "IS:269",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-03",
+    "domain": "Civil & Structural",
+    "agency": "Delhi Development Authority (DDA)",
+    "tender_title": "Portland Pozzolana Cement Fly Ash Based for Plaster and Masonry",
+    "query": "Procurement of Portland Pozzolana Cement PPC fly ash based for brick masonry and external cement plaster conforming to IS 1489 Part 1 with mandatory BIS certification mark.",
+    "expected_family_id": "IS:1489:P1",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-04",
+    "domain": "Civil & Structural",
+    "agency": "NBCC (India) Limited",
+    "tender_title": "Hot Rolled Structural Steel Beams Columns Angles E250",
+    "query": "Supply of hot rolled structural steel sections including I-beams, channels, and equal angles Grade E250 Quality A conforming to IS 2062 for pre-engineered building PEB frame fabrication.",
+    "expected_family_id": "IS:2062",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-05",
+    "domain": "Civil & Structural",
+    "agency": "CPWD Horticulture & Civil",
+    "tender_title": "Ready Mixed Concrete RMC M30 Grade",
+    "query": "Manufacturing, supplying and placing of Ready-Mixed Concrete RMC grade M25 and M30 batched in fully automated computerized batching plant conforming to IS 4926 transit mixer delivery.",
+    "expected_family_id": "IS:4926",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-06",
+    "domain": "Civil & Structural",
+    "agency": "State Police Housing Corporation",
+    "tender_title": "Vitrified Ceramic Floor Tiles 600x600 mm",
+    "query": "Providing and laying vitrified ceramic floor tiles polished rectified size 600x600 mm water absorption less than 0.08% conforming to IS 15622 Group B1a with matching joint grout.",
+    "expected_family_id": "IS:15622",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-07",
+    "domain": "Civil & Structural",
+    "agency": "Military Engineer Services (MES)",
+    "tender_title": "Solid Core Wooden Flush Door Shutters 35mm",
+    "query": "Supply and fixing of factory made solid core wooden flush door shutters 35mm thick commercial veneer both faces conforming to IS 2202 Part 1 with hardwood frame and ISI mark.",
+    "expected_family_id": "IS:2202",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-08",
+    "domain": "Civil & Structural",
+    "agency": "PMAY Urban Housing Mission",
+    "tender_title": "Precast Solid Concrete Blocks for Load Bearing Walls",
+    "query": "Supply of precast solid concrete masonry units blocks for foundation and load bearing external walls compressive strength 5.0 N/mm2 conforming to IS 2185 Part 1.",
+    "expected_family_id": "IS:2185:P1",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-09",
+    "domain": "Civil & Structural",
+    "agency": "Smart City Development Corporation",
+    "tender_title": "Precast Concrete Paving Blocks for Pedestrian Walkways",
+    "query": "Providing and laying 80 mm thick interlocking precast concrete paving blocks M40 grade for heavy traffic footpaths and parking bays conforming to IS 15658.",
+    "expected_family_id": "IS:15658",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-10",
+    "domain": "Civil & Structural",
+    "agency": "CPWD Project Circle",
+    "tender_title": "Pressed Mild Steel Door Frames Profile C",
+    "query": "Providing and fixing pressed steel door frames profile C manufactured from 1.6 mm thick commercial mild steel sheet conforming to IS 4351 with shock absorbers and hinges.",
+    "expected_family_id": "IS:4351",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-11",
+    "domain": "Civil & Structural",
+    "agency": "Hospital Services Consultancy (HSCC)",
+    "tender_title": "Stainless Steel Kitchen Sinks for Hospital Canteen",
+    "query": "Supply and installation of AISI 304 grade stainless steel kitchen sinks with drain board bowl depth 200 mm conforming to IS 13983 with waste fittings.",
+    "expected_family_id": "IS:13983",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-12",
+    "domain": "Civil & Structural",
+    "agency": "DDA Housing Division",
+    "tender_title": "White Vitreous China Orissa Pattern Water Closet Pan",
+    "query": "Providing and fixing white glazed vitreous china water closet squatting pan Orissa pattern size 580x440 mm conforming to IS 2556 Part 3 with S or P trap.",
+    "expected_family_id": "IS:2556:P3",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-13",
+    "domain": "Civil & Structural",
+    "agency": "CPWD Maintenance Division",
+    "tender_title": "Plastic Dual Flushing Cistern for Water Closets",
+    "query": "Supply and fixing of plastic low level flushing cistern with dual flush lever 10 litre capacity white color conforming to IS 7231 with internal brass/plastic valves.",
+    "expected_family_id": "IS:7231",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-14",
+    "domain": "Civil & Structural",
+    "agency": "State PWD Roads & Bridges",
+    "tender_title": "Paving Bitumen VG-30 for Dense Bituminous Macadam",
+    "query": "Supply of viscosity grade paving bitumen VG-30 in bulk tankers for dense bituminous macadam DBM and asphalt concrete road surfacing conforming to IS 73.",
+    "expected_family_id": "IS:73",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-15",
+    "domain": "Civil & Structural",
+    "agency": "National Highways Authority of India (NHAI)",
+    "tender_title": "Cationic Bitumen Emulsion Rapid Setting RS-1",
+    "query": "Supply of cationic bitumen emulsion rapid setting grade RS-1 for tack coat and surface dressing in highway pavement rehabilitation conforming to IS 8887.",
+    "expected_family_id": "IS:8887",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-16",
+    "domain": "Civil & Structural",
+    "agency": "Airport Authority of India (AAI)",
+    "tender_title": "Extruded Aluminium Windows and Glazed Partitions",
+    "query": "Fabrication and fixing of architectural anodized extruded aluminium alloy doors, casement windows and ventilators conforming to IS 1948 with 5mm toughened float glass.",
+    "expected_family_id": "IS:1948",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-17",
+    "domain": "Civil & Structural",
+    "agency": "Metro Rail Corporation",
+    "tender_title": "Plywood for Concrete Shuttering and Formwork",
+    "query": "Procurement of film faced waterproof plywood for concrete shuttering and scaffolding formwork 12mm thickness conforming to IS 4990 BWP grade.",
+    "expected_family_id": "IS:4990",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-18",
+    "domain": "Water Supply & PHED",
+    "agency": "Jal Jeevan Mission (JJM) / PHED",
+    "tender_title": "Galvanized Mild Steel ERW Pipes Medium Class 80mm NB",
+    "query": "Supply of galvanized mild steel tubes and tubulars ERW medium grade class B nominal bore 80mm with screwed and socketed ends for rural piped drinking water conforming to IS 1239 Part 1.",
+    "expected_family_id": "IS:1239:P1",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-19",
+    "domain": "Water Supply & PHED",
+    "agency": "Maharashtra Jeevan Pradhikaran (MJP)",
+    "tender_title": "Centrifugally Cast Ductile Iron Pressure Pipes Class K9 300mm",
+    "query": "Manufacturing, supplying and testing of centrifugally cast ductile iron pressure pipes DI pipes class K9 diameter 300 mm with socket and spigot push-on joints for water transmission main conforming to IS 8329.",
+    "expected_family_id": "IS:8329",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-20",
+    "domain": "Water Supply & PHED",
+    "agency": "Municipal Corporation Water Works",
+    "tender_title": "Centrifugally Cast Spun Iron Pressure Pipes 150mm",
+    "query": "Supply of centrifugally cast spun iron pressure pipes class LA diameter 150mm for underground potable water distribution network conforming to IS 1536.",
+    "expected_family_id": "IS:1536",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-21",
+    "domain": "Water Supply & PHED",
+    "agency": "UP Jal Nigam / JJM",
+    "tender_title": "Unplasticized PVC Pipes 110mm 6kg/cm2 for Potable Water",
+    "query": "Supply of unplasticized PVC uPVC pipes for potable drinking water supplies outer diameter 110mm working pressure class 3 (6 kgf/cm2) with elastomeric sealing ring conforming to IS 4985.",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-22",
+    "domain": "Water Supply & PHED",
+    "agency": "Rural Water Supply & Sanitation (RWSS)",
+    "tender_title": "High Density Polyethylene HDPE Pipes PE 100 PN 10",
+    "query": "Supply and delivery of High Density Polyethylene HDPE pipes manufactured from PE-100 virgin grade pressure rating PN 10 outer diameter 90mm conforming to IS 4984 for rural water supply.",
+    "expected_family_id": "IS:4984",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-23",
+    "domain": "Water Supply & PHED",
+    "agency": "Delhi Jal Board (DJB)",
+    "tender_title": "Cast Iron Resilient Seated Sluice Valves PN 1.6",
+    "query": "Supply of cast iron double flanged sluice valves class PN 1.6 nominal size 200mm with cap and handwheel inside screw non-rising stem conforming to IS 14846.",
+    "expected_family_id": "IS:14846",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-24",
+    "domain": "Water Supply & PHED",
+    "agency": "State Irrigation & Water Resources",
+    "tender_title": "Submersible Pumpsets 10 HP for Deep Tubewells",
+    "query": "Supply, installation and commissioning of borewell submersible pumpsets 10 HP 415 V 3 phase 50 Hz multistage centrifugal pump for agricultural irrigation tubewells conforming to IS 8034.",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-25",
+    "domain": "Water Supply & PHED",
+    "agency": "Zilla Parishad Rural Water",
+    "tender_title": "Electric Monobloc Centrifugal Pumpset 3 HP",
+    "query": "Supply of electric monoset centrifugal pumps for clear cold water agricultural irrigation and domestic booster suction size 50mm 3 HP single phase conforming to IS 9079.",
+    "expected_family_id": "IS:9079",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-26",
+    "domain": "Water Supply & PHED",
+    "agency": "Municipal Health Department",
+    "tender_title": "Rotational Moulded Polyethylene Water Storage Tanks 5000 Litres",
+    "query": "Supply and delivery of rotationally moulded polyethylene cylindrical vertical water storage tanks capacity 5000 litres UV stabilized double layer food grade conforming to IS 12701.",
+    "expected_family_id": "IS:12701",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-27",
+    "domain": "Water Supply & PHED",
+    "agency": "Urban Drainage & Sewerage Board",
+    "tender_title": "Cast Iron Manhole Covers and Frames Heavy Duty Grade HD-20",
+    "query": "Supply of cast iron manhole covers and frames heavy duty grade HD 20 metric circular 560mm internal opening for city road sewerage and storm drains conforming to IS 1726.",
+    "expected_family_id": "IS:1726",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-28",
+    "domain": "Water Supply & PHED",
+    "agency": "Smart City Water Utility",
+    "tender_title": "Domestic Cold Water Meters Multi-Jet Inferential 15mm",
+    "query": "Supply of magnetic drive multi-jet inferential domestic cold water meters nominal bore 15mm class B dry dial conforming to IS 779 with brass body.",
+    "expected_family_id": "IS:779",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-29",
+    "domain": "Water Supply & PHED",
+    "agency": "State Highway Development Project",
+    "tender_title": "Precast Reinforced Concrete Culvert Pipes NP3 900mm",
+    "query": "Manufacturing and laying of precast reinforced concrete pipes class NP3 internal diameter 900mm with spigot and socket ends for highway cross drainage culverts conforming to IS 458.",
+    "expected_family_id": "IS:458",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-30",
+    "domain": "Highways & Infrastructure",
+    "agency": "NHAI Bridge Division",
+    "tender_title": "Uncoated Low Relaxation Seven-Ply Steel Strands 12.7mm for PSC",
+    "query": "Supply of uncoated stress relieved low relaxation seven-ply steel strands 12.7 mm nominal diameter for post-tensioned prestressed concrete bridge girders conforming to IS 14268.",
+    "expected_family_id": "IS:14268",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-31",
+    "domain": "Highways & Infrastructure",
+    "agency": "Dedicated Freight Corridor (DFCCIL)",
+    "tender_title": "Plain Hard-Drawn Steel Wire for Prestressed Concrete Sleepers",
+    "query": "Procurement of high tensile plain hard-drawn cold drawn steel wire 3mm diameter for prestressed concrete railway sleepers conforming to IS 1785 Part 1 with mandatory BIS mark.",
+    "expected_family_id": "IS:1785:P1",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-32",
+    "domain": "Highways & Infrastructure",
+    "agency": "MoRTH Expressway Project",
+    "tender_title": "Hot Rolled Steel Sheets for W-Beam Highway Crash Barriers",
+    "query": "Supply of hot rolled structural steel flat plates and coils Grade Fe 410 / Fe 510 conforming to IS 5986 for cold-forming W-beam galvanized expressway safety crash barriers.",
+    "expected_family_id": "IS:5986",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-33",
+    "domain": "Highways & Infrastructure",
+    "agency": "Border Roads Organisation (BRO)",
+    "tender_title": "Cold Reduced Carbon Steel Sheets for Road Signage Boards",
+    "query": "Procurement of cold reduced carbon steel sheet and strip CRCA grade CR1 1.2 mm thickness conforming to IS 513 Part 1 for manufacturing high-altitude road signage panels.",
+    "expected_family_id": "IS:513",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-34",
+    "domain": "Highways & Infrastructure",
+    "agency": "State Road Development Corporation",
+    "tender_title": "Hot Applied Thermoplastic Road Marking Paint White and Yellow",
+    "query": "Applying hot-applied thermoplastic road marking paint 2.5 mm thickness with premix glass beads and drop-on glass beads for lane delineation conforming to IS 164.",
+    "expected_family_id": "IS:164",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-35",
+    "domain": "Electrical & Power",
+    "agency": "State Electricity Distribution Company (Discom)",
+    "tender_title": "Outdoor Step-Down Distribution Transformers 11kV/433V 100 kVA",
+    "query": "Design, manufacture and supply of 100 kVA 11 kV / 433 V 3 phase 50 Hz outdoor liquid immersed copper wound distribution transformers BEE 3 Star Level 2 conforming to IS 1180 Part 1.",
+    "expected_family_id": "IS:1180",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-36",
+    "domain": "Electrical & Power",
+    "agency": "Power Grid Corporation of India (PGCIL)",
+    "tender_title": "ACSR Conductor Panther and Zebra for Overhead Lines",
+    "query": "Supply of Aluminium Conductors Galvanized Steel Reinforced ACSR Panther and Zebra for 132kV overhead transmission lines conforming to IS 398 Part 2 with grease anti-corrosive protection.",
+    "expected_family_id": "IS:398:P2",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-37",
+    "domain": "Electrical & Power",
+    "agency": "State Transmission Corporation (STU)",
+    "tender_title": "Cross-Linked Polyethylene XLPE Insulated 33kV Power Cable",
+    "query": "Supply of 33 kV 3 core 300 sq.mm stranded compacted aluminium conductor XLPE insulated galvanized steel strip armoured power cable conforming to IS 7098 Part 2.",
+    "expected_family_id": "IS:7098:P2",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-38",
+    "domain": "Electrical & Power",
+    "agency": "CPWD Electrical Wing",
+    "tender_title": "1.1 kV Grade PVC Insulated Copper Building Wire 2.5 sq mm",
+    "query": "Supply of single core 1100 V grade PVC insulated unsheathed flexible multi-strand electrolytic copper conductor wire size 2.5 sq mm conforming to IS 694 for conduit wiring.",
+    "expected_family_id": "IS:694",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-39",
+    "domain": "Electrical & Power",
+    "agency": "RDSS Scheme Discom Circle",
+    "tender_title": "Single Phase Whole Current Static Watthour Energy Meters",
+    "query": "Supply of single phase 2 wire 240 V 10-60 A static AC watthour electricity energy meters accuracy Class 1.0 with LCD display optical port conforming to IS 13779.",
+    "expected_family_id": "IS:13779",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-40",
+    "domain": "Electrical & Power",
+    "agency": "National Smart Grid Mission (NSGM)",
+    "tender_title": "Three Phase Direct Connected Smart Prepaid Energy Meters",
+    "query": "Supply and AMI integration of 3-phase 4-wire whole current static smart electricity meters Class 1.0 with cellular 4G GPRS communication conforming to IS 16444 Part 1.",
+    "expected_family_id": "IS:16444",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-41",
+    "domain": "Electrical & Power",
+    "agency": "Energy Efficiency Services Limited (EESL)",
+    "tender_title": "Energy Efficient Three Phase Squirrel Cage Induction Motors IE3",
+    "query": "Supply of Premium Efficiency IE3 three phase squirrel cage induction electric motors 15 kW 415 V 4 pole 50 Hz totally enclosed fan cooled TEFC conforming to IS 12615.",
+    "expected_family_id": "IS:12615",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-42",
+    "domain": "Electrical & Power",
+    "agency": "NTPC Thermal Power Project",
+    "tender_title": "Moulded Case Circuit Breaker MCCB 400A 50kA",
+    "query": "Supply of 4-pole 400A 415V AC moulded case circuit breaker MCCB breaking capacity 50kA with microprocessor based trip release conforming to IS/IEC 60947-2.",
+    "expected_family_id": "IS/IEC:60947:P2",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-43",
+    "domain": "Electrical & Power",
+    "agency": "CPWD Sub-Station Division",
+    "tender_title": "Miniature Circuit Breakers MCB 16A Single Pole Type C",
+    "query": "Providing and fixing 16A single pole C-curve miniature circuit breaker MCB breaking capacity 10kA for electrical distribution board conforming to IS/IEC 60898-1.",
+    "expected_family_id": "IS/IEC:60898:P1",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-44",
+    "domain": "Electrical & Power",
+    "agency": "State Secretariat Electrical Maintenance",
+    "tender_title": "Rigid Steel Conduits for Heavy Duty Electrical Wiring 25mm",
+    "query": "Supply of rigid steel conduits for electrical installations medium duty hot dip galvanized nominal size 25mm conforming to IS 9537 Part 2 with couplers and bends.",
+    "expected_family_id": "IS:9537:P2",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-45",
+    "domain": "Smart Cities & IT",
+    "agency": "Smart City Surveillance Command Center",
+    "tender_title": "High Definition IP CCTV Bullet Video Surveillance Cameras",
+    "query": "Procurement of 4MP high definition IP-based network bullet CCTV surveillance cameras vandal proof IP67 ONVIF compliant conforming to IS 13252 Part 1 IT Equipment Safety.",
+    "expected_family_id": "IS:13252:P1",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-46",
+    "domain": "Smart Cities & IT",
+    "agency": "Municipal Corporation Street Lighting",
+    "tender_title": "Outdoor LED Roadway Street Light Luminaires 120W",
+    "query": "Supply and commissioning of 120 Watt pressure die cast aluminium outdoor LED street light luminaires efficacy 120 lm/W surge protection 10kV conforming to IS 10322 Part 5 Section 3.",
+    "expected_family_id": "IS:10322",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-47",
+    "domain": "Smart Cities & IT",
+    "agency": "GeM Procurement Portal",
+    "tender_title": "Self-Ballasted LED Bulbs 9W B22 Base for Office Complex",
+    "query": "Supply of self-ballasted LED lamps 9 watt cool daylight 6500K base B22 for general interior office lighting conforming to IS 16102 Part 1 with BIS registration.",
+    "expected_family_id": "IS:16102",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-48",
+    "domain": "Smart Cities & IT",
+    "agency": "National Informatics Centre (NIC) Data Centre",
+    "tender_title": "Online True Double Conversion UPS System 20 kVA",
+    "query": "Supply and installation of 20 kVA 3-phase online true double conversion uninterruptible power supply UPS system IGBT based conforming to IS 16242 Part 1 safety standards.",
+    "expected_family_id": "IS:16242:P1",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-49",
+    "domain": "Smart Cities & IT",
+    "agency": "Solar Energy Corporation of India (SECI)",
+    "tender_title": "Crystalline Silicon Solar Photovoltaic Modules 540Wp",
+    "query": "Supply of mono-crystalline silicon terrestrial photovoltaic PV solar modules 540 Wp bifacial cell efficiency > 21% conforming to IS 14286 and IS/IEC 61730 ALMM approved.",
+    "expected_family_id": "IS:14286",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-50",
+    "domain": "Fire & Life Safety",
+    "agency": "Airport Authority of India (AAI)",
+    "tender_title": "Portable ABC Dry Chemical Powder Fire Extinguishers 6kg",
+    "query": "Supply of portable fire extinguishers stored pressure dry chemical powder ABC type capacity 6 kg squeeze grip mechanism conforming to IS 15683 with ISI mark.",
+    "expected_family_id": "IS:15683",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-51",
+    "domain": "Fire & Life Safety",
+    "agency": "Delhi Metro Rail Corporation (DMRC)",
+    "tender_title": "Clean Agent HFC-227ea Fire Extinguisher 4kg for Signalling Rooms",
+    "query": "Procurement of clean agent gas based portable fire extinguishers 4kg stored pressure for electrical control and signalling equipment conforming to IS 15683.",
+    "expected_family_id": "IS:15683",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-52",
+    "domain": "Fire & Life Safety",
+    "agency": "Municipal Fire Brigade",
+    "tender_title": "Gunmetal Fire Hydrant Landing Valves 63mm Oblique Type",
+    "query": "Supply of gunmetal oblique type fire hydrant landing valves 63 mm instantaneous female outlet flange inlet tested to 2.5 MPa conforming to IS 5290.",
+    "expected_family_id": "IS:5290",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-53",
+    "domain": "Fire & Life Safety",
+    "agency": "State Industrial Development Corporation",
+    "tender_title": "First-Aid Fire Hose Reel Swinging Type 30 Meters",
+    "query": "Supply and fixing of swinging type first-aid fire hose reel 30 meter length 20mm bore high pressure thermoplastic rubber hose with shut-off nozzle conforming to IS 884.",
+    "expected_family_id": "IS:884",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-54",
+    "domain": "Fire & Life Safety",
+    "agency": "State Disaster Response Force (SDRF)",
+    "tender_title": "Non-Percolating Flexible Fire Fighting Delivery Hose 63mm",
+    "query": "Supply of 63mm diameter 30 meter length non-percolating flexible synthetic fire fighting delivery hose pipe proof pressure 2.1 MPa conforming to IS 636 Type A.",
+    "expected_family_id": "IS:636",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-55",
+    "domain": "Fire & Life Safety",
+    "agency": "High Court Building Administration",
+    "tender_title": "Heat Sensitive Rate-of-Rise Fire Detectors",
+    "query": "Supply and installation of addressable heat sensitive fire detectors combination rate-of-rise and fixed temperature for automatic fire alarm conforming to IS 2175.",
+    "expected_family_id": "IS:2175",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-56",
+    "domain": "Fire & Life Safety",
+    "agency": "L&T Construction / NHAI Safety",
+    "tender_title": "Industrial Safety Helmets with 4-Point Suspension",
+    "query": "Supply of high-density polyethylene HDPE industrial safety helmets with 4-point ratchet suspension sweatband chin strap conforming to IS 2925 for construction workers.",
+    "expected_family_id": "IS:2925",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-57",
+    "domain": "Fire & Life Safety",
+    "agency": "Steel Authority of India (SAIL)",
+    "tender_title": "Industrial Safety Footwear Steel Toe Cap Boots",
+    "query": "Supply of industrial safety footwear leather shoes with steel toe cap 200 Joules impact resistance polyurethane PU sole conforming to IS 15298 Part 2.",
+    "expected_family_id": "IS:15298:P2",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-58",
+    "domain": "Railways & Heavy Industry",
+    "agency": "Indian Railways / RDSO",
+    "tender_title": "Carbon Steel Castings for Railway Freight Wagons and Bogies",
+    "query": "Procurement of carbon steel castings Grade 1 and Grade 2 for railway freight rolling stock bogie bolster and side frames conforming to IS 1030.",
+    "expected_family_id": "IS:1030",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-59",
+    "domain": "Railways & Heavy Industry",
+    "agency": "Indian Navy / Mazagon Dock",
+    "tender_title": "Galvanized Steel Wire Ropes for Cranes and Hoisting",
+    "query": "Supply of galvanized steel wire ropes 6x36 construction independent wire rope core IWRC tensile grade 1770 N/mm2 for dockyard cranes conforming to IS 2266.",
+    "expected_family_id": "IS:2266",
+    "expected_qco": true,
+    "type": "GOV_TENDER_BOQ"
+  },
+  {
+    "id": "TENDER-60",
+    "domain": "Railways & Heavy Industry",
+    "agency": "Ministry of Defence (MoD) / Ordnance",
+    "tender_title": "Heavy Cotton Duck Canvas for Army Tents and Tarpaulins",
+    "query": "Procurement of heavy unbleached cotton duck canvas fabric variety 1 water-repellent rot-proof for military tents and army tarpaulin covers conforming to IS 1422.",
+    "expected_family_id": "IS:1422",
+    "expected_qco": false,
+    "type": "GOV_TENDER_BOQ"
+  }
+]

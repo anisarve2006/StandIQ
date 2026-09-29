@@ -478,5 +478,126 @@
     "expected_family_id": "IS:15683",
     "expected_qco": true,
     "type": "MULTILINGUAL_BENGALI"
+  },
+  {
+    "id": "CASE-61",
+    "domain": "Multilingual Indic",
+    "query": "ಮನೆ ನಿರ್ಮಾಣಕ್ಕಾಗಿ 16mm ಕಬ್ಬಿಣದ ಸರಳು Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_KANNADA"
+  },
+  {
+    "id": "CASE-62",
+    "domain": "Multilingual Indic",
+    "query": "ಕೃಷಿ ನೀರಾವರಿಗಾಗಿ ಸಬ್‌ಮರ್ಸಿಬಲ್ ಪಂಪ್ ಮತ್ತು ನೀರಿನ ಮೋಟರ್ 5 HP",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_KANNADA"
+  },
+  {
+    "id": "CASE-63",
+    "domain": "Multilingual Indic",
+    "query": "ಕುಡಿಯುವ ನೀರಿನ ಸರಬರಾಜಿಗೆ ಪಿವಿಸಿ ಪೈಪ್ 110mm",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_KANNADA"
+  },
+  {
+    "id": "CASE-64",
+    "domain": "Multilingual Indic",
+    "query": "കെട്ടിട നിർമ്മാണത്തിനുള്ള ടിഎംടി കമ്പി 12mm Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_MALAYALAM"
+  },
+  {
+    "id": "CASE-65",
+    "domain": "Multilingual Indic",
+    "query": "കൃഷി ആവശ്യങ്ങൾക്കുള്ള സബ്മേഴ്സിബിൾ പമ്പ് 415V",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_MALAYALAM"
+  },
+  {
+    "id": "CASE-66",
+    "domain": "Multilingual Indic",
+    "query": "കുടിവെള്ള വിതരണത്തിനുള്ള പിവിസി പൈപ്പ് 90mm",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_MALAYALAM"
+  },
+  {
+    "id": "CASE-67",
+    "domain": "Multilingual Indic",
+    "query": "ਮਕਾਨ ਬਣਾਉਣ ਲਈ 12mm ਸਰਿਆ Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_PUNJABI"
+  },
+  {
+    "id": "CASE-68",
+    "domain": "Multilingual Indic",
+    "query": "ਖੇਤੀਬਾੜੀ ਲਈ ਪਾਣੀ ਦੀ ਮੋਟਰ ਅਤੇ ਸਬਮਰਸੀਬਲ ਪੰਪ 5 HP",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_PUNJABI"
+  },
+  {
+    "id": "CASE-69",
+    "domain": "Multilingual Indic",
+    "query": "ଘର ତିଆରି ପାଇଁ ରଡ୍ Fe 500D 16mm",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_ODIA"
+  },
+  {
+    "id": "CASE-70",
+    "domain": "Multilingual Indic",
+    "query": "ଚାଷ କାର୍ଯ୍ୟ ପାଇଁ ସବମର୍ସିବଲ ପମ୍ପ ଏବଂ ମୋଟର 5 HP",
+    "expected_family_id": "IS:8034",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_ODIA"
+  },
+  {
+    "id": "CASE-71",
+    "domain": "Multilingual Indic",
+    "query": "বাড়ি নির্মাণের জন্য 16mm রড Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_BENGALI"
+  },
+  {
+    "id": "CASE-72",
+    "domain": "Multilingual Indic",
+    "query": "পানীয় জল সরবরাহের জন্য পিভিসি পাইপ 110mm",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_BENGALI"
+  },
+  {
+    "id": "CASE-73",
+    "domain": "Multilingual Indic",
+    "query": "મકાન બાંધકામ માટે 12mm સળિયા Fe 500D",
+    "expected_family_id": "IS:1786",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_GUJARATI"
+  },
+  {
+    "id": "CASE-74",
+    "domain": "Multilingual Indic",
+    "query": "પીવાના પાણીની સપ્લાય માટે પીવીસી પાઇપ 90mm",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_GUJARATI"
+  },
+  {
+    "id": "CASE-75",
+    "domain": "Multilingual Indic",
+    "query": "पिण्याच्या पाण्यासाठी पीव्हीसी पाईप 110mm",
+    "expected_family_id": "IS:4985",
+    "expected_qco": true,
+    "type": "MULTILINGUAL_MARATHI"
   }
 ]
+

@@ -133,17 +133,64 @@ class EvidencePackBuilder:
             if "environment" not in constraints:
                 gaps.append("Working fluid characteristics and temperature range omitted.")
 
-        # 4. Certification & QCO Rules
+        # 4. Multi-Factor Certification & QCO Regulatory Intelligence
         orders = certification_info.get("orders", [])
-        cert_data = {
-            "status": certification_info.get("status", "NOT IDENTIFIED"),
-            "is_mandatory": certification_info.get("is_mandatory", False),
-            "scheme": certification_info.get("scheme"),
-            "applicable_qco": orders[0]["product_name"] if orders else None,
-            "gazette_notification": orders[0]["gazette_notification"] if orders else None,
-            "source_authority": "Ministry of Commerce and Industry / Central Government of India",
-            "regulatory_banner": "Regulatory orders change; verify against the e-Gazette and BIS before tender finalization."
-        }
+        
+        if orders:
+            order = orders[0]
+            prod_scope = order.get("product_name", "")
+            gazette = order.get("gazette_notification", "")
+            scheme = order.get("scheme", "ISI_MARK")
+            
+            # Check for de-notification or exemption in the gazette / scope
+            is_denotified = any(term in prod_scope.lower() for term in ["de-notified", "denotified", "exempted", "rescinded"])
+            
+            if is_denotified:
+                regulatory_status = "EXEMPTED_OR_DENOTIFIED"
+                evidence = gazette or "Official De-notification Order"
+                reason = f"De-notified from compulsory BIS certification: {prod_scope}"
+                is_mandatory = False
+                effective_date = "De-notified"
+            else:
+                regulatory_status = "MANDATORY"
+                is_mandatory = True
+                evidence = gazette if gazette else f"{prod_scope} (Compulsory Quality Control Order)"
+                reason = f"Mandatory standard marking enforced under Central Government QCO."
+                
+                # Extract effective date if present
+                import re
+                date_match = re.search(r'\b(?:\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})\b', gazette, re.IGNORECASE)
+                effective_date = date_match.group(0) if date_match else "In Force (as per Gazette notification)"
+
+            cert_data = {
+                "regulatory_status": regulatory_status,
+                "status": regulatory_status,
+                "is_mandatory": is_mandatory,
+                "evidence": evidence,
+                "effective_date": effective_date,
+                "scope": prod_scope,
+                "scheme": "BIS Scheme-I (Compulsory ISI Mark)" if "ISI" in scheme else scheme,
+                "applicable_qco": prod_scope,
+                "gazette_notification": gazette,
+                "source_authority": "Ministry of Commerce and Industry / Central Line Ministry",
+                "source_url": order.get("source_url", "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/scheme-1/"),
+                "reason": reason
+            }
+        else:
+            cert_data = {
+                "regulatory_status": "NOT_VERIFIED",
+                "status": "NOT_VERIFIED",
+                "is_mandatory": False,
+                "evidence": "No Compulsory QCO Notification Found",
+                "effective_date": None,
+                "scope": None,
+                "scheme": None,
+                "applicable_qco": None,
+                "gazette_notification": None,
+                "source_authority": "Bureau of Indian Standards",
+                "source_url": "https://www.bis.gov.in/product-certification/products-under-compulsory-certification/scheme-1/",
+                "reason": "No current QCO evidence found for this exact product/IS combination. Regulatory orders change frequently; verify against the latest e-Gazette and BIS before tender finalization."
+            }
 
         # 5. Multi-Dimensional Confidence Vector (Layer 35)
         conf_vector = constraint_results.get("confidence_vector", {})
@@ -188,11 +235,17 @@ class EvidencePackBuilder:
                 "family_id": family_id,
                 "raw_id": raw_id,
                 "title_en": primary_standard.get("title_en"),
+                "domain": primary_standard.get("domain"),
+                "product_type": primary_standard.get("product_type"),
+                "material": primary_standard.get("material"),
+                "application": primary_standard.get("application"),
+                "standard_type": primary_standard.get("standard_type"),
                 "division": primary_standard.get("division"),
                 "committee": primary_standard.get("committee"),
                 "scope_summary": primary_standard.get("scope_text") or primary_standard.get("title_en"),
                 "archive_url": version_status_info["archive_url"]
             },
+
             "version_verification": version_status_info,
             "certification": cert_data,
             "allied_standards": categorized_allied,

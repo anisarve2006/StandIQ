@@ -1,21 +1,41 @@
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-from schemas.domain import VersionInfo, CertificationInfo, Requirement, ApplicabilityResult
+from schemas.domain import VersionInfo, CertificationInfo, Requirement, ApplicabilityResult, VersionDiffInfo, AmendmentRecord
 
 class AlliedStandardResponse(BaseModel):
+
     source_standard: str
     relationship: str
     target_standard: str
     reason: Optional[str] = None
     evidence: Optional[str] = None
 
+class AlliedStandardItem(BaseModel):
+    standard_id: str
+    title: Optional[str] = None
+    relationship: str
+    provenance: Optional[str] = None
+    year: Optional[int] = None
+    status: Optional[str] = None
+
+class CategorizedAlliedStandards(BaseModel):
+    normative_references: List[AlliedStandardItem] = []
+    test_methods: List[AlliedStandardItem] = []
+    safety_codes: List[AlliedStandardItem] = []
+    installation_codes: List[AlliedStandardItem] = []
+    terminology_glossaries: List[AlliedStandardItem] = []
+
 class AlliedStandardsResponse(BaseModel):
     family_id: str
-    allied_standards: List[AlliedStandardResponse]
+    categories: CategorizedAlliedStandards = CategorizedAlliedStandards()
+    allied_standards: List[AlliedStandardResponse] = []
+
 
 class VersionResponse(BaseModel):
     family_id: str
     version_info: VersionInfo
+    version_diff: Optional[VersionDiffInfo] = None
+
 
 class CertificationResponse(BaseModel):
     family_id: str
@@ -40,6 +60,34 @@ class TenderAnalyzeResponse(BaseModel):
     clauses: List[TenderClauseDetail]
     recommendations: Dict[str, Any]
 
+class AuditVulnerabilityFinding(BaseModel):
+    id: str
+    dimension: str  # "GFR_144_I", "CVC_COMPETITION", "CAG_AUDIT", "ARBITRATION_TRAP"
+    dimension_title: str
+    severity: str  # "CRITICAL", "HIGH", "MEDIUM", "LOW"
+    clause_text: str
+    rule_reference: str
+    issue: str
+    consequence: str
+    remediation: str
+    risk_points: Optional[int] = 0
+
+class DisputeRiskReport(BaseModel):
+    total_risk_score: int  # 0 to 100
+    risk_tier: str  # "SAFE", "LOW", "MODERATE", "HIGH", "CRITICAL"
+    summary: str
+    dimension_scores: Dict[str, int]  # {"gfr": int, "cvc": int, "cag": int, "arbitration": int}
+    dimension_max_scores: Optional[Dict[str, int]] = None  # Dynamic maximums (sum to 100)
+    commodity_criticality: Optional[str] = None  # e.g. "TIER_1_STRUCTURAL_SAFETY"
+    findings: List[AuditVulnerabilityFinding]
+    remediated_specification: Optional[str] = None
+    compliance_certificate_id: Optional[str] = None
+
+class DisputeRiskAuditRequest(BaseModel):
+    tender_text: Optional[str] = None
+    clauses: Optional[List[str]] = []
+    target_standard: Optional[str] = None
+
 class TenderHealthFinding(BaseModel):
     severity: str
     category: str
@@ -52,6 +100,7 @@ class TenderHealthRequest(BaseModel):
 
 class TenderHealthResponse(BaseModel):
     findings: List[TenderHealthFinding]
+    dispute_risk_report: Optional[DisputeRiskReport] = None
 
 class TenderDiffRequest(BaseModel):
     version_a_text: str
@@ -153,3 +202,23 @@ class ChangesResponse(BaseModel):
 
 class ProcurementListResponse(BaseModel):
     sessions: List[ProcurementSessionResponse]
+
+class ClarifyRequest(BaseModel):
+    query: str
+    context: Optional[Dict[str, Any]] = None
+
+class ClarificationQuestion(BaseModel):
+    parameter: str
+    question: str
+    options: List[str]
+    required_for: Optional[str] = None
+
+class ClarifyResponse(BaseModel):
+    query: str
+    is_ambiguous: bool
+    detected_product: Optional[str] = None
+    detected_division: Optional[str] = None
+    clarifying_questions: List[ClarificationQuestion] = []
+    candidate_standards_considered: List[str] = []
+    message: str
+

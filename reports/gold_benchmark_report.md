@@ -13,14 +13,14 @@
 
 | Metric | Benchmark Target | MaanakAI Result | Evaluation Status |
 |---|---|---|---|
-| **Top-1 Accuracy** | ≥ 85.0% | **96.0%** (72/75) | PASS |
+| **Top-1 Accuracy** | ≥ 85.0% | **93.3%** (70/75) | PASS |
 | **Top-3 Recall** | ≥ 92.0% | **100.0%** (75/75) | PASS |
 | **Top-5 Recall** | ≥ 95.0% | **100.0%** (75/75) | PASS |
-| **Mean Reciprocal Rank (MRR)** | ≥ 0.8800 | **0.9800** | PASS |
-| **Compulsory QCO Match** | ≥ 88.0% | **74.7%** (56/75) | REVIEW |
+| **Mean Reciprocal Rank (MRR)** | ≥ 0.8800 | **0.9644** | PASS |
+| **Compulsory QCO Match** | ≥ 88.0% | **73.3%** (55/75) | REVIEW |
 | **Zero-Hallucination Rate** | 100.0% | **100.0%** | PASS |
-| **Latency (Median p50)** | < 1,500 ms | **3299.7 ms** | REVIEW |
-| **Latency (p95)** | < 3,500 ms | **13443.7 ms** | REVIEW |
+| **Latency (Median p50)** | < 1,500 ms | **2742.6 ms** | REVIEW |
+| **Latency (p95)** | < 3,500 ms | **12937.6 ms** | REVIEW |
 
 ---
 
@@ -28,15 +28,15 @@
 
 | Engineering Division / Procurement Domain | Cases | Top-1 Accuracy | Top-3 Recall | Top-5 Recall | Median Latency |
 |---|---|---|---|---|---|
-| **Chemical & Safety** | 6 | 100.0% | 100.0% | 100.0% | 3046.2 ms |
-| **Civil Engineering** | 12 | 83.3% | 100.0% | 100.0% | 2769.8 ms |
-| **Electronics and IT** | 4 | 100.0% | 100.0% | 100.0% | 2876.2 ms |
-| **Electrotechnical** | 10 | 100.0% | 100.0% | 100.0% | 2661.4 ms |
-| **Food and Agriculture** | 4 | 100.0% | 100.0% | 100.0% | 2778.6 ms |
-| **Mechanical Engineering** | 9 | 88.9% | 100.0% | 100.0% | 3287.3 ms |
-| **Medical and Healthcare** | 4 | 100.0% | 100.0% | 100.0% | 3299.8 ms |
-| **Multilingual Indic** | 25 | 100.0% | 100.0% | 100.0% | 5331.2 ms |
-| **Textiles** | 1 | 100.0% | 100.0% | 100.0% | 2696.0 ms |
+| **Chemical & Safety** | 6 | 100.0% | 100.0% | 100.0% | 2204.0 ms |
+| **Civil Engineering** | 12 | 75.0% | 100.0% | 100.0% | 2771.3 ms |
+| **Electronics and IT** | 4 | 75.0% | 100.0% | 100.0% | 2200.3 ms |
+| **Electrotechnical** | 10 | 100.0% | 100.0% | 100.0% | 2530.3 ms |
+| **Food and Agriculture** | 4 | 100.0% | 100.0% | 100.0% | 2293.1 ms |
+| **Mechanical Engineering** | 9 | 88.9% | 100.0% | 100.0% | 2568.8 ms |
+| **Medical and Healthcare** | 4 | 100.0% | 100.0% | 100.0% | 2545.3 ms |
+| **Multilingual Indic** | 25 | 100.0% | 100.0% | 100.0% | 5947.4 ms |
+| **Textiles** | 1 | 100.0% | 100.0% | 100.0% | 2454.5 ms |
 
 ---
 
@@ -44,7 +44,7 @@
 
 | Procuring Authority / Agency | Cases Evaluated | Top-1 Precision | Top-3 Coverage |
 |---|---|---|---|
-| Government Procurement | 75 | 96.0% | 100.0% |
+| Government Procurement | 75 | 93.3% | 100.0% |
 
 ---
 
@@ -90,7 +90,7 @@
 | `CASE-36` | Government Procurement: CASE-36 | `IS:1065` | `IS:1065` | **Rank 1** | Voluntary (Match) | Verified Zero-Hallucination |
 | `CASE-37` | Government Procurement: CASE-37 | `IS:13252:P1` | `IS:13252:P1` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |
 | `CASE-38` | Government Procurement: CASE-38 | `IS:13252:P1` | `IS:13252:P1` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |
-| `CASE-39` | Government Procurement: CASE-39 | `IS:16242:P1` | `IS:16242:P1` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |
+| `CASE-39` | Government Procurement: CASE-39 | `IS:16242:P1` | `IS:9815:P1` | **Rank 2** | Discrepancy | Verified Zero-Hallucination |
 | `CASE-40` | Government Procurement: CASE-40 | `IS:616` | `IS:616` | **Rank 1** | Discrepancy | Verified Zero-Hallucination |
 | `CASE-41` | Government Procurement: CASE-41 | `IS:14543` | `IS:14543` | **Rank 1** | Discrepancy | Verified Zero-Hallucination |
 | `CASE-42` | Government Procurement: CASE-42 | `IS:13428` | `IS:13428` | **Rank 1** | Discrepancy | Verified Zero-Hallucination |
@@ -101,7 +101,7 @@
 | `CASE-47` | Government Procurement: CASE-47 | `IS:15113` | `IS:15113` | **Rank 1** | Voluntary (Match) | Verified Zero-Hallucination |
 | `CASE-48` | Government Procurement: CASE-48 | `IS:10258` | `IS:10258` | **Rank 1** | Voluntary (Match) | Verified Zero-Hallucination |
 | `CASE-49` | Government Procurement: CASE-49 | `IS:5405` | `IS:5405` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |
-| `CASE-50` | Government Procurement: CASE-50 | `IS:1566` | `IS:1566` | **Rank 1** | Discrepancy | Verified Zero-Hallucination |
+| `CASE-50` | Government Procurement: CASE-50 | `IS:1566` | `IS:432:P1` | **Rank 3** | Discrepancy | Verified Zero-Hallucination |
 | `CASE-51` | Government Procurement: CASE-51 | `IS:1786` | `IS:1786` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |
 | `CASE-52` | Government Procurement: CASE-52 | `IS:8112` | `IS:8112` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |
 | `CASE-53` | Government Procurement: CASE-53 | `IS:1786` | `IS:1786` | **Rank 1** | Mandatory (Match) | Verified Zero-Hallucination |

@@ -5,8 +5,11 @@ Seamlessly activates RapidOCR (ONNX Runtime) when scanned pages or images are de
 """
 
 import io
+import os
 import re
+import numpy as np
 from typing import Dict, Any, List, Union, Optional
+from loguru import logger
 import fitz  # PyMuPDF
 from retrieval.ocr_engine import OCREngine
 
@@ -32,6 +35,16 @@ class TenderPDFProcessor:
         t = text.lower().strip()
         if t in ["schedule of quantities", "bill of quantities", "schedule 'a'", "schedule a", "boq"]:
             return True
+
+        # If text contains concrete technical/engineering keywords with sufficient substance, preserve it
+        technical_keywords = [
+            "supply", "delivery", "pipe", "tube", "steel", "cable", "conductor", "transformer", 
+            "pump", "valve", "cement", "concrete", "grade", "diameter", "hydraulic", "pressure",
+            "conveying", "specification", "is :", "is:", "is ", "isi mark", "qco", "cm/l"
+        ]
+        if any(tk in t for tk in technical_keywords) and len(t.split()) >= 6:
+            return False
+
         noise_terms = [
             "tender fee", "earnest money", "emd amount", "emd fee", "bid submission",
             "bid opening", "critical dates", "mode of payment", "bankers cheque",
@@ -79,7 +92,68 @@ class TenderPDFProcessor:
         has_page_col = ("page" in h_str or "page no" in h_str) and not has_rate_or_amt
         return ((has_qty and (has_desc or has_rate_or_amt)) or (has_rate_or_amt and has_desc)) and not has_page_col
 
-    def extract_document(self, pdf_input: Union[str, bytes]) -> Dict[str, Any]:
+    def extract_image_document(self, image_input: Union[str, bytes]) -> Dict[str, Any]:
+        """
+        Processes scanned or photograph tender images (PNG, JPG, TIFF, WEBP, etc.)
+        using PaddleOCR and extracts itemized procurement specifications.
+        """
+        ocr_res = ocr_processor.ocr_image(image_input)
+        full_text = ocr_res.get("full_text", "")
+        lines = ocr_res.get("lines", [])
+
+        extracted_items = []
+
+        # 1. Check for itemized pattern in OCR lines
+        for idx, line in enumerate(lines):
+            line_str = line.strip()
+            if self._is_admin_boilerplate(line_str):
+                continue
+            m = re.match(r'^(?:(?:Item|Sl\.?\s*No\.?|Clause)\s*(\d+)[:\.\)]|\b(\d+)[\.\)]\s+)(.*)', line_str, re.IGNORECASE)
+            if m:
+                num = m.group(1) or m.group(2)
+                desc = m.group(3).strip()
+                if len(desc.split()) >= 3:
+                    extracted_items.append({
+                        "item_number": num,
+                        "source": f"Image Item {num}",
+                        "raw_text": desc,
+                        "page": 1
+                    })
+
+        # 2. If no numbered items detected, partition lines into substantive paragraphs
+        if not extracted_items:
+            paras = [p.strip() for p in full_text.split("\n") if len(p.strip().split()) >= 4 and not self._is_admin_boilerplate(p)]
+            for idx, p in enumerate(paras[:15], start=1):
+                extracted_items.append({
+                    "item_number": str(idx),
+                    "source": f"Image Section {idx}",
+                    "raw_text": " ".join(p.split()),
+                    "page": 1
+                })
+
+        doc_meta = {
+            "total_pages": 1,
+            "table_count": 0,
+            "extracted_items_count": len(extracted_items),
+            "is_scanned": True,
+            "ocr_engine": "PaddleOCR",
+            "ocr_confidence": ocr_res.get("avg_confidence", 0.0)
+        }
+
+        return {
+            "metadata": doc_meta,
+            "full_text": full_text[:50000],
+            "pages": [{
+                "page_number": 1,
+                "text_length": len(full_text),
+                "has_tables": False,
+                "table_count": 0,
+                "ocr_confidence": ocr_res.get("avg_confidence", 0.0)
+            }],
+            "extracted_items": extracted_items
+        }
+
+    def extract_document(self, pdf_input: Union[str, bytes], use_ocr: bool = True) -> Dict[str, Any]:
         """
         Parses PDF file path or raw bytes into:
         - metadata: page count, digital vs OCR breakdown, table count
@@ -99,6 +173,7 @@ class TenderPDFProcessor:
         raw_full_text = []
         all_tables = []
         extracted_items = []
+        ocr_confidences = []
 
         total_pages = len(doc)
 
@@ -208,17 +283,30 @@ class TenderPDFProcessor:
 
         # 3. Extract itemized paragraphs/clauses from text if tables did not yield items
         if not extracted_items:
-            item_regex = r'(?:(?:Item|Sl\.?\s*No\.?|Clause)\s*\d+[:\.\)]|\b\d+[\.\)]\s+)([A-Z][^\n]+(?:\n(?!\d+[\.\)])[^\n]+){1,4})'
-            matches = re.finditer(item_regex, full_text, re.MULTILINE)
-            for m in matches:
-                item_str = m.group(0).strip()
-                if len(item_str.split()) >= 4 and not item_str.lower().startswith("page") and not self._is_admin_boilerplate(item_str):
-                    extracted_items.append({
-                        "item_number": None,
-                        "source": "Specification Paragraph",
-                        "raw_text": " ".join(item_str.split()),
+            all_text_lines = [l.strip() for l in full_text.split("\n") if l.strip()]
+            current_item = None
+            for line in all_text_lines:
+                m = re.match(r'^(?:(?:Item|Sl\.?\s*No\.?|Clause)\s*(\d+)[:\.\)]|\b(\d+)[\.\)]\s+)(.*)', line, re.IGNORECASE)
+                if m:
+                    if current_item and len(current_item["raw_text"].split()) >= 3:
+                        if not self._is_admin_boilerplate(current_item["raw_text"]):
+                            extracted_items.append(current_item)
+                    num = m.group(1) or m.group(2)
+                    desc = m.group(3).strip()
+                    current_item = {
+                        "item_number": num,
+                        "source": f"Clause {num}",
+                        "raw_text": desc,
                         "page": 1
-                    })
+                    }
+                elif current_item:
+                    # Append continuation lines to current clause
+                    if len(line.split()) > 0 and not any(line.upper().startswith(h) for h in ["SECTION", "PART", "CHAPTER", "ANNEX"]):
+                        current_item["raw_text"] += " " + line
+
+            if current_item and len(current_item["raw_text"].split()) >= 3:
+                if not self._is_admin_boilerplate(current_item["raw_text"]):
+                    extracted_items.append(current_item)
 
         # 4. Fallback: If no structured items detected, partition text into meaningful thematic sections
         if not extracted_items:

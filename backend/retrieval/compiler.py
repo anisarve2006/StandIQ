@@ -15,6 +15,7 @@ from retrieval.multilingual import (
     unmask_technical_entities
 )
 from retrieval.archetype_classifier import archetype_classifier
+from retrieval.product_classifier import product_classifier
 
 from repositories.alias_repository import alias_repository
 
@@ -161,7 +162,8 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
 
     # 5. Domain Acronym and Technical Synonym Expansion
     TECHNICAL_SYNONYMS = {
-        r'\bpvc\b': "polyvinyl chloride",
+        r'\bunplasticized\s+(?:polyvinyl\s+chloride|pvc)\b': "upvc",
+        r'\bpvc\b': "polyvinyl chloride upvc",
         r'\bgi\b': "galvanized steel zinc coated",
         r'\brcc\b': "reinforced concrete",
         r'\bgate valves?\b': "sluice valve",
@@ -210,6 +212,10 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
     # 5. Universal Procurement Archetype Classification
     archetype_info = archetype_classifier.classify(raw_query)
 
+    # 6. Action 1: Product / Domain Canonical Engineering Classification
+    query_for_classification = indic_info.get("canonical_english", clean_text)
+    product_spec = product_classifier.classify(query_for_classification)
+
     return {
         "raw_query": raw_query,
         "clean_query": clean_text,
@@ -217,6 +223,12 @@ def compile_query(raw_query: str) -> Dict[str, Any]:
         "exact_is": exact_is_list,
         "trade_matches": trade_matches,
         "constraints": constraints,
+        "classification": product_spec,
+        "product": product_spec["product"],
+        "domain": product_spec["domain"],
+        "material": product_spec["material"],
+        "form": product_spec["form"],
+        "standard_type": product_spec["standard_type"],
         "query_type": query_type,
         "detected_script": indic_info.get("detected_script", "latin"),
         "is_multilingual": indic_info.get("is_multilingual", False),

@@ -20,6 +20,8 @@ import os
 import re
 import json
 import time
+import copy
+from threading import Lock
 from typing import Dict, Any, List, Optional
 from loguru import logger
 
@@ -53,6 +55,11 @@ class StandardsRecommenderEngine:
         self.pdf_processor = TenderPDFProcessor()
         self.excel_processor = tender_excel_processor
         
+        # In-memory recommendation LRU cache
+        self._recommend_cache: Dict[tuple, Dict[str, Any]] = {}
+        self._recommend_cache_lock = Lock()
+        self._max_cache_size = 512
+        
         # Initialize local sovereign LLM (BharatGPT-3B Indic)
         self.bharatgpt = None
         try:
@@ -60,6 +67,13 @@ class StandardsRecommenderEngine:
             self.bharatgpt = bharatgpt_engine
         except Exception as e:
             logger.warning(f"Could not initialize BharatGPT service: {e}")
+
+    def clear_cache(self) -> None:
+        """Clear recommendation cache and underlying component caches."""
+        with self._recommend_cache_lock:
+            self._recommend_cache.clear()
+        if hasattr(self.graph_expander, "clear_cache"):
+            self.graph_expander.clear_cache()
 
     def generate_tender_clause_deterministic(self, evidence_pack: Dict[str, Any]) -> str:
         """
@@ -88,7 +102,8 @@ class StandardsRecommenderEngine:
         lines.append(f"**2. Regulatory & Quality Control Compliance:**")
         if cert["is_mandatory"]:
             scheme_title = cert["scheme"] or "BIS Standard Mark Scheme I"
-            lines.append(f"Compliance with **{scheme_title}** is **MANDATORY** pursuant to the Central Government Quality Control Order (QCO): *{cert['applicable_qco']}* (Gazette Notification: {cert['gazette_notification']}). The bidder MUST possess a valid BIS licence with CML number at the time of bid submission.")
+            gazette_txt = f" (Gazette Notification: {cert['gazette_notification']})" if cert.get("gazette_notification") else ""
+            lines.append(f"Compliance with **{scheme_title}** is **MANDATORY** pursuant to the Central Government Quality Control Order (QCO): *{cert['applicable_qco']}*{gazette_txt}. The bidder MUST possess a valid BIS licence with CML number at the time of bid submission.")
         else:
             lines.append(f"BIS certification for this category is currently voluntary / unnotified under mandatory QCO. Bidders offering BIS Certified goods with ISI Mark shall receive technical preference.")
         lines.append("")
@@ -233,7 +248,7 @@ class StandardsRecommenderEngine:
                 })
 
             total_ms = round((time.time() - t0) * 1000, 2)
-            return {
+            return _return_cached({
                 "status": "SUCCESS",
                 "is_multi_clause": True,
                 "total_clauses": len(multi_clauses),
@@ -255,7 +270,7 @@ class StandardsRecommenderEngine:
                 "specification_clause": "### MULTI-ITEM CONSTRUCTION SPECIFICATION\nConsolidated standards package generated for all itemized civil requirements.",
                 "total_time_ms": total_ms,
                 "latency_breakdown_ms": {"multi_clause_pipeline_ms": total_ms}
-            }
+            })
 
         # 1. Compile Query (Neuro-symbolic Layer A & B)
         t_compile = time.time()
@@ -268,7 +283,7 @@ class StandardsRecommenderEngine:
         arch_details = query_obj.get("archetype_details", {})
 
         if archetype == "SERVICE_RATE_SLAB":
-            return {
+            return _return_cached({
                 "status": "NON_PRODUCT_LINE",
                 "archetype": "SERVICE_RATE_SLAB",
                 "category": arch_details.get("category", "Logistics & Freight Rate Slab"),
@@ -301,10 +316,10 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         if archetype == "FINANCIAL_ADJUSTMENT":
-            return {
+            return _return_cached({
                 "status": "NON_PRODUCT_LINE",
                 "archetype": "FINANCIAL_ADJUSTMENT",
                 "category": arch_details.get("category", "Financial / Scrap Credit / Disposal Adjustment"),
@@ -337,10 +352,10 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         if archetype == "CONTRACTUAL_CONDITION":
-            return {
+            return _return_cached({
                 "status": "NON_PRODUCT_LINE",
                 "archetype": "CONTRACTUAL_CONDITION",
                 "category": arch_details.get("category", "Contractual / Legal Condition"),
@@ -373,7 +388,43 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
+
+        if archetype == "VAGUE_TENDER_BOILERPLATE":
+            return _return_cached({
+                "status": "ABSTAIN_VAGUE_QUERY",
+                "archetype": "VAGUE_TENDER_BOILERPLATE",
+                "category": arch_details.get("category", "Vague / Unspecified Boilerplate"),
+                "query": query_text,
+                "primary_recommendation": {
+                    "family_id": "NONE",
+                    "raw_id": "N/A (Unspecified Product)",
+                    "title_en": "Insufficient Technical Specification - No Manufactured Product Identified",
+                    "status": "NOT_APPLICABLE",
+                    "division": "General Procurement Boilerplate",
+                    "confidence": {
+                        "overall_label": "LOW",
+                        "composite_score": 0.0
+                    }
+                },
+                "allied_standards": {"test_methods": [], "safety_standards": [], "installation_standards": []},
+                "certification": {
+                    "is_mandatory": False,
+                    "status": "UNSPECIFIED",
+                    "scheme": "None",
+                    "applicable_qco": "None"
+                },
+                "specification_clause": "### VAGUE SPECIFICATION ADVISORY\nThis requirement contains generic procurement boilerplate or commercial adjectives without identifying any specific manufactured product, material, or engineering parameter. The system abstains from recommending a standard.",
+                "specification_gaps": ["Missing tangible product noun or engineering classification."],
+                "verification_audit": {
+                    "is_verified": True,
+                    "hallucination_strip_rate": 0.0,
+                    "violations": []
+                },
+                "alternative_candidates": [],
+                "latency_breakdown_ms": timings,
+                "total_time_ms": round((time.time() - t0) * 1000, 2)
+            })
 
         if archetype == "SERVICE_OR_LABOUR" and not query_obj.get("exact_is"):
             svc_std = arch_details.get("service_standard", {
@@ -382,7 +433,7 @@ class StandardsRecommenderEngine:
                 "title_en": "Quality Management Systems - Requirements (Service Governance)",
                 "status": "CURRENT"
             })
-            return {
+            return _return_cached({
                 "status": "SUCCESS",
                 "archetype": "SERVICE_OR_LABOUR",
                 "category": arch_details.get("category", "Operational Service Contract"),
@@ -415,7 +466,7 @@ class StandardsRecommenderEngine:
                 "alternative_candidates": [],
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
         # 2. Adaptive Retrieval (Parallel Multi-Path + RRF)
         t_ret = time.time()
@@ -423,32 +474,58 @@ class StandardsRecommenderEngine:
         timings["parallel_retrieval_ms"] = round((time.time() - t_ret) * 1000, 2)
 
         if not initial_candidates:
-            return {
+            return _return_cached({
                 "status": "ABSTAIN",
                 "message": "No relevant Indian Standard found in official catalogue with sufficient confidence.",
                 "query": query_obj,
                 "latency_breakdown_ms": timings,
                 "total_time_ms": round((time.time() - t0) * 1000, 2)
-            }
+            })
 
-        # 3. Late-Interaction ColBERT-style Reranking
-        t_rerank = time.time()
-        reranked_pool = self.reranker.rerank(query_obj["search_text"], initial_candidates, top_k=15)
-        timings["late_interaction_rerank_ms"] = round((time.time() - t_rerank) * 1000, 2)
-
-        # 4. Technical Constraint & Contradiction Verification
+        # 3. Hard Negative Gating (Pre-Rerank Architecture Layer)
+        # Query product = Steel Tube immediately eliminates Pump, Motor, Valve, Cable, Testing Equipment before expensive reranking
         t_const = time.time()
-        verified_candidates = []
-        for cand in reranked_pool:
-            c_res = self.constraint_engine.verify_candidate(cand, query_obj["constraints"])
+        compatible_candidates = []
+        rejected_candidates = []
+        for cand in initial_candidates:
+            c_res = self.constraint_engine.verify_candidate(
+                cand, 
+                query_obj["constraints"],
+                classification=query_obj.get("classification")
+            )
             cand_copy = dict(cand)
             cand_copy["constraint_result"] = c_res
-            verified_candidates.append(cand_copy)
+            if c_res["is_compatible"]:
+                compatible_candidates.append(cand_copy)
+            else:
+                rejected_candidates.append(cand_copy)
 
-        # Filter out hard contradictory candidates (if any compatible candidates exist)
-        compatible_candidates = [c for c in verified_candidates if c["constraint_result"]["is_compatible"]]
-        candidates_to_use = compatible_candidates if compatible_candidates else verified_candidates
+        # Only pass compatible candidates to reranking; fallback only if empty
+        candidates_for_rerank = compatible_candidates if compatible_candidates else initial_candidates
         timings["constraint_verification_ms"] = round((time.time() - t_const) * 1000, 2)
+
+        # 4. Late-Interaction ColBERT-style Reranking
+        t_rerank = time.time()
+        reranked_pool = self.reranker.rerank(query_obj["search_text"], candidates_for_rerank, top_k=15)
+        candidates_to_use = reranked_pool
+        timings["late_interaction_rerank_ms"] = round((time.time() - t_rerank) * 1000, 2)
+
+
+        # Action 4: BharatGPT Ambiguity Arbitration (Judge Agent)
+        arbitration_audit = None
+        if len(candidates_to_use) >= 2 and self.bharatgpt and self.bharatgpt.is_available():
+            score_1 = candidates_to_use[0].get("late_interaction_score", 1.0)
+            score_2 = candidates_to_use[1].get("late_interaction_score", 0.0)
+            # If candidates are in close contention (within 8% score delta) and not an exact match
+            if abs(score_1 - score_2) <= 0.08 and candidates_to_use[0].get("source_channel") != "EXACT_ID":
+                t_judge = time.time()
+                arb_result = self.bharatgpt.arbitrate_candidates(query_text, candidates_to_use[:3])
+                if arb_result:
+                    arbitration_audit = arb_result
+                    chosen = arb_result["chosen_candidate"]
+                    if chosen["family_id"] != candidates_to_use[0]["family_id"]:
+                        candidates_to_use = [chosen] + [c for c in candidates_to_use if c["family_id"] != chosen["family_id"]]
+                timings["bharatgpt_judge_ms"] = round((time.time() - t_judge) * 1000, 2)
 
         # Primary Standard selection
         primary_candidate = candidates_to_use[0]
@@ -504,6 +581,10 @@ class StandardsRecommenderEngine:
                 "year": alt.get("year"),
                 "status": alt.get("status"),
                 "division": alt.get("division"),
+                "domain": alt.get("domain"),
+                "product_type": alt.get("product_type"),
+                "material": alt.get("material"),
+                "standard_type": alt.get("standard_type"),
                 "relevance_score": alt.get("late_interaction_score", 0.0),
                 "confidence_label": alt["constraint_result"]["confidence_vector"]["confidence_label"]
             })
@@ -523,9 +604,15 @@ class StandardsRecommenderEngine:
                 "year": primary_candidate.get("year"),
                 "status": primary_candidate.get("status"),
                 "division": primary_candidate.get("division"),
+                "domain": primary_candidate.get("domain"),
+                "product_type": primary_candidate.get("product_type"),
+                "material": primary_candidate.get("material"),
+                "application": primary_candidate.get("application"),
+                "standard_type": primary_candidate.get("standard_type"),
                 "pdf_url": primary_candidate.get("pdf_url") or primary_candidate.get("archive_url"),
                 "confidence": evidence_pack["multidimensional_confidence"]
             },
+
             "allied_standards": evidence_pack["allied_standards"],
             "certification": evidence_pack["certification"],
             "specification_clause": verification_report["sanitized_text"],
@@ -538,7 +625,7 @@ class StandardsRecommenderEngine:
             "alternative_candidates": alternatives,
             "total_time_ms": total_time_ms,
             "latency_breakdown_ms": timings
-        }
+        })
 
         if use_cache:
             query_cache.put(query_text, response_payload, {"top_candidates": top_candidates})
@@ -556,7 +643,6 @@ class StandardsRecommenderEngine:
         """
         t0 = time.time()
         
-        # Detect if input is Excel (.xls / .xlsx / .csv) or PDF or Text
         is_excel = False
         is_text = False
         is_image = False
@@ -599,7 +685,9 @@ class StandardsRecommenderEngine:
                 except Exception:
                     pass
 
-        if is_excel:
+        if is_image:
+            doc_parsed = self.pdf_processor.extract_image_document(pdf_input)
+        elif is_excel:
             doc_parsed = self.excel_processor.extract_document(pdf_input, filename=filename)
         elif is_image:
             doc_parsed = self.pdf_processor.extract_image(pdf_input, filename=filename)
@@ -625,6 +713,22 @@ class StandardsRecommenderEngine:
 
         items = doc_parsed["extracted_items"][:max_items]
 
+        # 0. Global Document Pre-Scan: Detect Section-Wide Anchor Standard and Primary Product
+        full_doc_text = " \n ".join([it["raw_text"] for it in items])
+        doc_anchor_rec = None
+        anchor_product_words = set()
+        if len(items) > 1:
+            try:
+                candidate_anchor = self.recommend(full_doc_text, top_candidates=top_candidates)
+                if candidate_anchor.get("status") == "SUCCESS":
+                    doc_anchor_rec = candidate_anchor
+                    anchor_title = (doc_anchor_rec["primary_recommendation"].get("title_en") or "").lower()
+                    anchor_product_words = set(re.findall(r'[a-zA-Z]{4,}', anchor_title)) - {
+                        "specification", "general", "requirements", "standard", "standards", "method", "methods"
+                    }
+            except Exception as e:
+                logger.warning(f"Document pre-scan failed: {e}")
+
         item_recommendations = []
         mandatory_count = 0
         voluntary_count = 0
@@ -632,7 +736,33 @@ class StandardsRecommenderEngine:
 
         for idx, item in enumerate(items, start=1):
             text = item["raw_text"]
-            rec = self.recommend(text, top_candidates=top_candidates)
+            text_lower = text.lower()
+
+            # Check if this item is a subordinate clause of the document-wide item specification
+            is_subordinate_clause = False
+            if doc_anchor_rec and anchor_product_words:
+                shares_product_noun = bool(set(re.findall(r'[a-zA-Z]{4,}', text_lower)) & anchor_product_words)
+                is_clause_pattern = any(text_lower.startswith(p) for p in [
+                    "the ", "all ", "shall ", "each ", "in accordance", "sampling ", "testing ", "compressive "
+                ]) or any(k in text_lower for k in [
+                    "shall be", "shall conform", "shall have", "shall satisfy", "tested in accordance", "provide test certificates"
+                ])
+                if shares_product_noun or is_clause_pattern:
+                    is_subordinate_clause = True
+
+            if is_subordinate_clause and doc_anchor_rec:
+                # Inherit the document's verified governing standard instead of running isolated wild search
+                rec = dict(doc_anchor_rec)
+                # If clause is specifically about acceptance testing, feature the allied test method
+                if any(k in text_lower for k in ["test", "testing", "tested", "absorption", "efflorescence", "compressive strength"]):
+                    test_methods = doc_anchor_rec.get("allied_standards", {}).get("test_methods", [])
+                    if test_methods:
+                        primary_test = test_methods[0]
+                        rec["primary_recommendation"] = dict(primary_test)
+                        rec["category"] = "Acceptance Testing Standard"
+            else:
+                rec = self.recommend(text, top_candidates=top_candidates)
+
             status = rec.get("status")
 
             if status == "SUCCESS":

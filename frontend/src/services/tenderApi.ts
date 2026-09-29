@@ -37,5 +37,12 @@ export const tenderApi = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  },
+  auditRisk: async (data: { tender_text?: string; clauses?: string[]; target_standard?: string }): Promise<any> => {
+    return fetchApi('/tender/audit-risk', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 };
+

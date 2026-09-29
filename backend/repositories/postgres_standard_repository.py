@@ -30,3 +30,7 @@ class PostgresStandardRepository(StandardRepository):
                     return [{"version": r[0], "status": r[1], "effective_date": r[2], "supersedes": r[3]} for r in rows]
         except Exception:
             return []
+
+    def get_amendments(self, family_id: str) -> List[Dict[str, Any]]:
+        return []
+
