@@ -25,15 +25,19 @@ class VerificationKernel:
         """Loads canonical set of all family_ids and numbers in standards.db for instant O(1) checks."""
         conn = get_sqlite_connection(self.db_path)
         cur = conn.cursor()
-        cur.execute("SELECT family_id, number FROM standards")
         self.valid_family_ids = set()
         self.valid_numbers = set()
-        for fid, num in cur.fetchall():
-            if fid:
-                self.valid_family_ids.add(fid.upper())
-            if num:
-                self.valid_numbers.add(str(num))
-        conn.close()
+        try:
+            cur.execute("SELECT family_id, number FROM standards")
+            for fid, num in cur.fetchall():
+                if fid:
+                    self.valid_family_ids.add(fid.upper())
+                if num:
+                    self.valid_numbers.add(str(num))
+        except sqlite3.OperationalError:
+            pass
+        finally:
+            conn.close()
 
     def extract_is_mentions(self, text: str) -> List[Dict[str, Any]]:
         """Finds all potential IS citations in generated text."""

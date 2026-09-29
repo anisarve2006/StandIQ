@@ -283,7 +283,7 @@ def translate_indic_procurement_query(query: str) -> Dict[str, Any]:
                     "trade_hits": trade_hits,
                     "canonical_english": final_canonical,
                     "expanded_terms": list(set(canonical_terms)),
-                    "translation_engine": "BharatGPT-3B-Indic (Local GGUF)"
+                    "translation_engine": f"BharatGPT-3B-Indic ({'Modal Serverless' if (bgpt and getattr(bgpt, '_modal_url', None)) else 'Local GGUF'})"
                 }
 
     # 4. Fallback Path: Rule-based Indic intent translation + Trade Lexicon
