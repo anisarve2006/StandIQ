@@ -625,7 +625,7 @@ class StandardsRecommenderEngine:
             "alternative_candidates": alternatives,
             "total_time_ms": total_time_ms,
             "latency_breakdown_ms": timings
-        })
+        }
 
         if use_cache:
             query_cache.put(query_text, response_payload, {"top_candidates": top_candidates})
