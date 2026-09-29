@@ -224,8 +224,29 @@ class RecommendResponse(BaseModel):
     alternative_candidates: List[Dict[str, Any]]
     latency_breakdown_ms: Dict[str, float]
 
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.exceptions import RequestValidationError
+from terminal_page import get_hacker_terminal_html
+
+@app.get("/", include_in_schema=False)
+def root_endpoint(request: Request):
+    """
+    Root Endpoint ('/').
+    Serves a retro cyber-hacker terminal dashboard with live status and interactive CLI,
+    or returns structured JSON if requested by programmatic API clients.
+    """
+    accept = request.headers.get("accept", "")
+    if "application/json" in accept and "text/html" not in accept:
+        return JSONResponse({
+            "status": "ONLINE",
+            "service": "MaanakAI - Indian Standards Recommender & Compliance Engine",
+            "version": "3.1.0",
+            "docs": "/docs",
+            "redoc": "/redoc",
+            "health": "/api/v1/health",
+            "metrics": "/api/v1/system/metrics"
+        })
+    return HTMLResponse(content=get_hacker_terminal_html(version="3.1.0"))
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
