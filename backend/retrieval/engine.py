@@ -72,6 +72,7 @@ class StandardsRecommenderEngine:
         """Clear recommendation cache and underlying component caches."""
         with self._recommend_cache_lock:
             self._recommend_cache.clear()
+        query_cache.invalidate()
         if hasattr(self.graph_expander, "clear_cache"):
             self.graph_expander.clear_cache()
 
@@ -195,15 +196,37 @@ class StandardsRecommenderEngine:
         timings = {}
 
         # 0. Check Multi-Tier LRU Query Cache (Sub-millisecond retrieval)
+        cache_key = (self.db_path, query_text.strip(), top_candidates)
         if use_cache:
+            with self._recommend_cache_lock:
+                if cache_key in self._recommend_cache:
+                    cached = copy.deepcopy(self._recommend_cache[cache_key])
+                    total_ms = round((time.time() - t0) * 1000, 2)
+                    cached["total_time_ms"] = total_ms
+                    cached["is_cached"] = True
+                    metrics_collector.record_request(total_ms, is_cached=True)
+                    return cached
+
             cached_result = query_cache.get(query_text, {"top_candidates": top_candidates})
             if cached_result is not None:
-                cached_copy = dict(cached_result)
+                cached_copy = copy.deepcopy(cached_result) if isinstance(cached_result, dict) else cached_result
                 cached_copy["is_cached"] = True
                 total_ms = round((time.time() - t0) * 1000, 2)
                 cached_copy["total_time_ms"] = total_ms
                 metrics_collector.record_request(total_ms, is_cached=True)
                 return cached_copy
+
+        def _return_cached(payload: Dict[str, Any]) -> Dict[str, Any]:
+            total_time_ms = payload.get("total_time_ms", round((time.time() - t0) * 1000, 2))
+            payload["total_time_ms"] = total_time_ms
+            if use_cache:
+                with self._recommend_cache_lock:
+                    if len(self._recommend_cache) >= self._max_cache_size:
+                        self._recommend_cache.pop(next(iter(self._recommend_cache)))
+                    self._recommend_cache[cache_key] = copy.deepcopy(payload)
+                query_cache.put(query_text, payload, {"top_candidates": top_candidates})
+            metrics_collector.record_request(total_time_ms, is_cached=False)
+            return payload
 
         # Multi-Clause Specification / Schedule of Requirements Handling
         clause_pattern = r'(?:^|\n)\s*(\d+)[\.\)]\s+([^\n]+(?:\n(?!\s*\d+[\.\)]\s+)[^\n]+)*)'
@@ -627,11 +650,7 @@ class StandardsRecommenderEngine:
             "latency_breakdown_ms": timings
         }
 
-        if use_cache:
-            query_cache.put(query_text, response_payload, {"top_candidates": top_candidates})
-        metrics_collector.record_request(total_time_ms, is_cached=False)
-
-        return response_payload
+        return _return_cached(response_payload)
 
     def recommend_pdf(self, pdf_input: Any, max_items: int = 50, top_candidates: int = 3, filename: Optional[str] = None) -> Dict[str, Any]:
         """

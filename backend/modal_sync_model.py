@@ -63,6 +63,7 @@ def download_model(mode: str, source: str, filename: str = "BharatGPT-3B-Indic.Q
 
     elif mode == "gdrive":
         import re
+        # pyrefly: ignore [missing-import]
         import gdown
         print(f"📥 Fetching from Google Drive: {source}...")
         file_id = source.strip()
