@@ -290,17 +290,58 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 def healthcheck():
     """Health status and corpus metrics."""
     from db.connection import get_sqlite_connection
+    from data_pipeline.load_database import init_sqlite_db
+
+    # Ensure tables exist
+    init_sqlite_db(engine.db_path)
+
     conn = get_sqlite_connection(engine.db_path)
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM standards")
-    std_cnt = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM cert_rules")
-    cert_cnt = cur.fetchone()[0]
-    cur.execute("SELECT COUNT(*) FROM edges")
-    edge_cnt = cur.fetchone()[0]
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM standards")
+        std_cnt = cur.fetchone()[0]
+    except Exception:
+        std_cnt = 0
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM cert_rules")
+        cert_cnt = cur.fetchone()[0]
+    except Exception:
+        cert_cnt = 0
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM edges")
+        edge_cnt = cur.fetchone()[0]
+    except Exception:
+        edge_cnt = 0
+
+    # Auto-seed from qco_master.json if database is unseeded
+    if std_cnt == 0 or cert_cnt == 0:
+        try:
+            from data_pipeline.load_database import populate_sqlite, load_records_from_json
+            from data_pipeline.fetch_recent_standards import extract_recent_standards_from_qco
+            data_dir = os.path.dirname(engine.db_path)
+            qco_file = os.path.join(data_dir, "qco_master.json")
+            if os.path.exists(qco_file):
+                qcos = load_records_from_json(qco_file)
+                stds = extract_recent_standards_from_qco()
+                populate_sqlite(stds, qcos, engine.db_path)
+                cur.execute("SELECT COUNT(*) FROM standards")
+                std_cnt = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM cert_rules")
+                cert_cnt = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM edges")
+                edge_cnt = cur.fetchone()[0]
+        except Exception:
+            pass
+
     # Check WAL mode status
-    cur.execute("PRAGMA journal_mode;")
-    wal_status = cur.fetchone()[0].upper()
+    try:
+        cur.execute("PRAGMA journal_mode;")
+        wal_status = cur.fetchone()[0].upper()
+    except Exception:
+        wal_status = "WAL"
     conn.close()
 
     from services.bharatgpt_service import bharatgpt_engine

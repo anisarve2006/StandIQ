@@ -28,7 +28,7 @@ TESTS = [
 ]
 
 print("=" * 70)
-print("🇮🇳  MAANAKAI (मानक AI) — QUICK SELF-TEST")
+print("  MAANAKAI (मानक AI) — QUICK SELF-TEST")
 print("=" * 70)
 
 for label, query in TESTS:
@@ -39,10 +39,10 @@ for label, query in TESTS:
     cert = res.get("certification", {})
     timings = res.get("latency_breakdown_ms", {})
 
-    print(f"    👉 Recommended IS:  {primary.get('raw_id')} — {primary.get('title_en')}")
-    print(f"    👉 Year & Status:   {primary.get('year')} ({primary.get('status')})")
-    print(f"    👉 Regulatory QCO:  {cert.get('status')} [{cert.get('scheme', 'N/A')}]")
-    print(f"    👉 Latency:         {timings.get('total_pipeline_ms', 0):.1f} ms")
+    print(f"     Recommended IS:  {primary.get('raw_id')} — {primary.get('title_en')}")
+    print(f"     Year & Status:   {primary.get('year')} ({primary.get('status')})")
+    print(f"     Regulatory QCO:  {cert.get('status')} [{cert.get('scheme', 'N/A')}]")
+    print(f"     Latency:         {timings.get('total_pipeline_ms', 0):.1f} ms")
 
 print("\n" + "=" * 70)
 print("[PASS] Quick self-test completed successfully!")

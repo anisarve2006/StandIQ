@@ -51,7 +51,7 @@ class BharatGPTService:
                 "Run `modal run modal_sync_model.py ...` first to download the weights into the volume."
             )
 
-        print(f"🚀 Loading {MODEL_FILENAME} into RAM (CPU AVX2, 4 threads)...")
+        print(f" Loading {MODEL_FILENAME} into RAM (CPU AVX2, 4 threads)...")
         self.llm = Llama(
             model_path=MODEL_PATH,
             n_ctx=2048,
@@ -59,7 +59,7 @@ class BharatGPTService:
             n_gpu_layers=0,           # CPU mode
             verbose=False
         )
-        print("✅ BharatGPT-3B is warm and ready on Modal CPU!")
+        print(" BharatGPT-3B is warm and ready on Modal CPU!")
 
     @modal.asgi_app()
     def serve(self):

@@ -70,7 +70,7 @@ PRESET_TESTS = [
 
 def print_banner():
     print("\n" + "=" * 75)
-    print("🇮🇳  MAANAKAI (मानक AI) — INTERACTIVE SELF-TESTING SUITE")
+    print("  MAANAKAI (मानक AI) — INTERACTIVE SELF-TESTING SUITE")
     print("    Bureau of Indian Standards (BIS) Recommender Engine")
     print("=" * 75)
 
@@ -81,7 +81,7 @@ def display_result(res: dict):
         return
 
     print("\n" + "-" * 75)
-    print(f"🎯 PRIMARY RECOMMENDED STANDARD:")
+    print(f" PRIMARY RECOMMENDED STANDARD:")
     print(f"   • Standard ID:     {primary.get('raw_id')} ({primary.get('family_id')})")
     print(f"   • Title:           {primary.get('title_en')}")
     print(f"   • Publication Yr:  {primary.get('year')}  |  Status: {primary.get('status')}")
@@ -91,7 +91,7 @@ def display_result(res: dict):
 
     # Confidence breakdown
     conf = primary.get("confidence", {})
-    print(f"\n📊 CALIBRATED CONFIDENCE: [{conf.get('overall_label', 'HIGH')}]")
+    print(f"\n CALIBRATED CONFIDENCE: [{conf.get('overall_label', 'HIGH')}]")
     print(f"   • Semantic Match:      {conf.get('semantic_match', 0.0) * 100:.0f}%")
     print(f"   • Technical Match:     {conf.get('technical_match', 0.0) * 100:.0f}%")
     print(f"   • Graph Support:       {conf.get('graph_support', 0.0) * 100:.0f}%")
@@ -100,7 +100,7 @@ def display_result(res: dict):
     # QCO Certification
     cert = res.get("certification", {})
     qco_badge = "MANDATORY COMPLIANCE" if cert.get("is_mandatory") else "VOLUNTARY STANDARD"
-    print(f"\n⚖️  REGULATORY STATUS: [{qco_badge}]")
+    print(f"\n️  REGULATORY STATUS: [{qco_badge}]")
     if cert.get("scheme"):
         print(f"   • Applicable Scheme:   {cert.get('scheme')}")
     for order in cert.get("orders", [])[:2]:
@@ -111,7 +111,7 @@ def display_result(res: dict):
     test_methods = allied.get("test_methods", [])
     safety_codes = allied.get("safety_standards", [])
     if test_methods or safety_codes:
-        print(f"\n🔗 NORMATIVE ALLIED STANDARDS (FROM KNOWLEDGE GRAPH):")
+        print(f"\n NORMATIVE ALLIED STANDARDS (FROM KNOWLEDGE GRAPH):")
         for t in test_methods[:2]:
             print(f"   • [TEST METHOD]     {t.get('raw_id')}: {t.get('title_en')}")
         for s in safety_codes[:2]:
@@ -120,7 +120,7 @@ def display_result(res: dict):
     # Latency Breakdown
     timings = res.get("latency_breakdown_ms", {})
     total_ms = timings.get("total_pipeline_ms", 0.0)
-    print(f"\n⚡ LATENCY BREAKDOWN: {total_ms:.1f} ms (CPU Inference)")
+    print(f"\n LATENCY BREAKDOWN: {total_ms:.1f} ms (CPU Inference)")
     print("-" * 75)
 
 def run_pdf_audit_test():
@@ -135,7 +135,7 @@ def run_pdf_audit_test():
     elapsed = (time.time() - t0) * 1000
 
     print("\n" + "=" * 75)
-    print(f"📄 TENDER PDF AUDIT MATRIX (Processed in {elapsed:.0f} ms)")
+    print(f" TENDER PDF AUDIT MATRIX (Processed in {elapsed:.0f} ms)")
     print("=" * 75)
     summary = matrix.get("compliance_summary", {})
     print(f"• Document Name:      {matrix.get('document_name')}")
@@ -146,7 +146,7 @@ def run_pdf_audit_test():
 
     print("\nItemized Breakdown:")
     for it in matrix.get("item_compliance", []):
-        qco_flag = "⚠️ MANDATORY QCO" if it.get("mandatory_qco") else "VOLUNTARY"
+        qco_flag = "️ MANDATORY QCO" if it.get("mandatory_qco") else "VOLUNTARY"
         print(f"  [Item {it.get('item_no')}] {it.get('description')[:40]}... -> {it.get('primary_standard')} ({qco_flag})")
     print("=" * 75)
 
@@ -164,7 +164,7 @@ def main():
         choice = input("\nEnter choice [0-4]: ").strip()
 
         if choice == "0":
-            print("\nExiting. Good luck with your project! 🚀\n")
+            print("\nExiting. Good luck with your project! \n")
             break
 
         elif choice == "1":

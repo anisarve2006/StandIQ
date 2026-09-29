@@ -1,4 +1,4 @@
-# 🇮🇳 MaanakAI (मानक AI)
+# MaanakAI (मानक AI)
 ### Intelligent Indian Standards (BIS) Recommender & Procurement Compliance Engine
 **Smart India Hackathon (SIH) | Problem Statement: 26108**  
 *Ministry of Consumer Affairs, Food & Public Distribution — Bureau of Indian Standards (BIS)*
@@ -13,7 +13,7 @@
 
 ---
 
-## 📌 1. Problem Statement & Background
+## 1. Problem Statement & Background
 
 Government departments, Public Sector Enterprises (PSEs), state infrastructure agencies (CPWD, DDA, NHAI, Discoms), and private entities procure lakhs of crores of engineering goods and civil services annually via the **Government e-Marketplace (GeM)** and national e-procurement portals.
 
@@ -28,42 +28,42 @@ Procurement officials are legally mandated under GFR Rule 144(i) and DPIIT direc
 
 ---
 
-## 🚀 2. Key System Capabilities
+## 2. Key System Capabilities
 
-### 🧠 A. Multi-Stage Hybrid Retrieval & Constraint Engine
+### A. Multi-Stage Hybrid Retrieval & Constraint Engine
 - **FTS5 Lexical Search (BM25):** Sub-millisecond full-text lexical indexing over 19,423 standards.
 - **Dense Semantic Embeddings:** 384-dimensional dense vector embeddings with Reciprocal Rank Fusion (RRF).
 - **Deterministic Numerical Constraint Engine:** Extracts and enforces physical constraints (e.g., diameter `12mm`, voltage `415V`, pressure `5 MPa`, yield strength `Fe 500D`), eliminating mismatched classifications.
 
-### 🛡️ B. Zero-Hallucination Verification Kernel
+### ️ B. Zero-Hallucination Verification Kernel
 - Hard mathematical invariant checking: **Every cited standard number in final output is verified against the canonical local database (`standards.db`)**.
 - Rejection threshold for synthetic citations: Ensures zero invented standards reach procurement tenders.
 
-### ⚖️ C. Grounded Regulatory Intelligence (QCO Engine)
+### ️ C. Grounded Regulatory Intelligence (QCO Engine)
 - **Eliminates Unsafe Assumptions:** Rejects the flawed logic that *"Standard exists $\implies$ Voluntary/Mandatory"*.
 - **Official Gazette Grounding:** Cross-references every standard against **2,257 in-force Quality Control Orders (QCO)** with Ministry order titles, effective enforcement dates, and verified product scopes (DPIIT Steel, Cement, Chemicals, MeitY CRS, BIS Scheme-I).
 
-### 📄 D. Multimodal Tender Ingestion with PaddleOCR v2.9+
+### D. Multimodal Tender Ingestion with PaddleOCR v2.9+
 - Native support for scanned multi-page tender PDFs (CPWD/DDA formats) with embedded table parsing and Schedule of Quantities (BoQ) extraction.
 - High-precision **PaddleOCR** pipeline with automatic orientation/angle classification (`use_angle_cls=True`) achieving **99.28% OCR confidence** without heavy GPU requirements.
 
-### 🌐 E. Multilingual Indic Trade Lexicon & Entity Guard
+### E. Multilingual Indic Trade Lexicon & Entity Guard
 - Bridges colloquial trade language to technical BIS terminology across **Hindi, Marathi, Tamil, Telugu, and Hinglish**.
 - **Entity Guard Preservation:** Automatically isolates and shields technical engineering tokens (e.g., `Grade 43`, `Fe 500D`, `36W LED`, `3-phase`) from being distorted during transliteration/translation.
 
-### 💻 F. Modern Interactive Procurement Workspace
+### F. Modern Interactive Procurement Workspace
 - Production-grade React 18 + TypeScript web application built with clean modular design.
 - Features include: Live Tender Health Auditor, Contradiction Detection, BoQ Upload & Compliance Matrix, Interactive Knowledge Graph Visualizer, Standards Basket, and One-Click GeM-ready Tender Export (Markdown / PDF).
 
 ---
 
-## 🏗️ 3. Detailed System Architecture & Data Pipeline
+## ️ 3. Detailed System Architecture & Data Pipeline
 
 MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval & Regulatory Verification Engine**. It deliberately separates deterministic legal/catalog facts from generative natural language explanations to guarantee 100% auditable correctness.
 
 ---
 
-### 🏛️ High-Level System Architecture Diagram (Text & GitHub Readable)
+### ️ High-Level System Architecture Diagram (Text & GitHub Readable)
 
 ```text
 +---------------------------------------------------------------------------------------------------------+
@@ -72,14 +72,14 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
                                                      │
                                    [ INPUT: Query / Tender PDF / BoQ ]
                                                      │
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 1: MULTIMODAL INGESTION LAYER                                                                     |
 |  • PyMuPDF (fitz): Fast C-level extraction for digital PDFs, table geometry (<35 ms/page)              |
 |  • PaddleOCR v2.9+: 150 DPI render fallback, DBNet text detection + SVTR recognition, angle correction   |
 +---------------------------------------------------------------------------------------------------------+
                                                      │  (Raw BoQ Line Items / Natural Text)
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 2: NEURO-SYMBOLIC QUERY COMPILER & ENTITY GUARD                                                   |
 |  • Procurement Archetype Classifier: Material Supply vs Civil Demolition vs Salvage Scrap Credit        |
@@ -87,7 +87,7 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
 |  • Entity Guard: Protects numbers & engineering units (12mm, 415V, Fe 500D) from transliteration error  |
 +---------------------------------------------------------------------------------------------------------+
                                                      │  (Normalized Canonical English + Constraints)
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 3: 3-WAY PARALLEL HYBRID RETRIEVAL (standards.db: 19,423 BIS Standards)                           |
 |  ┌────────────────────────────┐  ┌────────────────────────────┐  ┌────────────────────────────┐         |
@@ -97,11 +97,11 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
 |  │ • Family lookup ("IS 1786")│  │ • Tier 3: BM25 score rank  │  │ • In-memory LRU cache      │         |
 |  └────────────────────────────┘  └────────────────────────────┘  └────────────────────────────┘         |
 |                                                │                                                        |
-|                                                ▼                                                        |
+|                                                                                                        |
 |                 RECIPROCAL RANK FUSION (RRF, k=60): Exact (3.5) + Dense (1.5) + Lexical (1.2)           |
 +---------------------------------------------------------------------------------------------------------+
                                                      │  (Top-30 Candidate Standards)
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 4: LATE-INTERACTION RE-RANKING & TECHNICAL CONSTRAINTS                                            |
 |  • ColBERT Token-Level MaxSim: MaxSim(Q, D) = 1/|Q| ∑ max Sim(q_i, d_j) across title & scope tokens    |
@@ -109,7 +109,7 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
 |  • Contradiction Engine: Prunes environment conflicts (indoor vs outdoor) & out-of-range specs         |
 +---------------------------------------------------------------------------------------------------------+
                                                      │  (Ranked Top Standards)
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 5: STANDARDS KNOWLEDGE GRAPH & AGENTIC COMPLETENESS                                               |
 |  • 14,656 Directed Graph Edges: TESTED_BY (testing), CITED_IN (design codes), SAFETY_CODE (safety)      |
@@ -117,7 +117,7 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
 |  • Targeted Micro-Retrieval: Automatically fetches missing allied testing & safety standards            |
 +---------------------------------------------------------------------------------------------------------+
                                                      │  (Structured Evidence Pack)
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 6: GROUNDED REGULATORY INTELLIGENCE (2,257 Live Gazette QCO Orders)                               |
 |  • Gazette Notification Mapping: S.O. Order Number, Effective Date, Line Ministry (DPIIT, Steel, MeitY)|
@@ -125,7 +125,7 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
 |  • Zero-Assumption Safety Fallback: "NOT_VERIFIED" if product scope lacks official gazette evidence     |
 +---------------------------------------------------------------------------------------------------------+
                                                      │  (Grounded Legal & Technical Dossier)
-                                                     ▼
+                                                     
 +---------------------------------------------------------------------------------------------------------+
 | STAGE 7: ZERO-HALLUCINATION VERIFICATION KERNEL & SYNTHESIS                                             |
 |  • 100% Hard Existence Invariant: Every IS number cited in output must exist in standards.db (19,423)   |
@@ -137,7 +137,7 @@ MaanakAI is engineered as an **Air-Gapped, Neuro-Symbolic Multi-Path Retrieval &
 ```
 
 <details>
-<summary><b>🔍 Click to view interactive Mermaid Graph Diagram</b></summary>
+<summary><b> Click to view interactive Mermaid Graph Diagram</b></summary>
 
 ```mermaid
 graph TD
@@ -225,7 +225,7 @@ graph TD
 
 ---
 
-### 📋 End-to-End Pipeline Execution Matrix
+### End-to-End Pipeline Execution Matrix
 
 | Stage | Process / Core Technology | Primary Files / Modules | Input $\to$ Output | Latency Profile |
 |---|---|---|---|---|
@@ -239,7 +239,7 @@ graph TD
 | **Total** | **Air-Gapped, Neuro-Symbolic End-to-End Pipeline** | `backend/retrieval/engine.py` | **Raw Specification $\to$ Audit-Ready Compliance Dossier** | **~250 ms (median)** |
 
 
-### 🔬 Detailed Component-by-Component Specifications
+### Detailed Component-by-Component Specifications
 
 #### Layer 1: Multimodal Ingestion & Vision Layer
 - **Modules:** [`backend/retrieval/pdf_processor.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/backend/retrieval/pdf_processor.py) & [`backend/retrieval/ocr_processor.py`](file:///c:/Users/Pushkar%20Shelar/Desktop/SIH%2026108/backend/retrieval/ocr_processor.py)
@@ -308,7 +308,7 @@ graph TD
 
 ---
 
-## 📊 4. Validated Evaluation & Benchmark Results
+## 4. Validated Evaluation & Benchmark Results
 
 All evaluation benchmarks are verifiable via reproducibility scripts included in the repository.
 
@@ -317,13 +317,13 @@ All evaluation benchmarks are verifiable via reproducibility scripts included in
 
 | Benchmark Metric | Target Standard | MaanakAI Result | Status |
 |---|---|---|---|
-| **Top-1 Primary Standard Accuracy** | $\ge 80.0\%$ | **91.7%** | ✅ PASSED (+11.7%) |
-| **Top-3 Recommendation Recall** | $\ge 90.0\%$ | **100.0%** | ✅ PASSED (Perfect) |
-| **Top-5 Recommendation Recall** | $\ge 95.0\%$ | **100.0%** | ✅ PASSED (Perfect) |
-| **Mean Reciprocal Rank (MRR)** | $\ge 0.850$ | **0.9556** | ✅ PASSED |
-| **Zero-Hallucination Guarantee** | $100.0\%$ | **100.0%** | ✅ PASSED (Zero Invented Codes) |
-| **Compulsory QCO Detection** | $\ge 85.0\%$ | **89.5%** | ✅ PASSED |
-| **Unit Test Coverage** | $100\%$ passing | **17 / 17 passed** | ✅ PASSED |
+| **Top-1 Primary Standard Accuracy** | $\ge 80.0\%$ | **91.7%** |  PASSED (+11.7%) |
+| **Top-3 Recommendation Recall** | $\ge 90.0\%$ | **100.0%** |  PASSED (Perfect) |
+| **Top-5 Recommendation Recall** | $\ge 95.0\%$ | **100.0%** |  PASSED (Perfect) |
+| **Mean Reciprocal Rank (MRR)** | $\ge 0.850$ | **0.9556** |  PASSED |
+| **Zero-Hallucination Guarantee** | $100.0\%$ | **100.0%** |  PASSED (Zero Invented Codes) |
+| **Compulsory QCO Detection** | $\ge 85.0\%$ | **89.5%** |  PASSED |
+| **Unit Test Coverage** | $100\%$ passing | **17 / 17 passed** |  PASSED |
 
 ### Real-World 165-Page DDA Tender BoQ Audit
 *Evaluated on authentic Delhi Development Authority Tender (`NIT No. 05/EE(P)/SE(SCC-3)/DDA/2026-27`):*
@@ -337,7 +337,7 @@ All evaluation benchmarks are verifiable via reproducibility scripts included in
 
 ---
 
-## 📁 5. Repository Organization
+## 5. Repository Organization
 
 ```
 SIH 26108/
@@ -408,7 +408,7 @@ SIH 26108/
 
 ---
 
-## ⚡ 6. Quick Start Guide
+## 6. Quick Start Guide
 
 ### Prerequisites
 - Python 3.10+ (Tested on Python 3.11 & 3.13)
@@ -450,7 +450,7 @@ npm run dev
 
 ---
 
-## 🧪 7. Instant CLI Verification (Zero Setup)
+## 7. Instant CLI Verification (Zero Setup)
 
 You can run self-testing scripts directly from the workspace root:
 
@@ -475,7 +475,7 @@ python -m pytest tests/ -v
 
 ---
 
-## 👥 8. Team & Acknowledgements
+## 8. Team & Acknowledgements
 
 - **Developed for:** Smart India Hackathon (SIH) 2024 / 2026
 - **Theme:** Smart Automation / Public Procurement Intelligence

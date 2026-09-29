@@ -1,10 +1,10 @@
-# 🚀 MaanakAI Deployment Guide (SIH 26108)
+# MaanakAI Deployment Guide (SIH 26108)
 
 This guide covers deploying the complete **MaanakAI** full-stack application (React 19 Frontend + FastAPI Backend) across **Modal (Serverless GPU)**, **Docker Compose**, and **Cloud PaaS (Vercel + Render)**.
 
 ---
 
-## 📑 Deployment Architectures at a Glance
+## Deployment Architectures at a Glance
 
 | Deployment Target | Where Model Runs | RAM Needed | Setup Time | Best For |
 | :--- | :--- | :--- | :--- | :--- |
@@ -14,7 +14,7 @@ This guide covers deploying the complete **MaanakAI** full-stack application (Re
 
 ---
 
-## ⚡ Method 1: Deploying BharatGPT on Modal (Serverless GPU)
+## Method 1: Deploying BharatGPT on Modal (Serverless GPU)
 
 Modal hosts the 3.78 GB `BharatGPT-3B-Indic.Q8_0.gguf` model on an NVIDIA T4/L4 GPU, scaling down to zero when idle.
 
@@ -52,7 +52,7 @@ modal deploy modal_bharatgpt.py
 ```
 Modal will print your permanent HTTPS URL:
 ```text
-✓ Created web endpoint: https://<username>--maanak-bharatgpt-bharatgptservice-generate.modal.run
+ Created web endpoint: https://<username>--maanak-bharatgpt-bharatgptservice-generate.modal.run
 ```
 *(Base URL: `https://<username>--maanak-bharatgpt-bharatgptservice.modal.run`)*
 
@@ -66,7 +66,7 @@ BHARATGPT_MODAL_URL=https://<username>--maanak-bharatgpt-bharatgptservice.modal.
 
 ---
 
-## 🐳 Method 2: Full-Stack Deployment with Docker Compose
+## Method 2: Full-Stack Deployment with Docker Compose
 
 A single command builds and runs both Frontend (served via Nginx) and Backend (FastAPI).
 
@@ -96,7 +96,7 @@ docker compose down
 
 ---
 
-## ☁️ Method 3: Cloud PaaS (Frontend on Vercel + Backend on Render)
+## ️ Method 3: Cloud PaaS (Frontend on Vercel + Backend on Render)
 
 ### Backend (Render / Railway)
 1. Exclude `.gguf` files from git (already in `.gitignore` & `.dockerignore`).
@@ -125,7 +125,7 @@ docker compose down
 
 ---
 
-## 🔍 Verification & Health Checks
+## Verification & Health Checks
 
 Once deployed, verify everything is functional:
 

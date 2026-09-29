@@ -35,7 +35,7 @@ image = (
 )
 def download_model(mode: str, source: str, filename: str = "BharatGPT-3B-Indic.Q8_0.gguf"):
     dest_path = f"{VOL_MOUNT_PATH}/{filename}"
-    print(f"🚀 Starting cloud-to-cloud transfer [mode={mode}] to {dest_path}...")
+    print(f" Starting cloud-to-cloud transfer [mode={mode}] to {dest_path}...")
 
     if mode == "direct":
         import requests
@@ -65,7 +65,7 @@ def download_model(mode: str, source: str, filename: str = "BharatGPT-3B-Indic.Q
         import re
         # pyrefly: ignore [missing-import]
         import gdown
-        print(f"📥 Fetching from Google Drive: {source}...")
+        print(f" Fetching from Google Drive: {source}...")
         file_id = source.strip()
         if "drive.google.com" in source:
             match = re.search(r"/d/([a-zA-Z0-9_-]+)", source) or re.search(r"id=([a-zA-Z0-9_-]+)", source)
@@ -77,7 +77,7 @@ def download_model(mode: str, source: str, filename: str = "BharatGPT-3B-Indic.Q
     elif mode == "hf":
         import shutil
         from huggingface_hub import hf_hub_download
-        print(f"📥 Downloading from Hugging Face repo {source} -> {filename}...")
+        print(f" Downloading from Hugging Face repo {source} -> {filename}...")
         cached_file = hf_hub_download(repo_id=source, filename=filename)
         shutil.copy(cached_file, dest_path)
 
@@ -87,13 +87,13 @@ def download_model(mode: str, source: str, filename: str = "BharatGPT-3B-Indic.Q
     # Commit changes permanently to the Modal Volume
     model_volume.commit()
     file_size_gb = os.path.getsize(dest_path) / (1024 ** 3)
-    print(f"✅ Model successfully saved! Location: {dest_path} ({file_size_gb:.2f} GB)")
+    print(f" Model successfully saved! Location: {dest_path} ({file_size_gb:.2f} GB)")
     return {"status": "success", "path": dest_path, "size_gb": file_size_gb}
 
 @app.local_entrypoint()
 def main(mode: str = "direct", source: str = "", filename: str = "BharatGPT-3B-Indic.Q8_0.gguf"):
     if not source:
-        print("❌ Error: --source argument is required.")
+        print(" Error: --source argument is required.")
         print("Example: modal run modal_sync_model.py --mode direct --source \"https://example.com/model.gguf\"")
         return
     download_model.remote(mode=mode, source=source, filename=filename)

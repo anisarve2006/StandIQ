@@ -31,7 +31,7 @@ except ImportError:
 
 def print_banner():
     print("\n" + "=" * 80)
-    print("🇮🇳  MAANAKAI (मानक AI) — TENDER PDF & BoQ COMPLIANCE AUDITOR")
+    print("  MAANAKAI (मानक AI) — TENDER PDF & BoQ COMPLIANCE AUDITOR")
     print("    Bureau of Indian Standards (BIS) Recommendation Engine")
     print("=" * 80)
 
@@ -62,7 +62,7 @@ def audit_pdf(pdf_path: str, max_items: int = 15):
     items = matrix.get("item_recommendations", [])
 
     print("\n" + "=" * 80)
-    print(f"📊 TENDER AUDIT EXECUTIVE SUMMARY (Processed in {elapsed_s:.2f}s)")
+    print(f" TENDER AUDIT EXECUTIVE SUMMARY (Processed in {elapsed_s:.2f}s)")
     print("=" * 80)
     print(f"• Document Pages:       {meta.get('pages', 'N/A')}")
     print(f"• Total Items Analyzed: {len(items)}")
@@ -106,18 +106,18 @@ def audit_pdf(pdf_path: str, max_items: int = 15):
         cert = it.get("certification", {})
         is_mand = cert.get("is_mandatory", False)
         scheme = cert.get("scheme", "")
-        qco_label = f"⚠️ MANDATORY ({scheme})" if is_mand else "VOLUNTARY"
+        qco_label = f"️ MANDATORY ({scheme})" if is_mand else "VOLUNTARY"
 
         print(f"\n[Item {idx}] Page {page} ({source}):")
-        print(f"  📝 Specification:    \"{query_snippet}\"")
-        print(f"  🎯 Recommended IS:   {std_id} — {std_title}")
-        print(f"  🏷️ Status:           {status}  |  Confidence: {std.get('confidence_label', 'HIGH')}")
-        print(f"  ⚖️ Certification:    [{qco_label}]")
+        print(f"   Specification:    \"{query_snippet}\"")
+        print(f"   Recommended IS:   {std_id} — {std_title}")
+        print(f"  ️ Status:           {status}  |  Confidence: {std.get('confidence_label', 'HIGH')}")
+        print(f"  ️ Certification:    [{qco_label}]")
         
         # Specification gaps
         gaps = it.get("specification_gaps", [])
         if gaps:
-            print(f"  ⚠️ Missing In Tender:")
+            print(f"  ️ Missing In Tender:")
             for g in gaps:
                 print(f"     • {g}")
 
@@ -132,7 +132,7 @@ def audit_pdf(pdf_path: str, max_items: int = 15):
         f.write("\n".join(markdown_lines))
 
     print("\n" + "=" * 80)
-    print(f"💾 Full audit report successfully saved to:\n👉 {report_path}")
+    print(f" Full audit report successfully saved to:\n {report_path}")
     print("=" * 80 + "\n")
 
 def main():

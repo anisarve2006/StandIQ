@@ -122,28 +122,28 @@ Every recommendation carries an **evidence tier**: `CLAUSE_EVIDENCE` (backed by 
 ```
                           ┌────────────────────────── DATA PLANE (offline / async) ──────────────────────────┐
  Source registry          │                                                                                  │
- (url, date, sha256,  ──► │ Adapters: KYS catalogue │ curated IS PDFs │ QCO/gazette PDFs │ real tenders     │
+ (url, date, sha256,  ── │ Adapters: KYS catalogue │ curated IS PDFs │ QCO/gazette PDFs │ real tenders     │
   licence note)           │        │                                                                         │
                           │  Parse (Docling → PyMuPDF → OCR → optional VLM) + page-quality score            │
                           │        │                                                                         │
                           │  Structure (clause tree, tables, figures) → contextual chunks                    │
                           │        │                                                                         │
                           │  Extract: IDs, references, amendments, cert rules (deterministic-first)          │
-                          │        ▼                                                                         │
-                          │  POSTGRES (truth) ──► Qdrant [cards, clauses]   ──► (optional) Neo4j             │
+                          │                                                                                 │
+                          │  POSTGRES (truth) ── Qdrant [cards, clauses]   ── (optional) Neo4j             │
                           └──────────────────────────────────────────────────────────────────────────────────┘
 
                           ┌────────────────────────── SERVING PLANE (online) ────────────────────────────────┐
- Portal widget / Web UI ─►│ FastAPI gateway (API keys, rate limit, i18n) ──┬─► short query (sync, fast path)  │
- REST clients ───────────►│                                                 └─► tender/doc (async Celery job)  │
+ Portal widget / Web UI ─│ FastAPI gateway (API keys, rate limit, i18n) ──┬─ short query (sync, fast path)  │
+ REST clients ───────────│                                                 └─ tender/doc (async Celery job)  │
                           │                                                                                  │
-                          │ Query understanding ─► RequirementSpec ─► Router                                 │
-                          │   ─► Card recall (dense+sparse+trigram) ─► Clause retrieval (filtered)           │
-                          │   ─► RRF ─► cross-encoder rerank ─► standard-level aggregation                   │
-                          │   ─► Applicability (SATISFIES/VIOLATES/UNKNOWN) ─► Allied graph ─► Version       │
-                          │   ─► Certification ─► Completeness ─► Scoring/abstention                         │
-                          │   ─► Evidence pack ─► LLM rationale (optional) ─► VERIFICATION KERNEL            │
-                          │   ─► Response (structured first, rationale streams after) ─► UI / API / export   │
+                          │ Query understanding ─ RequirementSpec ─ Router                                 │
+                          │   ─ Card recall (dense+sparse+trigram) ─ Clause retrieval (filtered)           │
+                          │   ─ RRF ─ cross-encoder rerank ─ standard-level aggregation                   │
+                          │   ─ Applicability (SATISFIES/VIOLATES/UNKNOWN) ─ Allied graph ─ Version       │
+                          │   ─ Certification ─ Completeness ─ Scoring/abstention                         │
+                          │   ─ Evidence pack ─ LLM rationale (optional) ─ VERIFICATION KERNEL            │
+                          │   ─ Response (structured first, rationale streams after) ─ UI / API / export   │
                           └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
