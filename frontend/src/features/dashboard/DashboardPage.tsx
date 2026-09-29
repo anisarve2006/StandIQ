@@ -4,11 +4,8 @@ import {
   Plus, 
   Compass, 
   ArrowUpRight, 
-  CheckCircle2, 
   FileText, 
-  Layers, 
   ShieldCheck, 
-  Users,
   Eye,
   Copy,
   Download,
@@ -32,51 +29,7 @@ export default function DashboardPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const totalStandardsIdentified = documents.reduce((acc, d) => acc + (d.recommendedStandards?.length || 0), 0);
-  const totalAnalyses = documents.length;
-  const avgConfidence = documents.length > 0
-    ? Math.round(documents.reduce((acc, d) => acc + (d.auditSummary?.complianceScore ?? 0), 0) / documents.length)
-    : 0;
-  const totalDepartments = new Set(documents.map(d => d.department).filter(Boolean)).size;
 
-  const statCards = [
-    {
-      key: 'standardsIdentified',
-      title: t('standardsIdentified'),
-      value: `${totalStandardsIdentified}`,
-      change: totalStandardsIdentified > 0 ? `${totalStandardsIdentified} active` : 'No data yet',
-      changeType: 'neutral',
-      icon: Layers,
-      color: 'blue'
-    },
-    {
-      key: 'analysesCompleted',
-      title: t('analysesCompleted'),
-      value: `${totalAnalyses}`,
-      change: totalAnalyses > 0 ? `${totalAnalyses} completed` : '0 uploaded',
-      changeType: 'neutral',
-      icon: CheckCircle2,
-      color: 'purple'
-    },
-    {
-      key: 'avgMatchConfidence',
-      title: t('avgMatchConfidence'),
-      value: totalAnalyses > 0 ? `${avgConfidence}%` : 'N/A',
-      change: totalAnalyses > 0 ? 'Verified' : 'No analyses',
-      changeType: 'neutral',
-      icon: ShieldCheck,
-      color: 'emerald'
-    },
-    {
-      key: 'departmentsUsing',
-      title: t('departmentsUsing'),
-      value: `${totalDepartments}`,
-      change: totalDepartments > 0 ? `${totalDepartments} active` : '0 active',
-      changeType: 'neutral',
-      icon: Users,
-      color: 'amber'
-    },
-  ];
 
   const handleOpenDoc = (doc: AnalyzedDocument) => {
     setActiveDocId(doc.id);
@@ -152,38 +105,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 02. Metrics Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {statCards.map((card, idx) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={idx}
-              className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{card.title}</span>
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <Icon className="w-4 h-4" />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {card.value}
-                </div>
-                <div className="mt-1.5 flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200/60">
-                    {card.change}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* 03. Recent Documents & Output Table */}
+      {/* 02. Recent Documents & Output Table */}
       <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
         {/* Table Header Controls */}
         <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between gap-4">
