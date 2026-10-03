@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './auth.store';
 import { procurementApi } from '../services/procurementApi';
 import type { ProcurementSessionResponse } from '../types/api';
 
@@ -820,12 +821,14 @@ export function StandIQProvider({ children }: { children: React.ReactNode }) {
     return langDict[key] || TRANSLATIONS.English[key] || key;
   };
 
+  const { user: authUser } = useAuth();
+  
   const user = {
-    name: 'Anirudh',
-    initials: 'AS',
-    email: 'anirudh.sarve@procurement.gov.in',
-    role: 'Senior Procurement Officer',
-    department: 'Electrical & Industrial Equipment',
+    name: authUser?.full_name || 'Guest',
+    initials: authUser?.full_name ? authUser.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'G',
+    email: authUser?.email || '',
+    role: authUser?.role || '',
+    department: 'GeM',
   };
 
   const markAlertsAsRead = () => {

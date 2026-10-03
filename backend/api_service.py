@@ -6,7 +6,8 @@ Run with: uvicorn api_service:app --host 0.0.0.0 --port 8000 --reload
 
 import os
 from typing import Optional, Dict, Any, List
-from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Response
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request, Response, Depends
+from dependencies.auth import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -81,7 +82,7 @@ app = FastAPI(
 # Enable CORS for Next.js / React frontend teammates
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -107,6 +108,9 @@ tender_diff_service = TenderDiffService()
 specification_service = SpecificationService()
 procurement_session_service = ProcurementSessionService(session_repo)
 export_service = ExportService(procurement_session_service)
+from auth.router import router as auth_router
+app.include_router(auth_router)
+
 completeness_service = CompletenessService()
 
 
@@ -369,7 +373,7 @@ def healthcheck():
     }
 
 @app.post("/api/v1/recommend", response_model=Dict[str, Any], tags=["Retrieval & Standards Intelligence"])
-def recommend_endpoint(req: RecommendRequest):
+def recommend_endpoint(req: RecommendRequest, current_user: dict = Depends(get_current_user)):
     """
     Main recommendation endpoint for Web UI:
     Takes natural language query or tender text and executes full 12-layer pipeline.
@@ -381,7 +385,7 @@ def recommend_endpoint(req: RecommendRequest):
     return result
 
 @app.post("/api/v1/standards/clarify", response_model=ClarifyResponse, tags=["Retrieval & Standards Intelligence"])
-def clarify_standards_endpoint(req: ClarifyRequest):
+def clarify_standards_endpoint(req: ClarifyRequest, current_user: dict = Depends(get_current_user)):
     """Analyzes a vague procurement query and generates actionable prompt questions
     (e.g., 'Is the rating 100 kVA or 250 kVA? What is the primary voltage (11 kV or 33 kV)?')
     with selectable options to pinpoint exact Indian Standards.
@@ -391,7 +395,7 @@ def clarify_standards_endpoint(req: ClarifyRequest):
     return completeness_service.clarify_query(req.query, context=req.context)
 
 @app.get("/api/v1/standard/{family_id}", tags=["Catalogue & Normative Graph"])
-def get_standard_details(family_id: str):
+def get_standard_details(family_id: str, current_user: dict = Depends(get_current_user)):
     """Direct lookup of standard metadata and allied graph neighborhood."""
     from db.connection import get_sqlite_connection
     conn = get_sqlite_connection(engine.db_path)
@@ -462,7 +466,7 @@ class VerifyRequest(BaseModel):
     evidence_pack: Dict[str, Any] = Field(..., description="The verified evidence pack returned by /api/v1/recommend")
 
 @app.get("/api/v1/search", tags=["Retrieval & Standards Intelligence"])
-def global_search(q: str, limit: int = 10):
+def global_search(q: str, limit: int = 10, current_user: dict = Depends(get_current_user)):
     """
     Fast, generic global search for standards bypassing the full recommendation loop.
     Uses multi-tier lexical + semantic search if needed.
@@ -488,7 +492,7 @@ def global_search(q: str, limit: int = 10):
     return {"results": clean_results}
 
 @app.post("/api/v1/verify", tags=["Retrieval & Standards Intelligence"])
-def verify_clause(req: VerifyRequest):
+def verify_clause(req: VerifyRequest, current_user: dict = Depends(get_current_user)):
     """
     Standalone Verification Endpoint.
     Verifies an existing or generated tender clause against an evidence pack.
@@ -497,30 +501,30 @@ def verify_clause(req: VerifyRequest):
     return report
 
 @app.get("/api/v1/standard/{family_id}/allied", response_model=AlliedStandardsResponse, tags=["Catalogue & Normative Graph"])
-def get_allied_standards(family_id: str):
+def get_allied_standards(family_id: str, current_user: dict = Depends(get_current_user)):
     return allied_service.get_allied_standards_categorized(family_id)
 
 
 @app.get("/api/v1/standard/{family_id}/versions", response_model=VersionResponse, tags=["Catalogue & Normative Graph"])
-def get_standard_versions(family_id: str):
+def get_standard_versions(family_id: str, current_user: dict = Depends(get_current_user)):
     return version_service.get_version_response(family_id)
 
 
 @app.get("/api/v1/standard/{family_id}/certification", response_model=CertificationResponse, tags=["Catalogue & Normative Graph"])
-def get_standard_certification(family_id: str):
+def get_standard_certification(family_id: str, current_user: dict = Depends(get_current_user)):
     certs = regulatory_service.get_certification_info(family_id)
     return CertificationResponse(family_id=family_id, certifications=certs)
 
 @app.post("/api/v1/tender/analyze", response_model=TenderAnalyzeResponse, tags=["Tender Risk & GFR 2017 Audit"])
-def analyze_tender(req: TenderAnalyzeRequest):
+def analyze_tender(req: TenderAnalyzeRequest, current_user: dict = Depends(get_current_user)):
     return tender_service.analyze_text(req.text or "")
 
 @app.post("/api/v1/tender/health", response_model=TenderHealthResponse, tags=["Tender Risk & GFR 2017 Audit"])
-def get_tender_health(req: TenderHealthRequest):
+def get_tender_health(req: TenderHealthRequest, current_user: dict = Depends(get_current_user)):
     return tender_health_service.get_full_report(req.clauses)
 
 @app.post("/api/v1/tender/audit-risk", response_model=DisputeRiskReport, tags=["Tender Risk & GFR 2017 Audit"])
-def audit_tender_risk(req: DisputeRiskAuditRequest):
+def audit_tender_risk(req: DisputeRiskAuditRequest, current_user: dict = Depends(get_current_user)):
     """
     GFR 2017 & Legal Dispute Risk Scorer:
     Audits tender specifications against GFR 144(i), CVC brand-tailoring,
@@ -533,33 +537,33 @@ def audit_tender_risk(req: DisputeRiskAuditRequest):
     )
 
 @app.post("/api/v1/tender/diff", response_model=TenderDiffResponse, tags=["Tender Risk & GFR 2017 Audit"])
-def get_tender_diff(req: TenderDiffRequest):
+def get_tender_diff(req: TenderDiffRequest, current_user: dict = Depends(get_current_user)):
     return tender_diff_service.compare_tenders(req.version_a_text, req.version_b_text)
 
 @app.post("/api/v1/specification/generate", response_model=SpecificationGenerateResponse, tags=["Procurement Sessions & Specifications"])
-def generate_specification(req: SpecificationGenerateRequest):
+def generate_specification(req: SpecificationGenerateRequest, current_user: dict = Depends(get_current_user)):
     return specification_service.generate_specification(req.requirements, req.standards, req.evidence)
 
 @app.post("/api/v1/procurements/session", response_model=ProcurementSessionResponse, tags=["Procurement Sessions & Specifications"])
-def create_session(req: ProcurementSessionCreateRequest):
+def create_session(req: ProcurementSessionCreateRequest, current_user: dict = Depends(get_current_user)):
     return procurement_session_service.create_session(req)
 
 @app.get("/api/v1/procurements/session/{session_id}", response_model=ProcurementSessionResponse, tags=["Procurement Sessions & Specifications"])
-def get_session(session_id: str):
+def get_session(session_id: str, current_user: dict = Depends(get_current_user)):
     session = procurement_session_service.get_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     return session
 
 @app.post("/api/v1/export", response_model=ExportResponse, tags=["Procurement Sessions & Specifications"])
-def export_session(req: ExportRequest):
+def export_session(req: ExportRequest, current_user: dict = Depends(get_current_user)):
     try:
         return export_service.export(req)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/v1/export/package", tags=["Procurement Sessions & Specifications"])
-def export_specification_package(req: ExportPackageRequest):
+def export_specification_package(req: ExportPackageRequest, current_user: dict = Depends(get_current_user)):
     try:
         file_bytes, media_type, filename = export_service.export_package(req)
         return Response(
@@ -575,7 +579,7 @@ def export_specification_package(req: ExportPackageRequest):
 
 
 @app.get("/api/v1/dashboard/summary", response_model=DashboardSummary, tags=["System & Governance"])
-def get_dashboard_summary():
+def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
     _seed_demo_sessions()
     sessions = list(session_repo.sessions.values())
     total_findings = sum(len(s.tender_findings) for s in sessions)
@@ -589,7 +593,7 @@ def get_dashboard_summary():
     )
 
 @app.get("/api/v1/graph/standard/{family_id}", response_model=KnowledgeGraphResponse, tags=["Catalogue & Normative Graph"])
-def get_knowledge_graph(family_id: str):
+def get_knowledge_graph(family_id: str, current_user: dict = Depends(get_current_user)):
     graph = engine.graph_expander.expand_standard(family_id)
     nodes = []
     edges = []
@@ -602,7 +606,7 @@ def get_knowledge_graph(family_id: str):
     return KnowledgeGraphResponse(nodes=nodes, edges=edges)
 
 @app.get("/api/v1/changes", response_model=ChangesResponse, tags=["System & Governance"])
-def get_changes():
+def get_changes(current_user: dict = Depends(get_current_user)):
     return ChangesResponse(changes=[
         StandardChange(
             id="chg-001",
@@ -637,12 +641,12 @@ def get_changes():
     ])
 
 @app.get("/api/v1/procurements", response_model=ProcurementListResponse, tags=["Procurement Sessions & Specifications"])
-def list_procurements():
+def list_procurements(current_user: dict = Depends(get_current_user)):
     sessions = [procurement_session_service.get_session(sid) for sid in session_repo.sessions.keys()]
     return ProcurementListResponse(sessions=[s for s in sessions if s])
 
 @app.post("/api/v1/procurements/session/{session_id}/standards", tags=["Procurement Sessions & Specifications"])
-def add_standard_to_basket(session_id: str, standard: dict):
+def add_standard_to_basket(session_id: str, standard: dict, current_user: dict = Depends(get_current_user)):
     # Retrieve session, append standard, and save
     session = procurement_session_service.get_session(session_id)
     if not session:
@@ -653,7 +657,7 @@ def add_standard_to_basket(session_id: str, standard: dict):
     return session
 
 @app.delete("/api/v1/procurements/session/{session_id}/standards/{family_id}", tags=["Procurement Sessions & Specifications"])
-def remove_standard_from_basket(session_id: str, family_id: str):
+def remove_standard_from_basket(session_id: str, family_id: str, current_user: dict = Depends(get_current_user)):
     session = procurement_session_service.get_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -667,7 +671,7 @@ def remove_standard_from_basket(session_id: str, family_id: str):
 # ==========================================
 
 @app.post("/api/v1/feedback")
-def submit_procurement_feedback(submission: FeedbackSubmission):
+def submit_procurement_feedback(submission: FeedbackSubmission, current_user: dict = Depends(get_current_user)):
     """
     Active Learning Feedback Endpoint.
     Records procurement officer acceptance/corrections and dynamically adapts SQLite alias catalog.
@@ -678,7 +682,7 @@ def submit_procurement_feedback(submission: FeedbackSubmission):
     return res
 
 @app.get("/api/v1/system/metrics")
-def get_system_telemetry_metrics():
+def get_system_telemetry_metrics(current_user: dict = Depends(get_current_user)):
     """
     SRE Telemetry & System Design Observability Endpoint.
     Returns P50/P90/P99 latencies, cache hit ratio, circuit breaker status, and DB health.
@@ -686,7 +690,7 @@ def get_system_telemetry_metrics():
     return metrics_collector.get_summary()
 
 @app.post("/api/v1/system/cache/clear")
-def clear_query_cache():
+def clear_query_cache(current_user: dict = Depends(get_current_user)):
     """
     Invalidates the entire LRU query cache.
     """
