@@ -41,6 +41,8 @@ export interface ExtractedRequirement {
   specificationGaps?: string[];
   specificationClause?: string;
   isMandatoryQco?: boolean;
+  confidenceScore?: number;
+  rationale?: string;
 }
 
 export interface RecommendedStandardItem {
@@ -50,6 +52,8 @@ export interface RecommendedStandardItem {
   type: BasketStandard['type'];
   status: BasketStandard['status'];
   rationale: string;
+  confidence?: 'HIGH' | 'MEDIUM' | 'LOW' | string;
+  relevanceScore?: number;
 }
 
 export interface AuditSummary {

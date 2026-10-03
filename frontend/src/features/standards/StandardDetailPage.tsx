@@ -128,7 +128,7 @@ export default function StandardDetailPage() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate('/standards')}
-          className="text-xs font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1.5 transition-colors cursor-pointer"
+          className="text-xs font-semibold text-slate-500 hover:text-orange-600 flex items-center gap-1.5 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Standards Explorer</span>
@@ -151,7 +151,7 @@ export default function StandardDetailPage() {
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               {standard.status}
             </span>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
               {standard.type} Standard
             </span>
             {details.mandatoryQco && (
@@ -186,7 +186,7 @@ export default function StandardDetailPage() {
             className={`px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0 ${
               inBasket
                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-orange-600 hover:bg-orange-700 text-white'
             }`}
           >
             {inBasket ? (
@@ -233,14 +233,14 @@ export default function StandardDetailPage() {
             onClick={() => setActiveTab(tab.key as any)}
             className={`pb-3 pt-1 px-4 border-b-2 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === tab.key
-                ? 'border-blue-600 text-blue-600 font-bold'
+                ? 'border-orange-600 text-orange-600 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <span className="whitespace-nowrap">{tab.label}</span>
             {tab.count !== undefined && (
               <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full whitespace-nowrap shrink-0 ${
-                activeTab === tab.key ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
+                activeTab === tab.key ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
               }`}>
                 {tab.count}
               </span>
@@ -292,7 +292,7 @@ export default function StandardDetailPage() {
             {details.keyClauses.map((c, i) => (
               <div key={i} className="p-4 rounded-xl border border-slate-200/90 bg-slate-50/40 space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  <span className="font-mono text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
                     {c.clause}
                   </span>
                   <h3 className="text-xs font-bold text-slate-900">{c.title}</h3>
@@ -313,16 +313,16 @@ export default function StandardDetailPage() {
                 <div 
                   key={ref}
                   onClick={() => navigate(`/standards/${ref}`)}
-                  className="p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all flex items-center justify-between cursor-pointer group"
+                  className="p-3.5 rounded-xl border border-slate-200 hover:border-orange-300 hover:bg-orange-50/20 transition-all flex items-center justify-between cursor-pointer group"
                 >
                   <div className="flex items-center gap-2.5">
-                    <BookOpen className="w-4 h-4 text-blue-600" />
+                    <BookOpen className="w-4 h-4 text-orange-600" />
                     <div>
-                      <span className="font-mono font-bold text-xs text-slate-900 group-hover:text-blue-600 block">{ref}</span>
+                      <span className="font-mono font-bold text-xs text-slate-900 group-hover:text-orange-600 block">{ref}</span>
                       <span className="text-[11px] text-slate-400">Allied Indian Standard</span>
                     </div>
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600" />
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-600" />
                 </div>
               ))}
             </div>

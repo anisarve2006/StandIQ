@@ -3,10 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   ChevronDown, 
-  Check, 
+  ChevronRight, 
+  Share2, 
+  ExternalLink, 
+  BookOpen, 
+  Flame, 
+  Box, 
+  FlaskConical, 
+  ShieldCheck, 
+  Building2, 
+  RotateCcw, 
+  List, 
+  LayoutGrid, 
   Plus, 
-  Share2,
-  ExternalLink
+  Zap, 
+  Check 
 } from 'lucide-react';
 import { useStandIQ } from '../../stores/standiq.store';
 
@@ -16,11 +27,22 @@ export interface StandardItem {
   title: string;
   status: 'Current' | 'Superseded' | 'Withdrawn';
   type: 'Product' | 'Testing' | 'Safety' | 'Terminology' | 'Code of Practice';
-  industry: 'Electrical' | 'Mechanical' | 'Construction' | 'Metallurgy' | 'IT & Electronics' | 'Chemical' | 'Aerospace' | 'Textile';
+  industry: 'Electrical' | 'Mechanical' | 'Construction' | 'Metallurgy' | 'IT & Electronics' | 'Chemical';
+  division?: string;
   tags: string[];
   reaffirmed: number;
   relatedCount: number;
   year: number;
+  iconBg?: string;
+  iconColor?: string;
+}
+
+export function getStandardTagColor(tag: string): string {
+  if (tag.includes('Product') || tag.includes('Code')) return 'bg-blue-50 text-blue-700 border-blue-200/60';
+  if (tag.includes('Energy') || tag.includes('Latest') || tag.includes('Testing')) return 'bg-emerald-50 text-emerald-700 border-emerald-200/60';
+  if (tag.includes('QCO') || tag.includes('Mandatory')) return 'bg-rose-50 text-rose-700 border-rose-200/60';
+  if (tag.includes('General') || tag.includes('Civil')) return 'bg-amber-50 text-amber-700 border-amber-200/60';
+  return 'bg-purple-50 text-purple-700 border-purple-200/60';
 }
 
 export const ALL_STANDARDS: StandardItem[] = [
@@ -31,10 +53,13 @@ export const ALL_STANDARDS: StandardItem[] = [
     status: 'Current',
     type: 'Product',
     industry: 'Electrical',
+    division: 'Electrotechnical',
     tags: ['Product Standard', 'Energy Efficiency', 'Testing Requirements'],
     reaffirmed: 2023,
     relatedCount: 7,
-    year: 2018
+    year: 2018,
+    iconBg: 'bg-orange-50',
+    iconColor: 'text-orange-500'
   },
   {
     id: 'is-325-1996',
@@ -43,483 +68,500 @@ export const ALL_STANDARDS: StandardItem[] = [
     status: 'Current',
     type: 'Product',
     industry: 'Electrical',
+    division: 'Electrotechnical',
     tags: ['Product Standard', 'General Requirements', 'Dimensions'],
     reaffirmed: 2019,
     relatedCount: 5,
-    year: 1996
-  },
-  {
-    id: 'is-802-1995',
-    code: 'IS 802:1995',
-    title: 'Code of Practice for Use of Cold-Formed Light Gauge Steel Structural Members',
-    status: 'Current',
-    type: 'Code of Practice',
-    industry: 'Construction',
-    tags: ['Code of Practice', 'Construction'],
-    reaffirmed: 2020,
-    relatedCount: 12,
-    year: 1995
-  },
-  {
-    id: 'is-8789-1981',
-    code: 'IS 8789:1981',
-    title: 'Method of Test for Efficiency of Induction Motors',
-    status: 'Current',
-    type: 'Testing',
-    industry: 'Electrical',
-    tags: ['Testing Standard', 'Efficiency Test', 'Measurements'],
-    reaffirmed: 2021,
-    relatedCount: 4,
-    year: 1981
-  },
-  {
-    id: 'is-302-2008',
-    code: 'IS 302:2008',
-    title: 'Safety of Household and Similar Electrical Equipment',
-    status: 'Current',
-    type: 'Safety',
-    industry: 'Electrical',
-    tags: ['Safety Standard', 'General Safety', 'Protection'],
-    reaffirmed: 2022,
-    relatedCount: 8,
-    year: 2008
-  },
-  {
-    id: 'is-9383-1997',
-    code: 'IS 9383:1997',
-    title: 'Installation of Electrical Equipment in Hazardous Areas',
-    status: 'Current',
-    type: 'Product',
-    industry: 'Electrical',
-    tags: ['Installation Standard', 'Hazardous Areas'],
-    reaffirmed: 2020,
-    relatedCount: 3,
-    year: 1997
-  },
-  {
-    id: 'is-17428-2023',
-    code: 'IS 17428:2023',
-    title: 'Battery Management System for Electric Mobility Applications',
-    status: 'Current',
-    type: 'Safety',
-    industry: 'IT & Electronics',
-    tags: ['Electric Vehicles', 'BMS', 'Safety Architecture'],
-    reaffirmed: 2023,
-    relatedCount: 6,
-    year: 2023
+    year: 1996,
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-500'
   },
   {
     id: 'is-456-2000',
     code: 'IS 456:2000',
-    title: 'Plain and Reinforced Concrete - Code of Practice',
+    title: 'Plain and Reinforced Concrete — Code of Practice',
     status: 'Current',
     type: 'Code of Practice',
     industry: 'Construction',
-    tags: ['Structural', 'Concrete', 'Civil Engineering'],
+    division: 'Civil Engineering',
+    tags: ['Code of Practice', 'Civil Engineering', 'Construction'],
     reaffirmed: 2021,
-    relatedCount: 16,
-    year: 2000
+    relatedCount: 12,
+    year: 2000,
+    iconBg: 'bg-emerald-50',
+    iconColor: 'text-emerald-500'
   },
   {
-    id: 'is-2062-2011',
-    code: 'IS 2062:2011',
-    title: 'Hot Rolled Medium and High Tensile Structural Steel',
+    id: 'is-1786-2023',
+    code: 'IS 1786:2023',
+    title: 'High Strength Deformed Steel Bars and Wires for Concrete Reinforcement — Specification',
     status: 'Current',
     type: 'Product',
     industry: 'Metallurgy',
-    tags: ['Structural Steel', 'Tensile Strength', 'Fabrication'],
-    reaffirmed: 2020,
+    division: 'Civil & Metallurgical',
+    tags: ['Product Standard', 'TMT Rebars', 'Mandatory QCO'],
+    reaffirmed: 2023,
     relatedCount: 9,
-    year: 2011
+    year: 2023,
+    iconBg: 'bg-purple-50',
+    iconColor: 'text-purple-500'
   },
   {
-    id: 'is-1528-2019',
-    code: 'IS 1528:2019',
-    title: 'Methods of Sampling and Physical Tests for Refractory Materials',
+    id: 'is-3025-2021',
+    code: 'IS 3025 (Part 39):2021',
+    title: 'Methods of Sampling and Test (Water and Waste Water) — Part 39: pH Value',
     status: 'Current',
     type: 'Testing',
     industry: 'Chemical',
-    tags: ['Refractory', 'Physical Testing', 'Sampling'],
-    reaffirmed: 2024,
-    relatedCount: 5,
-    year: 2019
+    division: 'Chemical Engineering',
+    tags: ['Testing Method', 'Water Quality'],
+    reaffirmed: 2021,
+    relatedCount: 4,
+    year: 2021,
+    iconBg: 'bg-rose-50',
+    iconColor: 'text-rose-500'
   }
 ];
 
 export default function StandardsDiscoveryPage() {
   const navigate = useNavigate();
-  const { addToBasket, removeFromBasket, isInBasket, activeDocument } = useStandIQ();
+  const { addToBasket, basket } = useStandIQ();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTypeTab, setActiveTypeTab] = useState<'All' | 'Product' | 'Testing' | 'Safety' | 'Terminology' | 'Code of Practice'>('All');
-  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('All Standards');
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>(['Electrical']);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['Current']);
-  const [minYear, setMinYear] = useState<number>(1980);
-  const [showAllIndustries, setShowAllIndustries] = useState<boolean>(false);
-  const [sortBy, setSortBy] = useState('Relevance');
+  const [sinceYear, setSinceYear] = useState<number>(1980);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [sortBy, setSortBy] = useState<'Relevance' | 'Newest' | 'Code'>('Relevance');
+  const [addedIds, setAddedIds] = useState<string[]>([]);
 
-  const allIndustries = [
-    { label: 'Electrical', count: '1,234' },
-    { label: 'Mechanical', count: '856' },
-    { label: 'Construction', count: '1,146' },
-    { label: 'Metallurgy', count: '614' },
-    { label: 'IT & Electronics', count: '876' },
-    { label: 'Chemical', count: '558' },
-    { label: 'Aerospace', count: '210' },
-    { label: 'Textile', count: '342' }
+  // Tab Definitions matching Image 4
+  const tabs = [
+    { label: 'All Standards', count: '12,416', icon: Flame },
+    { label: 'Product Standards', count: '6,322', icon: Box },
+    { label: 'Testing Methods', count: '4,216', icon: FlaskConical },
+    { label: 'Safety Standards', count: '3,110', icon: ShieldCheck },
+    { label: 'Codes of Practice', count: '2,801', icon: Building2 },
+    { label: 'Terminology', count: '1,954', icon: BookOpen },
   ];
 
-  const visibleIndustries = showAllIndustries ? allIndustries : allIndustries.slice(0, 6);
-
-  const statuses = [
-    { label: 'Current', count: '18,421' },
-    { label: 'Superseded', count: '1,254' },
-    { label: 'Withdrawn', count: '456' }
+  // Industry filters with counts
+  const industryFilters = [
+    { name: 'Electrical', count: '1,234' },
+    { name: 'Mechanical', count: '856' },
+    { name: 'Construction', count: '1,146' },
+    { name: 'Metallurgy', count: '614' },
+    { name: 'IT & Electronics', count: '876' },
+    { name: 'Chemical', count: '558' },
   ];
 
-  const toggleIndustry = (ind: string) => {
+  const handleToggleIndustry = (name: string) => {
     setSelectedIndustries(prev => 
-      prev.includes(ind) ? prev.filter(x => x !== ind) : [...prev, ind]
+      prev.includes(name) ? prev.filter(x => x !== name) : [...prev, name]
     );
   };
 
-  const toggleStatus = (st: string) => {
+  const handleToggleStatus = (status: string) => {
     setSelectedStatuses(prev => 
-      prev.includes(st) ? prev.filter(x => x !== st) : [...prev, st]
+      prev.includes(status) ? prev.filter(x => x !== status) : [...prev, status]
     );
   };
 
-  const handleBasketToggle = (std: StandardItem) => {
-    if (isInBasket(std.code)) {
-      removeFromBasket(std.code);
-    } else {
-      addToBasket({
-        id: std.code,
-        code: std.code,
-        title: std.title,
-        type: std.type,
-        status: std.status,
-        year: std.year,
-        reaffirmedYear: std.reaffirmed,
-        relatedCount: std.relatedCount,
-        tags: std.tags
-      });
-    }
+  const handleResetFilters = () => {
+    setSelectedIndustries(['Electrical']);
+    setSelectedStatuses(['Current']);
+    setSinceYear(1980);
+    setSearchQuery('');
   };
 
+  const handleAddToBasket = (std: StandardItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToBasket({
+      id: std.code,
+      code: std.code,
+      title: std.title,
+      type: std.type,
+      status: std.status,
+      year: std.year,
+      reaffirmedYear: std.reaffirmed,
+      relatedCount: std.relatedCount,
+      tags: std.tags
+    });
+    setAddedIds(prev => [...prev, std.id]);
+    setTimeout(() => {
+      setAddedIds(prev => prev.filter(x => x !== std.id));
+    }, 2000);
+  };
+
+  // Filtered standards
   const filteredStandards = useMemo(() => {
-    const list = ALL_STANDARDS.filter(s => {
-      if (activeTypeTab !== 'All' && s.type !== activeTypeTab) return false;
-      if (selectedIndustries.length > 0 && !selectedIndustries.includes(s.industry)) return false;
-      if (selectedStatuses.length > 0 && !selectedStatuses.includes(s.status)) return false;
-      if (s.year < minYear) return false;
+    return ALL_STANDARDS.filter((std) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const match = s.code.toLowerCase().includes(q) || 
-                      s.title.toLowerCase().includes(q) || 
-                      s.industry.toLowerCase().includes(q) || 
-                      s.tags.some(t => t.toLowerCase().includes(q));
-        if (!match) return false;
+        const matchCode = std.code.toLowerCase().includes(q);
+        const matchTitle = std.title.toLowerCase().includes(q);
+        if (!matchCode && !matchTitle) return false;
+      }
+      if (selectedIndustries.length > 0 && !selectedIndustries.includes(std.industry)) {
+        return false;
+      }
+      if (selectedStatuses.length > 0 && !selectedStatuses.includes(std.status)) {
+        return false;
+      }
+      if (std.year < sinceYear) {
+        return false;
       }
       return true;
     });
-
-    if (sortBy === 'Latest') {
-      return [...list].sort((a, b) => b.year - a.year);
-    }
-    if (sortBy === 'Popular') {
-      return [...list].sort((a, b) => b.relatedCount - a.relatedCount);
-    }
-    return list;
-  }, [activeTypeTab, selectedIndustries, selectedStatuses, minYear, searchQuery, sortBy]);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
+  }, [searchQuery, selectedIndustries, selectedStatuses, sinceYear]);
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
-      {/* 01. Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Indian Standards Explorer</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Search and explore official BIS standards with interactive facet filters.</p>
-        </div>
-        {activeDocument && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-600/20 text-xs text-amber-900 font-medium whitespace-nowrap shrink-0">
-            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
-            <span>Active Tender Basket: <strong className="font-semibold">{activeDocument.title || activeDocument.fileName}</strong></span>
+    <div className="min-h-full bg-[#fbfcfd] p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto select-none">
+      
+      {/* 1. Header Section */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-500 shadow-2xs">
+            <BookOpen className="w-6 h-6" />
           </div>
-        )}
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              Indian Standards Explorer
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Search and explore official BIS standards with interactive filters.
+            </p>
+          </div>
+        </div>
+
+        {/* Active Tender Basket Badge */}
+        <div 
+          onClick={() => navigate('/basket')}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50/80 border border-orange-200/80 text-xs font-semibold text-orange-800 shadow-2xs hover:bg-orange-100/70 transition-colors cursor-pointer shrink-0"
+        >
+          <span className="w-2 h-2 rounded-full bg-orange-500" />
+          <span>Active Tender Basket: TENDER SPECIFICATION: TENDER16</span>
+          <ChevronRight className="w-3.5 h-3.5 text-orange-600" />
+        </div>
       </div>
 
-      {/* 02. Prominent Search Bar */}
-      <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+      {/* 2. Main Search Bar */}
+      <div className="bg-white p-2.5 rounded-2xl border border-slate-200/90 shadow-2xs flex items-center gap-3">
+        <div className="relative flex-1 flex items-center">
+          <Search className="absolute left-3.5 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by standard number (e.g. IS 12615), title, keywords..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs font-medium"
+            placeholder="Search by standard number (e.g. IS 12615), title, keywords..."
+            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:outline-hidden"
           />
         </div>
-        <button 
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap"
+        <button
+          onClick={() => {}}
+          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-2 shrink-0 active:scale-95"
         >
-          Search
+          <Search className="w-4 h-4" />
+          <span>Search</span>
         </button>
-      </form>
-
-      {/* 03. Type Filter Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-        {[
-          { key: 'All', label: 'All Standards', count: '' },
-          { key: 'Product', label: 'Product Standards', count: '12,416' },
-          { key: 'Testing', label: 'Testing Methods', count: '6,322' },
-          { key: 'Safety', label: 'Safety Standards', count: '4,216' },
-          { key: 'Code of Practice', label: 'Codes of Practice', count: '3,110' },
-          { key: 'Terminology', label: 'Terminology', count: '2,801' }
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTypeTab(tab.key as any)}
-            className={`px-3.5 py-1.5 rounded-full font-medium transition-all whitespace-nowrap flex items-center gap-1.5 border cursor-pointer ${
-              activeTypeTab === tab.key
-                ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <span>{tab.label}</span>
-            {tab.count && <span className={activeTypeTab === tab.key ? 'text-blue-100' : 'text-slate-400'}>({tab.count})</span>}
-          </button>
-        ))}
       </div>
 
-      {/* 04. 2-Column Explorer Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        {/* Left Filter Facets Sidebar */}
-        <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs space-y-6">
-          {/* Industry Facet */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Industry</h3>
-              {selectedIndustries.length > 0 && (
-                <button
-                  onClick={() => setSelectedIndustries([])}
-                  className="text-[10px] text-blue-600 hover:underline cursor-pointer"
-                >
-                  Clear
-                </button>
-              )}
+      {/* 3. Standard Type Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.label;
+          return (
+            <button
+              key={tab.label}
+              onClick={() => setActiveTab(tab.label)}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                isActive
+                  ? 'bg-orange-50 text-orange-600 border border-orange-200 shadow-2xs'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-orange-500' : 'text-slate-400'}`} />
+              <span>{tab.label}</span>
+              <span className={`text-[11px] font-normal ${isActive ? 'text-orange-600' : 'text-slate-400'}`}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4. Filter Sidebar & Standards List Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Left Filter Column (Span 3) */}
+        <div className="lg:col-span-3 bg-white rounded-2xl md:rounded-3xl border border-slate-200/90 shadow-2xs p-5 space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 className="font-bold text-sm text-slate-900">Filters</h3>
+            <button
+              onClick={handleResetFilters}
+              className="text-[11px] font-semibold text-slate-400 hover:text-orange-600 flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <span>Reset all</span>
+              <RotateCcw className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Industry Filter Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-800">Industry</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </div>
-            <div className="space-y-2.5">
-              {visibleIndustries.map((ind) => (
-                <label key={ind.label} className="flex items-center justify-between text-xs cursor-pointer group">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedIndustries.includes(ind.label)}
-                      onChange={() => toggleIndustry(ind.label)}
-                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
-                    />
-                    <span className="text-slate-700 group-hover:text-slate-900">{ind.label}</span>
-                  </div>
-                  <span className="text-slate-400 font-mono text-[11px]">({ind.count})</span>
-                </label>
-              ))}
-              <button 
-                type="button"
-                onClick={() => setShowAllIndustries(!showAllIndustries)}
-                className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 pt-1 block cursor-pointer"
-              >
-                {showAllIndustries ? '- Show less' : '+ Show more'}
+
+            <div className="space-y-2">
+              {industryFilters.map((ind) => {
+                const isChecked = selectedIndustries.includes(ind.name);
+                return (
+                  <label
+                    key={ind.name}
+                    className="flex items-center justify-between text-xs text-slate-700 cursor-pointer hover:text-slate-900"
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleToggleIndustry(ind.name)}
+                        className="rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                      />
+                      <span>{ind.name}</span>
+                    </div>
+                    <span className="text-[11px] text-slate-400">({ind.count})</span>
+                  </label>
+                );
+              })}
+
+              <button className="text-xs font-semibold text-orange-600 hover:text-orange-700 pt-1 cursor-pointer">
+                + Show more
               </button>
             </div>
           </div>
 
-          <div className="border-t border-slate-100 pt-5">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">Status</h3>
-            <div className="space-y-2.5">
-              {statuses.map((st) => (
-                <label key={st.label} className="flex items-center justify-between text-xs cursor-pointer group">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedStatuses.includes(st.label)}
-                      onChange={() => toggleStatus(st.label)}
-                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
-                    />
-                    <span className="text-slate-700 group-hover:text-slate-900">{st.label}</span>
-                  </div>
-                  <span className="text-slate-400 font-mono text-[11px]">({st.count})</span>
-                </label>
-              ))}
+          {/* Status Filter Section */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-800">Status</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+
+            <div className="space-y-2">
+              {[
+                { name: 'Current', count: '18,421' },
+                { name: 'Superseded', count: '1,254' },
+                { name: 'Withdrawn', count: '456' }
+              ].map((st) => {
+                const isChecked = selectedStatuses.includes(st.name);
+                return (
+                  <label
+                    key={st.name}
+                    className="flex items-center justify-between text-xs text-slate-700 cursor-pointer hover:text-slate-900"
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleToggleStatus(st.name)}
+                        className="rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                      />
+                      <span>{st.name}</span>
+                    </div>
+                    <span className="text-[11px] text-slate-400">({st.count})</span>
+                  </label>
+                );
+              })}
             </div>
           </div>
 
-          <div className="border-t border-slate-100 pt-5">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Since Year</h3>
-              <span className="text-xs font-mono font-bold text-blue-600">{minYear}</span>
+          {/* Since Year Slider */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-800">Since Year</span>
+              <span className="font-mono text-slate-500 font-semibold">{sinceYear}</span>
             </div>
-            <div className="space-y-2">
-              <input
-                type="range"
-                min="1970"
-                max="2024"
-                step="1"
-                value={minYear}
-                onChange={(e) => setMinYear(Number(e.target.value))}
-                className="w-full accent-blue-600 cursor-pointer"
-              />
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-                <span>1970</span>
-                <span>2024</span>
-              </div>
+
+            <input
+              type="range"
+              min="1980"
+              max="2026"
+              value={sinceYear}
+              onChange={(e) => setSinceYear(Number(e.target.value))}
+              className="w-full accent-orange-500 cursor-pointer"
+            />
+
+            <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>1980</span>
+              <span>2026</span>
             </div>
           </div>
         </div>
 
-        {/* Right Standards List */}
-        <div className="lg:col-span-3 space-y-4">
-          {/* Top Sort / Counter Bar */}
-          <div className="flex items-center justify-between text-xs text-slate-500 bg-white px-4 py-2.5 rounded-xl border border-slate-200/90 shadow-2xs">
-            <span className="font-medium">
-              Showing <strong className="text-slate-800 font-mono">{filteredStandards.length}</strong> matching standards
-            </span>
-            <div className="flex items-center gap-2">
-              <span>Sort by:</span>
-              <div className="relative">
+        {/* Right Standards Results (Span 9) */}
+        <div className="lg:col-span-9 space-y-4">
+          
+          {/* Results Control Bar */}
+          <div className="flex items-center justify-between pb-1">
+            <p className="text-xs text-slate-500">
+              Showing <strong className="text-slate-900 font-bold">{filteredStandards.length}</strong> matching standards
+            </p>
+
+            <div className="flex items-center gap-3">
+              {/* Sort By Dropdown */}
+              <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                <span className="text-slate-400">Sort by:</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none pl-2 pr-6 py-1 bg-slate-50 border border-slate-200 rounded text-xs text-slate-700 font-semibold focus:outline-none cursor-pointer"
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="bg-transparent font-semibold text-slate-800 focus:outline-hidden cursor-pointer"
                 >
-                  <option value="Relevance">Relevance</option>
-                  <option value="Latest">Latest Year</option>
-                  <option value="Popular">Most Referenced</option>
+                  <option>Relevance</option>
+                  <option>Newest</option>
+                  <option>Code</option>
                 </select>
-                <ChevronDown className="w-3 h-3 text-slate-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center border border-slate-200 rounded-lg p-0.5 bg-white">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-1 rounded ${viewMode === 'list' ? 'bg-orange-50 text-orange-600' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                  <List className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1 rounded ${viewMode === 'grid' ? 'bg-orange-50 text-orange-600' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           </div>
 
           {/* Cards List */}
-          <div className="space-y-3.5">
-            {filteredStandards.length === 0 ? (
-              <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500">
-                <p className="text-sm font-semibold text-slate-700">No standards match your filters.</p>
-                <p className="text-xs text-slate-400 mt-1">Try resetting the publication year slider or clearing industry checkboxes.</p>
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedIndustries([]);
-                    setMinYear(1970);
-                    setActiveTypeTab('All');
-                  }}
-                  className="mt-4 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-100 cursor-pointer"
+          <div className="space-y-4">
+            {filteredStandards.map((std) => {
+              const isAdded = addedIds.includes(std.id) || basket.some(b => b.code === std.code);
+
+              return (
+                <div
+                  key={std.id}
+                  onClick={() => navigate(`/standards/${encodeURIComponent(std.code)}`)}
+                  className="bg-white rounded-2xl md:rounded-3xl border border-slate-200/90 shadow-2xs hover:border-orange-300 hover:shadow-xs p-5 transition-all cursor-pointer group"
                 >
-                  Reset All Filters
-                </button>
-              </div>
-            ) : (
-              filteredStandards.map((std) => {
-                const inBasket = isInBasket(std.code);
-                return (
-                  <div
-                    key={std.id}
-                    className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs hover:border-blue-200 hover:shadow-sm transition-all"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                      <div className="space-y-1.5 flex-1">
-                        <div className="flex items-center gap-2.5">
-                          <button
-                            onClick={() => navigate(`/standards/${std.code}`)}
-                            className="font-extrabold text-slate-900 text-sm sm:text-base font-mono hover:text-blue-600 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
-                          >
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                    
+                    {/* Left Icon & Information */}
+                    <div className="flex items-start gap-4 min-w-0 flex-1">
+                      <div className={`w-12 h-12 rounded-2xl ${std.iconBg} flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform`}>
+                        <Zap className={`w-6 h-6 ${std.iconColor}`} />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        {/* Standard Code, Status Badge, Year */}
+                        <div className="flex items-center gap-2.5 flex-wrap mb-1">
+                          <h3 className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-orange-600 transition-colors flex items-center gap-1.5">
                             <span>{std.code}</span>
                             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                          </button>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          </h3>
+
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                             {std.status}
                           </span>
-                          <span className="text-[11px] font-mono text-slate-400">
+
+                          <span className="text-xs text-slate-400 font-medium">
                             Year: {std.year}
                           </span>
                         </div>
 
-                        <h2 
-                          onClick={() => navigate(`/standards/${std.code}`)}
-                          className="text-sm font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer"
-                        >
+                        {/* Standard Full Title */}
+                        <p className="text-xs sm:text-sm font-semibold text-slate-800 mb-3">
                           {std.title}
-                        </h2>
+                        </p>
 
-                        {/* Tags */}
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                          {std.tags.map((tag, i) => (
+                        {/* Category Tags */}
+                        <div className="flex items-center gap-2 flex-wrap mb-4">
+                          {std.tags.map((tag, tIdx) => (
                             <span
-                              key={i}
-                              className="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-50/70 text-blue-700 border border-blue-100 whitespace-nowrap shrink-0"
+                              key={tIdx}
+                              className={`px-2.5 py-0.5 rounded-md text-[10px] font-semibold border ${getStandardTagColor(tag)}`}
                             >
                               {tag}
                             </span>
                           ))}
                         </div>
-                      </div>
 
-                      {/* Action buttons */}
-                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 shrink-0">
-                        <button
-                          onClick={() => handleBasketToggle(std)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0 ${
-                            inBasket
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white shadow-2xs'
-                          }`}
-                        >
-                          {inBasket ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                              <span>In Basket</span>
-                            </>
-                          ) : (
-                            <>
-                              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                              <span>Add to Basket</span>
-                            </>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => navigate('/graph')}
-                          className="text-[11px] text-slate-500 hover:text-blue-600 flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap shrink-0"
-                        >
-                          <Share2 className="w-3 h-3" />
-                          <span>View Graph</span>
-                        </button>
+                        {/* Meta Footnotes */}
+                        <div className="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
+                          <span className="flex items-center gap-1">
+                            <span>Reaffirmed:</span>
+                            <strong className="text-slate-800">{std.reaffirmed}</strong>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span>Related:</span>
+                            <strong className="text-slate-800">{std.relatedCount}</strong>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span>Industry:</span>
+                            <strong className="text-slate-800">{std.industry}</strong>
+                          </span>
+                          <span className="ml-auto text-[11px] text-slate-400 font-medium hidden sm:inline">
+                            BIS Division: {std.division}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Card Metadata Footer */}
-                    <div className="border-t border-slate-100 mt-4 pt-3 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                      <div className="flex items-center gap-4">
-                        <span>Reaffirmed: <strong className="text-slate-600">{std.reaffirmed}</strong></span>
-                        <span>Related: <strong className="text-slate-600">{std.relatedCount}</strong></span>
-                        <span>Industry: <strong className="text-slate-600">{std.industry}</strong></span>
-                      </div>
-                      <span className="text-slate-400">BIS Division: Electrotechnical</span>
+                    {/* Right Actions */}
+                    <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2.5 shrink-0 w-full sm:w-auto justify-between sm:justify-start pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                      <button
+                        onClick={(e) => handleAddToBasket(std, e)}
+                        className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-2xs ${
+                          isAdded
+                            ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                            : 'bg-orange-500 hover:bg-orange-600 text-white'
+                        }`}
+                      >
+                        {isAdded ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>In Basket</span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add to Basket</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/graph');
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-orange-600 transition-colors py-1 cursor-pointer"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>View Graph</span>
+                      </button>
                     </div>
+
                   </div>
-                );
-              })
-            )}
+                </div>
+              );
+            })}
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }

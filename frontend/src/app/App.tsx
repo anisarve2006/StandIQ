@@ -21,6 +21,7 @@ import TenderDiffPage from '../features/tender-diff/TenderDiffPage';
 import SettingsPage from '../features/settings/SettingsPage';
 import LoginPage from '../features/auth/LoginPage';
 import RegisterPage from '../features/auth/RegisterPage';
+import LandingPage from '../features/landing/LandingPage';
 import { ProcurementProvider } from '../stores/procurement.store';
 import { StandIQProvider } from '../stores/standiq.store';
 import { AuthProvider, useAuth } from '../stores/auth.store';
@@ -32,7 +33,7 @@ function ProtectedRoute() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
-        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-slate-500 font-medium">Authenticating...</p>
       </div>
     );
@@ -58,7 +59,7 @@ function PublicRoute() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center">
-        <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-slate-500 font-medium">Loading...</p>
       </div>
     );
@@ -87,12 +88,15 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
+    element: <LandingPage />,
+  },
+  {
+    path: '/landing',
+    element: <LandingPage />,
+  },
+  {
     element: <ProtectedRoute />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />
-      },
       {
         path: 'dashboard',
         element: <DashboardPage />,

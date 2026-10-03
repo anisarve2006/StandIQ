@@ -16,13 +16,27 @@
     --text-secondary: #475569;
     --text-muted: #94a3b8;
     
-    --accent: #2563eb;
+    --accent: #ff9100;
+    --accent-hover: #e68200;
     --accent-foreground: #ffffff;
     
+    /* #ff9100 Full Tone & Shade Palette */
+    --saffron-50: #fff8ed;
+    --saffron-100: #ffeed4;
+    --saffron-200: #ffd9a8;
+    --saffron-300: #ffbf70;
+    --saffron-400: #ffa733;
+    --saffron-500: #ff9100;
+    --saffron-600: #e68200;
+    --saffron-700: #ba6800;
+    --saffron-800: #8f4f00;
+    --saffron-900: #6e3c00;
+    --saffron-950: #422300;
+    
     --success: #16a34a;
-    --warning: #d97706;
+    --warning: #ff9100;
     --error: #dc2626;
-    --info: #2563eb;
+    --info: #0284c7;
 
     color-scheme: light;
   }

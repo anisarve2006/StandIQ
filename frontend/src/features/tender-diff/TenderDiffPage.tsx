@@ -90,7 +90,7 @@ export default function TenderDiffPage() {
         <div>
           <button
             onClick={() => navigate('/tender-health')}
-            className="text-xs font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1.5 transition-colors mb-1 cursor-pointer"
+            className="text-xs font-semibold text-slate-500 hover:text-orange-600 flex items-center gap-1.5 transition-colors mb-1 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Tender Health</span>
@@ -115,7 +115,7 @@ export default function TenderDiffPage() {
           </button>
           <button
             onClick={() => navigate('/specification-builder')}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-2"
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-2"
           >
             <span>Proceed to Builder</span>
             <ArrowRight className="w-4 h-4" />
@@ -139,8 +139,8 @@ export default function TenderDiffPage() {
             </span>
           </div>
           <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs">
-            <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Standardized</span>
-            <span className="text-2xl font-extrabold text-blue-600 font-mono mt-1 block">
+            <span className="text-[11px] font-bold text-orange-600 uppercase tracking-wider block">Standardized</span>
+            <span className="text-2xl font-extrabold text-orange-600 font-mono mt-1 block">
               {modifiedCount.toString().padStart(2, '0')}
             </span>
           </div>
@@ -167,14 +167,14 @@ export default function TenderDiffPage() {
             rows={7}
             value={versionA}
             onChange={(e) => setVersionA(e.target.value)}
-            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none"
           />
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" />
               <span>Version B (BIS Compliant Tender)</span>
             </h3>
             <span className="text-[11px] font-mono text-emerald-600 font-bold">Standardized</span>
@@ -183,7 +183,7 @@ export default function TenderDiffPage() {
             rows={7}
             value={versionB}
             onChange={(e) => setVersionB(e.target.value)}
-            className="w-full p-3 bg-blue-50/20 border border-blue-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+            className="w-full p-3 bg-orange-50/20 border border-orange-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 resize-none"
           />
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function TenderDiffPage() {
         <button
           onClick={handleCompare}
           disabled={isComparing || !versionA || !versionB}
-          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
+          className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
         >
           {isComparing ? (
             <>
@@ -225,7 +225,7 @@ export default function TenderDiffPage() {
                       finding.type === 'added'
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                         : finding.type === 'modified'
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        ? 'bg-orange-50 text-orange-700 border-orange-200'
                         : 'bg-rose-50 text-rose-700 border-rose-200'
                     }`}>
                       {finding.type.toUpperCase()}
@@ -234,7 +234,7 @@ export default function TenderDiffPage() {
                   </div>
 
                   {finding.standardRef && (
-                    <span className="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+                    <span className="font-mono text-[11px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60">
                       Target: {finding.standardRef}
                     </span>
                   )}
