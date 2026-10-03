@@ -37,5 +37,14 @@ class Settings:
     bharatgpt_model_path: str = os.getenv("BHARATGPT_MODEL_PATH", "BharatGPT-3B-Indic.Q8_0.gguf")
     bharatgpt_modal_url: str = os.getenv("BHARATGPT_MODAL_URL", "")
 
-settings = Settings()
+    # Authentication & Security
+    jwt_secret: str = os.getenv("JWT_SECRET", "super-secret-key-change-in-production")
+    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
+    refresh_token_expire_days: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+    auth_cookie_name: str = os.getenv("AUTH_COOKIE_NAME", "refresh_token")
+    auth_cookie_secure: bool = os.getenv("AUTH_COOKIE_SECURE", "false").lower() == "true"
+    auth_cookie_samesite: str = os.getenv("AUTH_COOKIE_SAMESITE", "lax")
+    frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
+settings = Settings()
