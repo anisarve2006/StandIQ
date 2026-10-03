@@ -1,19 +1,15 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
-import PageContainer from '../../components/layout/PageContainer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { SplitPane } from '../../components/layout/SplitPane';
-import { SectionHeader } from '../../components/layout/SectionHeader';
-import { Tabs } from '../../components/ui/Tabs';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Textarea } from '../../components/ui/Textarea';
-import { Select } from '../../components/ui/Select';
-import { DataList } from '../../components/ui/DataList';
-import { Mono, Meta, Body } from '../../components/ui/Typography';
-import { Badge } from '../../components/ui/Badge';
-import { ErrorState } from '../../components/ui/ErrorState';
+import { 
+  X, 
+  Upload, 
+  FileText, 
+  ChevronRight, 
+  Sparkles, 
+  ArrowRight, 
+  AlertCircle,
+  RotateCcw
+} from 'lucide-react';
 import { useStandIQ, type AnalyzedDocument, type ExtractedRequirement, type RecommendedStandardItem } from '../../stores/standiq.store';
 
 export default function ProcurementWorkspace() {
@@ -142,44 +138,38 @@ export default function ProcurementWorkspace() {
       {
         id: 'c-3',
         number: '1.3',
-        title: 'Operating Conditions & Ambient Environment',
-        text: `Intended Application: ${draft.application || 'Standard industrial duty'}. Operating Environment: ${draft.environment || 'Standard tropical conditions conforming to Indian Standards'}.`,
+        title: 'Operating Conditions & Site Parameters',
+        text: `Application: ${draft.application || 'Standard duty'}. Environmental conditions: ${draft.environment || 'Standard tropical'}.`,
         isHighlighted: false,
-      },
+      }
     ];
 
     const requirements: ExtractedRequirement[] = [
       {
         id: 1,
-        title: 'Core Product Compliance',
-        severity: 'High',
-        requirementText: draft.description || 'Core technical specification parameter.',
-        recommendedStandard: matchedStandardCode,
-        status: 'accepted',
         clauseNumber: '1.1',
-        category: 'Product',
+        requirementText: draft.description || 'Primary scope of supply',
+        category: category,
+        severity: 'High',
+        recommendedStandard: matchedStandardCode,
         isMandatoryQco: true,
+        confidenceScore: 98,
+        status: 'accepted',
+        title: 'Scope of Supply Compliance',
+        rationale: `Mandatory Quality Control Order mandates BIS ISI Certification for ${category}.`
       },
       {
         id: 2,
-        title: 'Technical Performance Verification',
-        severity: 'High',
-        requirementText: draft.technicalSpec || 'Performance, testing and quality verification clause.',
-        recommendedStandard: matchedStandardCode,
-        status: 'accepted',
         clauseNumber: '1.2',
-        category: 'Testing',
-        isMandatoryQco: true,
-      },
-      {
-        id: 3,
-        title: 'Environmental & Operational Safeguards',
+        requirementText: draft.technicalSpec || 'Rating and performance specifications',
+        category: category,
         severity: 'Medium',
-        requirementText: `Operational limits: ${draft.environment || 'Standard operating limits'}`,
-        recommendedStandard: 'IS/ISO 9001:2015',
-        status: 'pending',
-        clauseNumber: '1.3',
-        category: 'Safety',
+        recommendedStandard: matchedStandardCode,
+        isMandatoryQco: true,
+        confidenceScore: 92,
+        status: 'accepted',
+        title: 'Performance & Rating Standards',
+        rationale: 'Conformity with latest reaffirmed Indian Standard revisions required under GFR 144(i).'
       }
     ];
 
@@ -187,36 +177,22 @@ export default function ProcurementWorkspace() {
       {
         code: matchedStandardCode,
         title: matchedStandardTitle,
-        match: 95,
         type: primaryType,
+        match: 98,
         status: 'Current',
-        rationale: 'Primary benchmark Indian Standard mandated under public procurement guidelines.',
-      },
-      {
-        code: 'IS/ISO 9001:2015',
-        title: 'Quality Management Systems - Requirements',
-        match: 90,
-        type: 'Product',
-        status: 'Current',
-        rationale: 'Mandatory quality assurance certification for vendor manufacturing facilities.',
-      },
+        rationale: `Directly aligns with ${category} scope. Quality Control Order mandates compulsory BIS ISI mark.`,
+        confidence: 'HIGH',
+        relevanceScore: 98,
+      }
     ];
 
-    // Dedicated Basket for this new document
     const dedicatedBasket = [
       {
         id: matchedStandardCode,
         code: matchedStandardCode,
         title: matchedStandardTitle,
         type: primaryType,
-        status: 'Current' as const,
         mandatory: true,
-      },
-      {
-        id: 'IS/ISO 9001:2015',
-        code: 'IS/ISO 9001:2015',
-        title: 'Quality Management Systems - Requirements',
-        type: 'Product' as const,
         status: 'Current' as const,
       }
     ];
@@ -259,203 +235,323 @@ export default function ProcurementWorkspace() {
     ? draft.description.length > 0 
     : (!!selectedFile || !!draft.fileName || (draft.technicalSpec && draft.technicalSpec.length > 0));
 
-  const describeTab = (
-    <div className="flex flex-col gap-6 p-6 border border-border border-t-0 bg-surface">
-      <Textarea
-        label="PRODUCT / SERVICE"
-        placeholder="Describe the product, equipment, material or service..."
-        value={draft.description}
-        onChange={(e) => setDraft(prev => ({ ...prev, description: e.target.value }))}
-        required
-        rows={3}
-      />
-      <Textarea
-        label="TECHNICAL SPECIFICATION"
-        placeholder="Enter technical requirements, dimensions, ratings, materials, operating conditions, etc."
-        value={draft.technicalSpec}
-        onChange={(e) => setDraft(prev => ({ ...prev, technicalSpec: e.target.value }))}
-        rows={5}
-      />
-      <Input
-        label="APPLICATION / INTENDED USE"
-        placeholder="e.g. Industrial heavy duty, continuous operation"
-        value={draft.application}
-        onChange={(e) => setDraft(prev => ({ ...prev, application: e.target.value }))}
-      />
-      <Input
-        label="OPERATING ENVIRONMENT"
-        placeholder="e.g. Outdoor tropical -5°C to 50°C, 95% RH"
-        value={draft.environment}
-        onChange={(e) => setDraft(prev => ({ ...prev, environment: e.target.value }))}
-      />
-      <Input
-        label="EXISTING STANDARD REFERENCES"
-        placeholder="e.g. IS 12615, IS 325, IS 800"
-        value={draft.existingStandards}
-        onChange={(e) => setDraft(prev => ({ ...prev, existingStandards: e.target.value }))}
-      />
-      <div className="flex items-center justify-between pt-2">
-        <Select
-          label="INPUT LANGUAGE"
-          value={draft.language}
-          onChange={(e) => setDraft(prev => ({ ...prev, language: e.target.value }))}
-          options={[
-            { value: 'auto', label: 'Auto-detect' },
-            { value: 'en', label: 'English' },
-            { value: 'hi', label: 'Hindi' },
-            { value: 'mr', label: 'Marathi' },
-          ]}
-        />
-        <button
-          type="button"
-          onClick={resetProcurementDraft}
-          className="text-xs text-text-muted hover:text-rose-600 transition-colors underline pt-5"
-        >
-          Reset Draft Form
-        </button>
-      </div>
-    </div>
-  );
-
-  const uploadTab = (
-    <div className="flex flex-col gap-6 p-6 border border-border border-t-0 bg-surface">
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileInputChange}
-        accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.xlsx,.xls,.csv,.txt"
-        className="hidden"
-      />
-      {!draft.fileName && !selectedFile ? (
-        <div 
-          onClick={handleFileSelect}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            const file = e.dataTransfer.files?.[0];
-            if (file) {
-              setSelectedFile(file);
-              setDraft(prev => ({
-                ...prev,
-                fileName: file.name,
-                fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`
-              }));
-              setError(null);
-            }
-          }}
-          className="border-2 border-dashed border-border p-10 flex flex-col items-center justify-center text-center rounded-sm hover:border-text-secondary cursor-pointer transition-colors"
-        >
-          <Mono className="text-text-secondary mb-2">DROP TENDER DOCUMENT OR SCANNED IMAGE</Mono>
-          <Meta className="mb-2">PDF (DIGITAL & OCR SCANNED) / PNG / JPG / EXCEL / CSV / TXT</Meta>
-          <span className="text-[10px] text-text-muted mb-4 font-mono">Auto-detects digital text; runs OCR for scanned pages</span>
-          <Button variant="secondary" onClick={(e) => { e.stopPropagation(); handleFileSelect(); }}>
-            SELECT FILE
-          </Button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between p-4 border border-border bg-surface-elevated rounded-sm">
-          <div className="flex flex-col gap-1">
-            <Mono className="text-text-primary font-bold">{draft.fileName || selectedFile?.name}</Mono>
-            <Meta>{draft.fileSize || `${((selectedFile?.size || 0) / (1024 * 1024)).toFixed(2)} MB`}</Meta>
-          </div>
-          <div className="flex items-center gap-4">
-            <Badge variant="success">READY</Badge>
-            <Button variant="ghost" size="sm" onClick={handleRemoveFile}>
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Input Text Field in Upload Section */}
-      <div className="flex flex-col gap-3 pt-2 border-t border-border">
-        <Input
-          label="TENDER TITLE / REFERENCE NUMBER"
-          placeholder="e.g. GEM/2026/B/8912401 or High Voltage Transformers Package"
-          value={draft.fileName || ''}
-          onChange={(e) => setDraft(prev => ({ ...prev, fileName: e.target.value }))}
-        />
-        <Textarea
-          label="OR ENTER SPECIFICATION TEXT DIRECTLY (NO FILE NEEDED)"
-          placeholder="Paste or type technical specification clauses, BoQ lines, or product ratings here..."
-          value={draft.technicalSpec || ''}
-          onChange={(e) => setDraft(prev => ({ ...prev, technicalSpec: e.target.value }))}
-          rows={3}
-        />
-      </div>
-      <Select
-        label="DOCUMENT LANGUAGE"
-        value={draft.language}
-        onChange={(e) => setDraft(prev => ({ ...prev, language: e.target.value }))}
-        options={[
-          { value: 'auto', label: 'Auto-detect' },
-          { value: 'en', label: 'English' },
-          { value: 'hi', label: 'Hindi' },
-        ]}
-      />
-    </div>
-  );
-
   return (
-    <PageContainer>
-      <PageHeader
-        eyebrow="NEW PROCUREMENT"
-        title="STANDARD INTELLIGENCE WORKSPACE"
-        description="Describe what you are procuring or provide an existing tender/specification for analysis. Data is automatically preserved across all tabs."
-      />
+    <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+      {/* 01. Breadcrumb & Header */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+          <button 
+            onClick={() => navigate('/procurements')} 
+            className="hover:text-slate-600 transition-colors cursor-pointer"
+          >
+            Procurements
+          </button>
+          <ChevronRight className="w-3.5 h-3.5" />
+          <span className="text-slate-800 font-semibold">New Procurement Workspace</span>
+        </div>
 
-      <SplitPane
-        primary={
-          <div className="flex flex-col gap-6">
-            <SectionHeader number="01" title="PROCUREMENT INPUT" />
-            <div className="flex flex-col">
-              <Tabs
-                defaultActive={draft.mode}
-                onChange={(id: string) => setDraft(prev => ({ ...prev, mode: id as 'describe' | 'upload' }))}
-                tabs={[
-                  { id: 'describe', label: 'DESCRIBE PROCUREMENT', content: describeTab },
-                  { id: 'upload', label: 'UPLOAD TENDER', content: uploadTab },
-                ]}
-              />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Create Procurement Workspace</h1>
+              <span className="bg-orange-50 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-orange-200/80">
+                Standards Alignment
+              </span>
             </div>
-            {error && <ErrorState title="VALIDATION ERROR" description={error} />}
-            <div className="flex justify-end pt-4">
-              <Button onClick={handleAnalyze} disabled={analyzing}>
-                {analyzing ? 'ANALYZING SPECIFICATION...' : 'ANALYZE PROCUREMENT →'}
-              </Button>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Draft procurement specifications or upload tender packages to auto-discover mandatory BIS standards and QCO mandates.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 02. Two-Column Workspace Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* LEFT COLUMN: Input Forms (7 Cols) */}
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-6 space-y-6">
+          
+          {/* Mode Selector Tabs */}
+          <div className="flex items-center p-1 bg-slate-100 rounded-xl max-w-md">
+            <button
+              type="button"
+              onClick={() => setDraft(prev => ({ ...prev, mode: 'describe' }))}
+              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center ${
+                draft.mode === 'describe'
+                  ? 'bg-white text-orange-600 shadow-2xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Describe Specification
+            </button>
+            <button
+              type="button"
+              onClick={() => setDraft(prev => ({ ...prev, mode: 'upload' }))}
+              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center ${
+                draft.mode === 'upload'
+                  ? 'bg-white text-orange-600 shadow-2xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Upload Tender Document
+            </button>
+          </div>
+
+          {/* Validation Alert */}
+          {error && (
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Tab 1: Describe Mode */}
+          {draft.mode === 'describe' && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                  Product / Equipment / Service Scope <span className="text-orange-600">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="e.g. Supply of Three-Phase Induction Motors 15 kW IE3 efficiency rating for municipal water pumping station..."
+                  value={draft.description}
+                  onChange={(e) => setDraft(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-y leading-relaxed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                  Technical Specifications &amp; Ratings
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder="Enter operating voltage (e.g. 415V), continuous duty S1, class F insulation, IP55 enclosure, test certificates required..."
+                  value={draft.technicalSpec}
+                  onChange={(e) => setDraft(prev => ({ ...prev, technicalSpec: e.target.value }))}
+                  className="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-y leading-relaxed"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                    Application / Intended Use
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Industrial heavy duty, continuous operation"
+                    value={draft.application}
+                    onChange={(e) => setDraft(prev => ({ ...prev, application: e.target.value }))}
+                    className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                    Operating Environment
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Outdoor tropical, -5°C to 50°C, 95% RH"
+                    value={draft.environment}
+                    onChange={(e) => setDraft(prev => ({ ...prev, environment: e.target.value }))}
+                    className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                  Existing Standard References (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. IS 12615, IS 325, IS 800"
+                  value={draft.existingStandards}
+                  onChange={(e) => setDraft(prev => ({ ...prev, existingStandards: e.target.value }))}
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Upload Mode */}
+          {draft.mode === 'upload' && (
+            <div className="space-y-4">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileInputChange}
+                accept=".pdf,.png,.jpg,.jpeg,.webp,.xlsx,.xls,.csv,.txt"
+                className="hidden"
+              />
+
+              {!draft.fileName && !selectedFile ? (
+                <div 
+                  onClick={handleFileSelect}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) {
+                      setSelectedFile(file);
+                      setDraft(prev => ({
+                        ...prev,
+                        fileName: file.name,
+                        fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+                      }));
+                      setError(null);
+                    }
+                  }}
+                  className="border-2 border-dashed border-slate-300 hover:border-orange-500 p-8 flex flex-col items-center justify-center text-center rounded-2xl cursor-pointer transition-colors bg-slate-50/50 hover:bg-orange-50/20 space-y-2.5"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                    <Upload className="w-6 h-6 stroke-[1.8]" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-slate-800">
+                      Drop Tender Document (PDF, Word, Scanned Notice)
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      Supports scanned PDFs with automated Tesseract OCR &amp; Indic parsing
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleFileSelect(); }}
+                    className="px-4 py-1.5 bg-white border border-slate-200 hover:border-orange-500 text-slate-700 hover:text-orange-600 rounded-xl text-xs font-semibold shadow-2xs transition-colors"
+                  >
+                    Select File
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 border border-emerald-200 bg-emerald-50/50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">{draft.fileName || selectedFile?.name}</p>
+                      <p className="text-[11px] font-mono text-slate-500">{draft.fileSize || '1.2 MB'} • Ready for analysis</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveFile}
+                    className="p-1 text-slate-400 hover:text-rose-600 rounded-md cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                  Tender Reference / Identifier (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. GEM/2026/B/8912401 or Metro Rail Traction Tender"
+                  value={draft.fileName || ''}
+                  onChange={(e) => setDraft(prev => ({ ...prev, fileName: e.target.value }))}
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1.5">
+                  Or Paste Specification Clauses Directly
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Paste drafted procurement clauses or technical specifications here..."
+                  value={draft.technicalSpec || ''}
+                  onChange={(e) => setDraft(prev => ({ ...prev, technicalSpec: e.target.value }))}
+                  className="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-y"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Reset button */}
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={resetProcurementDraft}
+              className="text-xs text-slate-400 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset Draft Form</span>
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: Context & Execution Card (5 Cols) */}
+        <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-6 space-y-5 sticky top-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Analysis Status</h2>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+              isReady 
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                : 'bg-amber-50 text-amber-800 border-amber-200'
+            }`}>
+              {isReady ? 'Ready for Analysis' : 'Awaiting Input'}
+            </span>
+          </div>
+
+          <div className="space-y-3 text-xs">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 font-medium">Input Mode</span>
+              <span className="font-bold text-slate-800">
+                {draft.mode === 'describe' ? 'Product Description' : 'Tender Document'}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 font-medium">Language</span>
+              <span className="font-bold text-slate-800 font-mono">
+                {draft.language === 'auto' ? 'Auto-Detect (Indic)' : draft.language.toUpperCase()}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-slate-500 font-medium">Target Grounding</span>
+              <span className="font-bold text-emerald-700">2,246 live BIS QCOs</span>
             </div>
           </div>
-        }
-        secondary={
-          <div className="flex flex-col gap-6 sticky top-8">
-            <SectionHeader number="02" title="ANALYSIS CONTEXT" />
-            <div className="p-6 border border-border bg-surface flex flex-col gap-8 rounded-sm">
-              <div className="flex flex-col gap-2">
-                <Meta>INPUT STATUS</Meta>
-                {isReady ? (
-                  <Badge variant="success" className="w-fit">READY FOR ANALYSIS</Badge>
-                ) : (
-                  <Badge variant="warning" className="w-fit">WAITING FOR INPUT</Badge>
-                )}
-              </div>
-              <DataList
-                items={[
-                  { label: 'LANGUAGE', value: draft.language === 'auto' ? 'AUTO-DETECT' : draft.language.toUpperCase() },
-                  { label: 'INPUT TYPE', value: draft.mode === 'describe' ? 'PRODUCT DESCRIPTION' : 'TENDER DOCUMENT' },
-                  { label: 'DOCUMENT', value: draft.fileName ? 'ATTACHED' : 'NOT ATTACHED' },
-                  { label: 'PERSISTENCE', value: 'AUTO-SAVED IN STORE' },
-                ]}
-              />
-              <div className="pt-4 border-t border-border flex flex-col gap-2">
-                <Meta>STATE PERSISTENCE</Meta>
-                <Body className="text-xs text-text-secondary">
-                  Your inputs are safely stored in frontend state. You can freely switch tabs or inspect standards without losing any work.
-                </Body>
-              </div>
-            </div>
+
+          <div className="p-3.5 rounded-xl bg-orange-50/60 border border-orange-200/70 space-y-1">
+            <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wider flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+              <span>What Happens Next?</span>
+            </span>
+            <p className="text-xs text-orange-950 leading-relaxed font-medium">
+              BISense parses all technical specifications, aligns product categories against Bureau of Indian Standards catalogs, flags Quality Control Orders, and creates your audit-ready procurement review.
+            </p>
           </div>
-        }
-      />
-    </PageContainer>
+
+          <button
+            type="button"
+            onClick={handleAnalyze}
+            disabled={analyzing || !isReady}
+            className="w-full py-3 bg-orange-600 hover:bg-orange-700 disabled:opacity-40 text-white font-semibold rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+          >
+            {analyzing ? (
+              <>
+                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Analyzing Specification...</span>
+              </>
+            ) : (
+              <>
+                <span>Analyze Procurement &amp; Align Standards</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

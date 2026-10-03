@@ -188,7 +188,7 @@ export default function ApprovalPage() {
           ) : (
             <button
               onClick={handleSendApproval}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs cursor-pointer"
+              className="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-xl flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs cursor-pointer"
             >
               {submitted ? <Check className="w-4 h-4 stroke-[2.5]" /> : <Send className="w-4 h-4" />}
               <span>{submitted ? 'Sent to Export!' : 'Proceed to Export'}</span>
@@ -262,7 +262,7 @@ export default function ApprovalPage() {
           {auditFeed.map((item) => (
             <div key={item.id} className="p-5 flex items-start justify-between gap-4 hover:bg-slate-50/60 transition-colors">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-bold text-xs flex items-center justify-center shrink-0">
                   {item.author.charAt(0)}
                 </div>
                 <div className="space-y-1">
@@ -306,14 +306,14 @@ export default function ApprovalPage() {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Add a comment or compliance note..."
-            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none shadow-2xs"
+            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none shadow-2xs"
           />
           <div className="flex items-center justify-between">
             <span className="text-[11px] text-slate-400">Comments are recorded in the official audit history.</span>
             <button
               type="submit"
               disabled={!commentText.trim()}
-              className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors"
+              className="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
               Post
             </button>

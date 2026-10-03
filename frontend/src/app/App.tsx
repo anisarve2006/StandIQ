@@ -22,15 +22,24 @@ import SettingsPage from '../features/settings/SettingsPage';
 import { ProcurementProvider } from '../stores/procurement.store';
 import { StandIQProvider } from '../stores/standiq.store';
 
+import LandingPage from '../features/landing/LandingPage';
+
 const router = createBrowserRouter([
   {
     path: '/',
+    element: <LandingPage />,
+  },
+  {
+    path: '/landing',
+    element: <LandingPage />,
+  },
+  {
+    path: '/login',
+    element: <Navigate to="/dashboard" replace />,
+  },
+  {
     element: <AppShell />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />
-      },
       {
         path: 'dashboard',
         element: <DashboardPage />,

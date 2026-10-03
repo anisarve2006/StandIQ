@@ -329,13 +329,13 @@ export default function ExportPage() {
                   onClick={() => setFormat(f.id as any)}
                   className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
                     isSelected
-                      ? 'border-blue-600 bg-blue-50/50 shadow-2xs ring-1 ring-blue-600/30'
+                      ? 'border-orange-500 bg-orange-50/40 shadow-2xs ring-1 ring-orange-500/20'
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-3.5">
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                      isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'
+                      isSelected ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-500'
                     }`}>
                       <Icon className="w-4 h-4" />
                     </div>
@@ -346,7 +346,7 @@ export default function ExportPage() {
                   </div>
 
                   <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                    isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 bg-white'
+                    isSelected ? 'border-orange-600 bg-orange-600' : 'border-slate-300 bg-white'
                   }`}>
                     {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </div>
@@ -376,7 +376,7 @@ export default function ExportPage() {
                     type="checkbox"
                     checked={item.checked}
                     onChange={() => togglePackageItem(item.id)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
+                    className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20"
                   />
                   <span className="text-xs font-semibold text-slate-800">{item.label}</span>
                 </div>
@@ -400,7 +400,7 @@ export default function ExportPage() {
               type="text"
               value={fileName}
               onChange={(e) => setFileName(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-l-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-l-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 font-medium"
             />
             <span className="px-3 py-2 bg-slate-100 border border-l-0 border-slate-200 rounded-r-lg text-xs font-mono text-slate-500 font-bold whitespace-nowrap shrink-0">
               .{format}
@@ -411,7 +411,7 @@ export default function ExportPage() {
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm self-end sm:self-auto whitespace-nowrap shrink-0 cursor-pointer"
+          className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm self-end sm:self-auto whitespace-nowrap shrink-0 cursor-pointer"
         >
           {downloadSuccess ? (
             <>

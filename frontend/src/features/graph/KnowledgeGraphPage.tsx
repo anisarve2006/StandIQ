@@ -43,11 +43,11 @@ const CENTER_NODE: GraphNode = {
   category: 'Main Standard',
   x: 380,
   y: 260,
-  color: '#2563eb',
-  cardBg: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-  cardBorder: '#1e40af',
-  badgeBg: '#dbeafe',
-  badgeText: '#1e40af',
+  color: '#ff9100',
+  cardBg: 'linear-gradient(135deg, #ff9100 0%, #ba6800 100%)',
+  cardBorder: '#8f4f00',
+  badgeBg: '#fff8ed',
+  badgeText: '#8f4f00',
   relationship: 'Root procurement specification standard for electric motors',
   relationshipTag: 'Root Specification',
   description: 'Energy efficient induction motors (three-phase) — Mandatory baseline standard for public procurement under Government of India Quality Control Orders (QCO 2024).',
@@ -276,7 +276,7 @@ export default function KnowledgeGraphPage() {
               placeholder="Search standards in graph (e.g. IS 8789, Testing, CRS)..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 font-medium"
             />
           </div>
 
@@ -310,7 +310,7 @@ export default function KnowledgeGraphPage() {
               onClick={() => setShowFilters(!showFilters)}
               className={`px-3.5 py-2 border rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors ${
                 showFilters || activeCategoryFilter !== 'All'
-                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                  ? 'bg-orange-50 text-orange-700 border-orange-200'
                   : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
               }`}
             >
@@ -330,7 +330,7 @@ export default function KnowledgeGraphPage() {
                 onClick={() => setActiveCategoryFilter(cat)}
                 className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-all ${
                   activeCategoryFilter === cat
-                    ? 'bg-blue-600 text-white font-semibold shadow-2xs'
+                    ? 'bg-orange-600 text-white font-semibold shadow-2xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -348,7 +348,7 @@ export default function KnowledgeGraphPage() {
           {/* Top Canvas Bar */}
           <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-600 animate-pulse" />
               <span className="font-bold text-slate-800">Target Standard Network</span>
               <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">| 6 Interlinked Dependencies</span>
             </div>
@@ -376,11 +376,11 @@ export default function KnowledgeGraphPage() {
                   <feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity="0.08" />
                 </filter>
                 <filter id="center-glow" x="-30%" y="-30%" width="160%" height="160%">
-                  <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#2563eb" floodOpacity="0.25" />
+                  <feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#ff9100" floodOpacity="0.25" />
                 </filter>
                 <linearGradient id="center-node-grad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#2563eb" />
-                  <stop offset="100%" stopColor="#1d4ed8" />
+                  <stop offset="0%" stopColor="#ff9100" />
+                  <stop offset="100%" stopColor="#ba6800" />
                 </linearGradient>
               </defs>
 
@@ -558,7 +558,7 @@ export default function KnowledgeGraphPage() {
                 <text
                   textAnchor="middle"
                   dy="12"
-                  className="font-sans font-bold text-[9px] fill-blue-100 uppercase tracking-wider"
+                  className="font-sans font-bold text-[9px] fill-orange-100 uppercase tracking-wider"
                 >
                   {CENTER_NODE.name}
                 </text>
@@ -569,7 +569,7 @@ export default function KnowledgeGraphPage() {
           {/* Bottom Legend Matching Reference Design */}
           <div className="p-4 bg-slate-50/80 border-t border-slate-100 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[11px] text-slate-600">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-100" />
+              <span className="w-2.5 h-2.5 rounded-full bg-orange-600 ring-2 ring-orange-100" />
               <span className="font-semibold text-slate-700">Main Standard</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -623,7 +623,7 @@ export default function KnowledgeGraphPage() {
                 {selectedNode.id !== CENTER_NODE.id && (
                   <button
                     onClick={() => navigate(`/standards/${selectedNode.code}`)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-orange-600 hover:bg-orange-50 transition-colors cursor-pointer"
                     title="Open Full Standard Document"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -637,11 +637,11 @@ export default function KnowledgeGraphPage() {
             {/* Relationship Callout */}
             <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                <Share2 className="w-3 h-3 text-blue-600" />
+                <Share2 className="w-3 h-3 text-orange-500" />
                 <span>Relationship to Procurement</span>
               </span>
               <p className="text-xs font-bold text-slate-800 leading-snug">{selectedNode.relationship}</p>
-              <span className="inline-block mt-1 text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60 font-mono">
+              <span className="inline-block mt-1 text-[10px] font-semibold text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200/80 font-mono">
                 Tag: {selectedNode.relationshipTag}
               </span>
             </div>
@@ -662,9 +662,9 @@ export default function KnowledgeGraphPage() {
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                   Referenced Clauses in Specification
                 </span>
-                <div className="p-2.5 rounded-lg bg-blue-50/50 border border-blue-100 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span className="font-mono text-xs font-bold text-blue-900">
+                <div className="p-2.5 rounded-lg bg-orange-50/60 border border-orange-200/70 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-orange-600 shrink-0" />
+                  <span className="font-mono text-xs font-bold text-orange-950">
                     {selectedNode.clauseRef}
                   </span>
                 </div>
@@ -683,7 +683,7 @@ export default function KnowledgeGraphPage() {
                     onClick={() => setSelectedNode(n)}
                     className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold transition-all cursor-pointer border ${
                       selectedNode.id === n.id
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                        ? 'bg-orange-600 text-white border-orange-600 shadow-2xs'
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
@@ -701,7 +701,7 @@ export default function KnowledgeGraphPage() {
               className={`w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer ${
                 inBasket
                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-orange-600 hover:bg-orange-700 text-white'
               }`}
             >
               {inBasket ? (

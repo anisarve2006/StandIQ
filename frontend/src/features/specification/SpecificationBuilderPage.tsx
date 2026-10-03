@@ -148,13 +148,13 @@ export default function SpecificationBuilderPage() {
                   step.completed
                     ? 'bg-emerald-500 text-white'
                     : step.active
-                    ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                    ? 'bg-orange-600 text-white ring-4 ring-orange-100'
                     : 'bg-slate-100 text-slate-400'
                 }`}
               >
                 {step.completed ? <Check className="w-3.5 h-3.5 stroke-[2.5]" /> : step.num}
               </div>
-              <span className={step.active ? 'text-blue-600 font-bold' : step.completed ? 'text-slate-800' : 'text-slate-400'}>
+              <span className={step.active ? 'text-orange-600 font-bold' : step.completed ? 'text-slate-800' : 'text-slate-400'}>
                 {step.label}
               </span>
               {idx < 3 && <ChevronRight className="w-4 h-4 text-slate-300 ml-4 hidden sm:block" />}
@@ -176,7 +176,7 @@ export default function SpecificationBuilderPage() {
             </div>
             <button
               onClick={() => navigate('/basket')}
-              className="text-xs text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+              className="text-xs text-orange-600 hover:text-orange-800 font-semibold cursor-pointer"
             >
               Edit Basket
             </button>
@@ -188,7 +188,7 @@ export default function SpecificationBuilderPage() {
                 No standards in basket.
                 <button
                   onClick={() => navigate('/standards')}
-                  className="block mx-auto mt-2 text-blue-600 font-semibold underline cursor-pointer"
+                  className="block mx-auto mt-2 text-orange-600 font-semibold underline cursor-pointer"
                 >
                   Browse standards catalog
                 </button>
@@ -197,10 +197,10 @@ export default function SpecificationBuilderPage() {
               basket.map((std) => (
                 <div
                   key={std.code}
-                  className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 bg-slate-50/70 hover:bg-white hover:border-blue-200 transition-colors group"
+                  className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200/80 bg-slate-50/70 hover:bg-white hover:border-orange-200 transition-colors group"
                 >
                   <div className="min-w-0 pr-2">
-                    <span className="font-mono text-xs font-bold text-slate-900 block group-hover:text-blue-600">
+                    <span className="font-mono text-xs font-bold text-slate-900 block group-hover:text-orange-600">
                       {std.code}
                     </span>
                     <span className="text-[11px] text-slate-500 truncate block">
@@ -222,7 +222,7 @@ export default function SpecificationBuilderPage() {
           <div className="pt-2">
             <button
               onClick={() => navigate('/standards')}
-              className="w-full py-2 border border-dashed border-slate-300 hover:border-blue-500 rounded-lg text-xs font-semibold text-slate-600 hover:text-blue-600 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              className="w-full py-2 border border-dashed border-slate-300 hover:border-orange-500 rounded-lg text-xs font-semibold text-slate-600 hover:text-orange-600 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add More Standards</span>
@@ -239,7 +239,7 @@ export default function SpecificationBuilderPage() {
             </div>
             <button
               onClick={() => setShowAddSection(!showAddSection)}
-              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+              className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Clause</span>
@@ -254,12 +254,12 @@ export default function SpecificationBuilderPage() {
                 value={newSectionTitle}
                 onChange={(e) => setNewSectionTitle(e.target.value)}
                 placeholder="Enter new tender clause title (e.g. Environmental Impact & Disposal Requirements)..."
-                className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                 onKeyDown={(e) => e.key === 'Enter' && handleAddSection()}
               />
               <button
                 onClick={handleAddSection}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs cursor-pointer shadow-xs"
+                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg text-xs cursor-pointer shadow-xs"
               >
                 Insert
               </button>
@@ -312,7 +312,7 @@ export default function SpecificationBuilderPage() {
                     type="checkbox"
                     checked={sec.enabled}
                     onChange={() => toggleSection(sec.id)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 cursor-pointer ml-1"
+                    className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20 cursor-pointer ml-1"
                     title="Toggle active in specification"
                   />
                   <button
@@ -348,7 +348,7 @@ export default function SpecificationBuilderPage() {
 
             <button
               onClick={handleGenerateAndExport}
-              className="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span>Generate & Export Spec</span>
@@ -364,7 +364,7 @@ export default function SpecificationBuilderPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileCheck className="w-4 h-4 text-blue-600" />
+                <FileCheck className="w-4 h-4 text-orange-500" />
                 <h2 className="font-bold text-slate-900 text-sm">Specification Draft Outline</h2>
               </div>
               <button 
@@ -378,7 +378,7 @@ export default function SpecificationBuilderPage() {
               <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-lg text-amber-900">
                 <span className="font-bold">Active Tender:</span> {activeDocument?.title || 'Standard Technical Procurement'}
               </div>
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900">
+              <div className="p-3 bg-orange-50/60 border border-orange-200/70 rounded-lg text-orange-950">
                 <span className="font-bold">Standard References ({basket.length}):</span>{' '}
                 {basket.length > 0 ? basket.map(s => s.code).join(', ') : 'No standards linked'}
               </div>
@@ -404,7 +404,7 @@ export default function SpecificationBuilderPage() {
               </button>
               <button
                 onClick={() => setPreviewModalOpen(false)}
-                className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold cursor-pointer"
+                className="px-4 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-semibold cursor-pointer"
               >
                 Close Preview
               </button>

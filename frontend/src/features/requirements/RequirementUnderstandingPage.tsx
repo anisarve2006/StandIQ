@@ -144,7 +144,7 @@ export default function RequirementUnderstandingPage() {
         <div>
           <button
             onClick={() => navigate('/procurements')}
-            className="text-xs font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1.5 transition-colors mb-1 cursor-pointer"
+            className="text-xs font-semibold text-slate-500 hover:text-orange-600 flex items-center gap-1.5 transition-colors mb-1 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Procurements</span>
@@ -165,7 +165,7 @@ export default function RequirementUnderstandingPage() {
           </button>
           <button
             onClick={() => navigate('/standards')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs text-xs cursor-pointer"
+            className="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs text-xs cursor-pointer"
           >
             <span>Match Standards</span>
             <ArrowRight className="w-4 h-4" />
@@ -176,7 +176,7 @@ export default function RequirementUnderstandingPage() {
       {/* 02. Summary Pill Card */}
       <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
             <Layers className="w-5 h-5" />
           </div>
           <div>
@@ -205,13 +205,13 @@ export default function RequirementUnderstandingPage() {
             onClick={() => setActiveCategory(cat)}
             className={`pb-3 pt-1 px-3.5 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
               activeCategory === cat
-                ? 'border-blue-600 text-blue-600 font-bold'
+                ? 'border-orange-600 text-orange-600 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <span>{cat}</span>
             <span className={`text-[10px] font-mono ml-1.5 px-1.5 py-0.2 rounded-full ${
-              activeCategory === cat ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
+              activeCategory === cat ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
             }`}>
               {cat === 'ALL' ? requirements.length : requirements.filter(r => r.category === cat).length}
             </span>
@@ -244,7 +244,7 @@ export default function RequirementUnderstandingPage() {
                       {req.category}
                     </span>
                   </td>
-                  <td className="py-3.5 px-5 font-mono font-bold text-blue-700">
+                  <td className="py-3.5 px-5 font-mono font-bold text-orange-700">
                     {req.normalized_value !== undefined 
                       ? `${req.normalized_value} ${req.unit || ''}` 
                       : (req.expected_value ? `${req.expected_value} ${req.unit || ''}` : 'Specified')}
@@ -303,7 +303,7 @@ export default function RequirementUnderstandingPage() {
                   type="text"
                   value={editingReq.name}
                   onChange={(e) => setEditingReq({ ...editingReq, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -320,7 +320,7 @@ export default function RequirementUnderstandingPage() {
                         setEditingReq({ ...editingReq, normalized_value: undefined, expected_value: e.target.value });
                       }
                     }}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                   />
                 </div>
                 <div>
@@ -329,7 +329,7 @@ export default function RequirementUnderstandingPage() {
                     type="text"
                     value={editingReq.unit || ''}
                     onChange={(e) => setEditingReq({ ...editingReq, unit: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                   />
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default function RequirementUnderstandingPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 cursor-pointer"
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 cursor-pointer"
                 >
                   Save Changes
                 </button>
@@ -372,7 +372,7 @@ export default function RequirementUnderstandingPage() {
                   placeholder="e.g. Ingress Protection (IP Rating)"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -409,7 +409,7 @@ export default function RequirementUnderstandingPage() {
                   id="mandatoryCheck"
                   checked={newRequired}
                   onChange={(e) => setNewRequired(e.target.checked)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
+                  className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20"
                 />
                 <label htmlFor="mandatoryCheck" className="text-slate-700 font-semibold cursor-pointer">
                   Mandatory Compliance Parameter
@@ -425,7 +425,7 @@ export default function RequirementUnderstandingPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 cursor-pointer"
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 cursor-pointer"
                 >
                   Add Parameter
                 </button>

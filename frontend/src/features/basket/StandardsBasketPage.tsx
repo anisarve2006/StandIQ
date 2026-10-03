@@ -144,7 +144,7 @@ export default function StandardsBasketPage() {
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm cursor-pointer"
+            className="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-xl flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Add Standard</span>
@@ -156,7 +156,7 @@ export default function StandardsBasketPage() {
       <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider">
-            <FolderOpen className="w-4 h-4 text-blue-600" />
+            <FolderOpen className="w-4 h-4 text-orange-500" />
             <span>Select Document Basket</span>
           </div>
           <span className="text-[11px] text-slate-400">
@@ -175,24 +175,24 @@ export default function StandardsBasketPage() {
                   setActiveDocId(doc.id);
                   setSelectedIds(docBasket.map(s => s.code));
                 }}
-                className={`px-3.5 py-2 rounded-lg text-xs font-semibold shrink-0 transition-all flex items-center gap-2.5 border cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-2.5 border cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                    ? 'bg-orange-600 text-white border-orange-600 shadow-xs'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                 }`}
               >
                 <FileText className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
                 <div className="text-left">
                   <div className="max-w-[170px] truncate leading-tight">{doc.title}</div>
-                  <div className={`text-[10px] font-normal ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
+                  <div className={`text-[10px] font-normal ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
                     {doc.category || 'Procurement'}
                   </div>
                 </div>
                 <span
                   className={`text-[11px] px-2 py-0.5 rounded-full font-mono font-bold ${
                     isSelected
-                      ? 'bg-white text-blue-700'
-                      : 'bg-blue-50 text-blue-700 border border-blue-200'
+                      ? 'bg-white text-orange-600'
+                      : 'bg-orange-50 text-orange-700 border border-orange-200'
                   }`}
                 >
                   {docBasket.length}
@@ -204,9 +204,9 @@ export default function StandardsBasketPage() {
       </div>
 
       {/* 03. Active Document Metadata Banner */}
-      <div className="bg-gradient-to-r from-amber-50/70 via-stone-50/80 to-orange-50/30 border border-amber-200/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="bg-gradient-to-r from-amber-50/70 via-stone-50/80 to-orange-50/30 border border-amber-200/60 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold font-mono text-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold font-mono text-sm shrink-0 shadow-2xs">
             {currentBasket.length}
           </div>
           <div>
@@ -220,7 +220,7 @@ export default function StandardsBasketPage() {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => navigate('/review', { state: { selectedDocId: activeDocId } })}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline underline-offset-2 whitespace-nowrap"
+            className="text-xs font-semibold text-orange-600 hover:text-orange-800 flex items-center gap-1 hover:underline underline-offset-2 whitespace-nowrap"
           >
             <span>Review Source Document</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -239,7 +239,7 @@ export default function StandardsBasketPage() {
                     type="checkbox"
                     checked={currentBasket.length > 0 && selectedIds.length === currentBasket.length}
                     onChange={toggleSelectAll}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
+                    className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20"
                   />
                 </th>
                 <th className="py-3 px-3 w-10 text-center whitespace-nowrap">#</th>
@@ -269,13 +269,13 @@ export default function StandardsBasketPage() {
                         type="checkbox"
                         checked={selectedIds.includes(s.code)}
                         onChange={() => toggleSelect(s.code)}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20"
+                        className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20"
                       />
                     </td>
                     <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-400 whitespace-nowrap">
                       {idx + 1}
                     </td>
-                    <td className="py-3.5 px-5 font-mono font-bold text-slate-900 group-hover:text-blue-600 whitespace-nowrap">
+                    <td className="py-3.5 px-5 font-mono font-bold text-slate-900 group-hover:text-orange-600 whitespace-nowrap">
                       {s.code}
                     </td>
                     <td className="py-3.5 px-5 font-medium text-slate-700 max-w-md">
@@ -337,7 +337,7 @@ export default function StandardsBasketPage() {
           <button
             onClick={() => navigate('/specification-builder')}
             disabled={currentBasket.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium px-5 py-2 rounded-lg flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+            className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white font-medium px-5 py-2 rounded-xl flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer"
           >
             <span>Proceed to Specification Builder</span>
             <ArrowRight className="w-4 h-4" />
@@ -351,7 +351,7 @@ export default function StandardsBasketPage() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                <Plus className="w-4 h-4 text-blue-600" />
+                <Plus className="w-4 h-4 text-orange-500" />
                 <span>Add Standard to Basket</span>
               </h3>
               <button
@@ -374,7 +374,7 @@ export default function StandardsBasketPage() {
                   placeholder="e.g. IS 456:2000 or IS/IEC 61439-1"
                   value={newCode}
                   onChange={(e) => setNewCode(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none"
                   required
                 />
               </div>
@@ -386,7 +386,7 @@ export default function StandardsBasketPage() {
                   placeholder="e.g. Plain and Reinforced Concrete - Code of Practice"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none"
                 />
               </div>
 
@@ -395,7 +395,7 @@ export default function StandardsBasketPage() {
                 <select
                   value={newType}
                   onChange={(e) => setNewType(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none bg-white"
                 >
                   <option value="Product">Product Standard</option>
                   <option value="Testing">Testing Standard</option>
@@ -416,7 +416,7 @@ export default function StandardsBasketPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-xs"
+                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold shadow-xs"
                 >
                   Add to This Basket
                 </button>

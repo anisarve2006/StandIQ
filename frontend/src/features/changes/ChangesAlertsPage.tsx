@@ -50,7 +50,7 @@ export default function ChangesAlertsPage() {
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                 : isNotif
                 ? 'bg-purple-50 text-purple-700 border-purple-200'
-                : 'bg-blue-50 text-blue-700 border-blue-200',
+                : 'bg-orange-50 text-orange-700 border-orange-200',
               date: c.date || 'Recent',
               standardCode: c.standard_id,
               unread: true
@@ -104,9 +104,9 @@ export default function ChangesAlertsPage() {
         {alerts.length > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-2xs transition-all active:scale-[0.98] text-xs self-start sm:self-auto cursor-pointer"
+            className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xs transition-all active:scale-[0.98] text-xs self-start sm:self-auto cursor-pointer"
           >
-            <CheckCheck className="w-4 h-4 text-blue-600" />
+            <CheckCheck className="w-4 h-4 text-orange-500" />
             <span>Mark All as Read</span>
           </button>
         )}
@@ -125,7 +125,7 @@ export default function ChangesAlertsPage() {
             onClick={() => setActiveTab(tab.key as any)}
             className={`pb-3 pt-1 px-3.5 border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
               activeTab === tab.key
-                ? 'border-blue-600 text-blue-600 font-bold'
+                ? 'border-orange-600 text-orange-600 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
@@ -133,7 +133,7 @@ export default function ChangesAlertsPage() {
             <span
               className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
                 activeTab === tab.key
-                  ? 'bg-blue-50 text-blue-700'
+                  ? 'bg-orange-50 text-orange-700'
                   : 'bg-slate-100 text-slate-600'
               }`}
             >
@@ -164,8 +164,8 @@ export default function ChangesAlertsPage() {
           filteredAlerts.map((item) => (
             <div
               key={item.id}
-              className={`bg-white rounded-xl border p-5 shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                item.unread ? 'border-blue-200 bg-blue-50/10' : 'border-slate-200/90'
+              className={`bg-white rounded-2xl border p-5 shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                item.unread ? 'border-orange-200 bg-orange-50/20' : 'border-slate-200/90'
               }`}
             >
               <div className="space-y-1.5 flex-1">
@@ -175,7 +175,7 @@ export default function ChangesAlertsPage() {
                   </span>
                   <span className="font-mono text-[11px] text-slate-400">{formatDate(item.date)}</span>
                   {item.unread && (
-                    <span className="w-2 h-2 rounded-full bg-blue-600" title="Unread alert" />
+                    <span className="w-2 h-2 rounded-full bg-orange-600" title="Unread alert" />
                   )}
                 </div>
 
@@ -185,7 +185,7 @@ export default function ChangesAlertsPage() {
                       navigate(`/standards`);
                     }
                   }}
-                  className={`text-sm font-bold text-slate-900 transition-colors ${item.standardCode ? 'hover:text-blue-600 cursor-pointer' : ''}`}
+                  className={`text-sm font-bold text-slate-900 transition-colors ${item.standardCode ? 'hover:text-orange-600 cursor-pointer' : ''}`}
                 >
                   {item.title}
                 </h2>
@@ -216,7 +216,7 @@ export default function ChangesAlertsPage() {
                 )}
                 <button
                   onClick={() => navigate('/tender-health')}
-                  className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-slate-400 hover:text-orange-600 hover:bg-slate-50 transition-colors cursor-pointer"
                   title="View Impact in Tender Health"
                 >
                   <ExternalLink className="w-4 h-4" />

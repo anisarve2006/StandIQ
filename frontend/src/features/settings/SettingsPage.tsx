@@ -115,7 +115,7 @@ export default function SettingsPage() {
 
         <button
           onClick={() => handleSave()}
-          className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition-all active:scale-[0.98] text-xs sm:text-sm self-start sm:self-auto cursor-pointer whitespace-nowrap shrink-0"
+          className="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-xs transition-all active:scale-[0.98] text-xs sm:text-sm self-start sm:self-auto cursor-pointer whitespace-nowrap shrink-0"
         >
           {saved ? <Check className="w-4 h-4 stroke-[2.5]" /> : <Save className="w-4 h-4" />}
           <span>{saved ? t('savedChanges') : t('saveChanges')}</span>
@@ -130,7 +130,7 @@ export default function SettingsPage() {
             onClick={() => setActiveTab(tab)}
             className={`pb-3 pt-1 px-3.5 border-b-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               activeTab === tab
-                ? 'border-blue-600 text-blue-600 font-bold'
+                ? 'border-orange-600 text-orange-600 font-bold'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -155,7 +155,7 @@ export default function SettingsPage() {
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
                   >
                     <option value="English">English</option>
                     <option value="Hindi">हिन्दी (Hindi)</option>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
                   <select
                     value={theme}
                     onChange={(e) => applyTheme(e.target.value)}
-                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
                   >
                     <option value="Soothing">Soothing (Eye-Care Warm Paper)</option>
                     <option value="Light">Crisp Light</option>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
                   <select
                     value={dateFormat}
                     onChange={(e) => setDateFormat(e.target.value)}
-                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
                   >
                     <option value="DD MMM YYYY">DD MMM YYYY (e.g. 24 Sep 2026)</option>
                     <option value="YYYY-MM-DD">YYYY-MM-DD (e.g. 2026-09-24)</option>
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                   <select
                     value={timeZone}
                     onChange={(e) => setTimeZone(e.target.value)}
-                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
                   >
                     <option value="(UTC+05:30) India Standard Time">(UTC+05:30) India Standard Time</option>
                     <option value="(UTC+00:00) UTC">(UTC+00:00) UTC</option>
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                   <select
                     value={itemsPerPage}
                     onChange={(e) => setItemsPerPage(e.target.value)}
-                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                    className="w-full appearance-none pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
                   >
                     <option value="10">10</option>
                     <option value="20">20</option>
@@ -301,7 +301,7 @@ export default function SettingsPage() {
                       onChange={n.toggle}
                       className="sr-only peer"
                     />
-                    <div className="w-10 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600" />
+                    <div className="w-10 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600" />
                   </label>
                 </div>
               ))}
@@ -327,7 +327,7 @@ export default function SettingsPage() {
                   type="checkbox"
                   checked={enforceLatestEdition}
                   onChange={() => setEnforceLatestEdition(!enforceLatestEdition)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 w-4 h-4 cursor-pointer"
+                  className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20 w-4 h-4 cursor-pointer"
                 />
               </div>
 
@@ -340,7 +340,7 @@ export default function SettingsPage() {
                   type="checkbox"
                   checked={requireBISCrs}
                   onChange={() => setRequireBISCrs(!requireBISCrs)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 w-4 h-4 cursor-pointer"
+                  className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20 w-4 h-4 cursor-pointer"
                 />
               </div>
 
@@ -353,7 +353,7 @@ export default function SettingsPage() {
                   type="checkbox"
                   checked={autoIncludeAllied}
                   onChange={() => setAutoIncludeAllied(!autoIncludeAllied)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 w-4 h-4 cursor-pointer"
+                  className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20 w-4 h-4 cursor-pointer"
                 />
               </div>
 
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                 type="checkbox"
                 checked={ocrEnabled}
                 onChange={() => setOcrEnabled(!ocrEnabled)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 w-4 h-4 cursor-pointer"
+                className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20 w-4 h-4 cursor-pointer"
               />
             </div>
           </div>
@@ -520,7 +520,7 @@ export default function SettingsPage() {
               <div className="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-3">
                 <div className="flex justify-between items-center text-xs font-bold text-slate-900">
                   <span>Match Confidence Threshold</span>
-                  <span className="font-mono text-blue-600">{matchConfidenceThreshold}%</span>
+                  <span className="font-mono text-orange-600">{matchConfidenceThreshold}%</span>
                 </div>
                 <input
                   type="range"
@@ -528,7 +528,7 @@ export default function SettingsPage() {
                   max="95"
                   value={matchConfidenceThreshold}
                   onChange={(e) => setMatchConfidenceThreshold(Number(e.target.value))}
-                  className="w-full accent-blue-600"
+                  className="w-full accent-orange-600"
                 />
                 <p className="text-[11px] text-slate-500">Only standards meeting or exceeding this confidence score will be automatically recommended.</p>
               </div>
@@ -543,7 +543,7 @@ export default function SettingsPage() {
                       onClick={() => setStrictnessLevel(lvl)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                         strictnessLevel === lvl 
-                          ? 'bg-blue-600 text-white border-blue-600' 
+                          ? 'bg-orange-600 text-white border-orange-600' 
                           : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
@@ -567,7 +567,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200/90 bg-slate-50/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                  <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-xs">
                     BIS
                   </div>
                   <div>
@@ -583,7 +583,7 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200/90 bg-slate-50/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs whitespace-nowrap shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs whitespace-nowrap shrink-0">
                     GeM
                   </div>
                   <div>
@@ -595,7 +595,7 @@ export default function SettingsPage() {
                   type="checkbox"
                   checked={gemSyncEnabled}
                   onChange={() => setGemSyncEnabled(!gemSyncEnabled)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 w-4 h-4 cursor-pointer"
+                  className="rounded border-slate-300 text-orange-600 focus:ring-orange-500/20 w-4 h-4 cursor-pointer"
                 />
               </div>
 
@@ -634,15 +634,15 @@ export default function SettingsPage() {
               <p className="text-xs text-slate-500 mt-0.5">Manage authenticated officer credentials and department assignment.</p>
             </div>
 
-            <div className="p-5 rounded-xl border border-slate-200/90 bg-slate-50/50 space-y-4">
+            <div className="p-5 rounded-2xl border border-slate-200/90 bg-slate-50/50 space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-base flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-500 to-amber-600 text-white font-bold text-base flex items-center justify-center shadow-xs">
                   {user.initials}
                 </div>
                 <div>
                   <h3 className="text-sm font-extrabold text-slate-900">{user.name} Sarve</h3>
                   <p className="text-xs text-slate-500 font-mono">{user.email}</p>
-                  <span className="mt-1 inline-block text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded border border-blue-200">
+                  <span className="mt-1 inline-block text-[10px] bg-orange-50 text-orange-700 font-semibold px-2 py-0.5 rounded border border-orange-200">
                     {user.role}
                   </span>
                 </div>
