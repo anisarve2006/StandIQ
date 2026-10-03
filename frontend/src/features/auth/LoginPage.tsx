@@ -76,22 +76,24 @@ export default function LoginPage() {
       
       {/* Centered Constrained Container - Brings things closer from left and right */}
       <div className="w-full max-w-[1260px] mx-auto px-6 sm:px-10 lg:px-12 py-8 lg:py-12 my-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-stretch">
           
           {/* ================= LEFT COLUMN: HERO & BRAND SHOWCASE ================= */}
-          <div className="lg:col-span-7 relative">
+          <div className="lg:col-span-7 relative self-stretch flex flex-col justify-between overflow-hidden">
             
-            {/* Architectural Parliament Artwork - Nested right beside cards */}
-            <div className="absolute -bottom-6 right-0 w-[55%] max-w-[420px] pointer-events-none select-none z-0 hidden md:block">
-              <div className="absolute top-1/4 left-1/4 w-60 h-60 bg-gradient-to-br from-amber-300/25 via-orange-400/15 to-transparent rounded-full blur-2xl pointer-events-none" />
+            {/* Architectural Parliament Artwork - Spans full height of the section */}
+            <div className="absolute inset-y-0 right-0 w-[62%] max-w-[500px] pointer-events-none select-none z-0 hidden md:block overflow-hidden">
+              <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-gradient-to-br from-amber-300/20 via-orange-400/10 to-transparent rounded-full blur-3xl pointer-events-none" />
               <img 
                 src="/parliament.png" 
                 alt="Indian Parliament" 
-                className="w-full h-auto object-contain relative z-10 opacity-90"
+                className="w-full h-full object-cover object-center relative z-10 opacity-90"
               />
-              {/* Soft edge fades */}
-              <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-20" />
-              <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent z-20" />
+              {/* Soft atmospheric edge fades to blend into background seamlessly */}
+              <div className="absolute inset-y-0 left-0 w-36 bg-gradient-to-r from-white via-white/80 to-transparent z-20" />
+              <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent z-20" />
+              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white via-white/70 to-transparent z-20" />
+              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent z-20" />
             </div>
 
             {/* Content Area */}
@@ -127,7 +129,7 @@ export default function LoginPage() {
               {/* 4 Feature Value Props */}
               <div className="space-y-3.5 max-w-xs sm:max-w-sm">
                 {/* 1. Explore Standards */}
-                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/60 backdrop-blur-xs">
+                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/80 backdrop-blur-xs border border-white/60 shadow-2xs">
                   <div className="w-11 h-11 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0 shadow-2xs">
                     <BookOpen className="w-5 h-5 text-orange-500" />
                   </div>
@@ -138,7 +140,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* 2. Smarter Compliance */}
-                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/60 backdrop-blur-xs">
+                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/80 backdrop-blur-xs border border-white/60 shadow-2xs">
                   <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 shadow-2xs">
                     <Search className="w-5 h-5 text-blue-500" />
                   </div>
@@ -149,7 +151,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* 3. Stay Updated */}
-                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/60 backdrop-blur-xs">
+                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/80 backdrop-blur-xs border border-white/60 shadow-2xs">
                   <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 shadow-2xs">
                     <ShieldCheck className="w-5 h-5 text-emerald-500" />
                   </div>
@@ -160,7 +162,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* 4. Better Decisions */}
-                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/60 backdrop-blur-xs">
+                <div className="flex items-center gap-3.5 p-1 rounded-2xl bg-white/80 backdrop-blur-xs border border-white/60 shadow-2xs">
                   <div className="w-11 h-11 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0 shadow-2xs">
                     <BarChart3 className="w-5 h-5 text-purple-500" />
                   </div>
