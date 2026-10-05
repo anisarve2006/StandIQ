@@ -141,9 +141,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         </div>
 
-        {/* Floating Mockup Preview Component */}
-        <div className="mt-2 md:mt-4">
-          <HeroMockupPreview />
+        {/* 3D Perspective Dashboard Mockup with Smooth Colors & Gradient Fade */}
+        <div className="mt-4 md:mt-8 relative max-w-6xl mx-auto">
+          {/* Smooth Ambient Color Glows behind the 3D card */}
+          <div className="absolute -top-12 left-1/4 w-[500px] h-[300px] bg-gradient-to-br from-orange-300/25 via-amber-200/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+          <div className="absolute top-1/3 -right-10 w-[450px] h-[350px] bg-gradient-to-bl from-orange-400/20 via-amber-300/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+          <div className="absolute bottom-10 left-10 w-[400px] h-[250px] bg-gradient-to-tr from-amber-200/20 via-orange-200/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+
+          {/* Clickable 3D Mockup Container */}
+          <div 
+            onClick={handleExploreClick}
+            className="cursor-pointer group relative overflow-hidden transition-all duration-700 ease-out hover:scale-[1.012]"
+            title="Click to launch full BISense interactive workspace"
+          >
+            <img 
+              src="/landing-hero-mockup.png" 
+              alt="BISense Platform Intelligence Workspace Mockup" 
+              className="w-full h-auto object-contain select-none drop-shadow-2xl" 
+            />
+
+            {/* Seamless white fade at the very bottom edge */}
+            <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 md:h-48 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          </div>
         </div>
 
       </div>

@@ -108,6 +108,17 @@ export default function DashboardPage() {
       {/* 1. Hero Welcome Banner */}
       <div className="relative bg-white rounded-2xl md:rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden min-h-[230px] flex flex-col md:flex-row items-center justify-between">
         
+        {/* Full Right Panorama Architectural Graphic */}
+        <div className="absolute top-0 right-0 bottom-0 w-full md:w-[60%] lg:w-[56%] pointer-events-none overflow-hidden">
+          <img 
+            src="/parliament.png" 
+            alt="Indian Parliament" 
+            className="w-full h-full object-cover object-right-top md:object-right opacity-95"
+          />
+          {/* Subtle smooth gradient fade on the left edge into white card */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/30 to-transparent w-1/3" />
+        </div>
+
         {/* Left Text & Call-To-Action Area */}
         <div className="relative z-10 p-6 md:p-8 lg:p-10 flex-1 max-w-xl">
           <div className="flex items-center gap-2 mb-2.5">
@@ -146,33 +157,19 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Right Architectural Graphic & Floating Quote */}
-        <div className="relative w-full md:w-1/2 h-56 md:h-full self-stretch overflow-hidden flex items-center justify-end">
-          {/* Indian Parliament Building Image with soft gradient blend */}
-          <div className="absolute inset-0 z-0">
-            <img 
-              src="/parliament.png" 
-              alt="Indian Parliament" 
-              className="w-full h-full object-cover object-center md:object-right opacity-90"
-            />
-            {/* Gradient mask to blend from white to image */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/50 to-transparent" />
-          </div>
-
-          {/* Floating Quote Card */}
-          <div className="relative z-10 mr-4 md:mr-8 p-3.5 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-100 shadow-sm max-w-[270px] self-start mt-4 hidden sm:block">
-            <div className="flex items-start gap-2">
-              <span className="text-orange-500 font-serif font-black text-2xl leading-none select-none">
-                “
-              </span>
-              <div>
-                <p className="text-[11px] font-medium text-slate-800 leading-snug">
-                  Building a compliant and self-reliant India with Standards.
-                </p>
-                <p className="text-[9px] text-slate-400 mt-1 font-normal text-right">
-                  — Bureau of Indian Standards
-                </p>
-              </div>
+        {/* Right Floating Quote Card */}
+        <div className="relative z-10 mr-4 md:mr-8 p-3.5 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-100 shadow-sm max-w-[270px] self-start mt-4 hidden sm:block">
+          <div className="flex items-start gap-2">
+            <span className="text-orange-500 font-serif font-black text-2xl leading-none select-none">
+              “
+            </span>
+            <div>
+              <p className="text-[11px] font-medium text-slate-800 leading-snug">
+                Building a compliant and self-reliant India with Standards.
+              </p>
+              <p className="text-[9px] text-slate-400 mt-1 font-normal text-right">
+                — Bureau of Indian Standards
+              </p>
             </div>
           </div>
         </div>
